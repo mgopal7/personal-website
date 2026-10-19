@@ -73,6 +73,8 @@ h1{margin:0;font-size:clamp(56px,8.6vw,116px);line-height:.95;letter-spacing:-.0
 .lnk{align-self:flex-start;background-image:linear-gradient(var(--matcha),var(--matcha));background-size:0% 40%;background-repeat:no-repeat;background-position:0 85%;transition:background-size .3s ease}
 .lnk:hover,.lnk:focus-visible{background-size:100% 40%}
 .lnk:focus-visible{outline:2px solid var(--ink);outline-offset:4px}
+.lnk-note{margin-left:10px;font-family:var(--mono);font-size:11px;color:var(--muted);font-weight:400}
+.lnk.soon{color:var(--muted);pointer-events:none}
 
 #preview{position:fixed;left:0;top:0;width:260px;height:170px;border-radius:6px;pointer-events:none;z-index:50;display:flex;align-items:flex-end;padding:12px;font-family:var(--mono);font-size:11px;color:var(--ink-2);opacity:0;transition:opacity .15s ease;background-size:cover;background-position:center}
 #cursor{position:fixed;left:0;top:0;width:12px;height:12px;margin:-6px 0 0 -6px;border-radius:50%;background:var(--ink);border:1.5px solid var(--ink);pointer-events:none;z-index:60;opacity:0;transition:width .2s ease,height .2s ease,margin .2s ease,background .2s ease,opacity .2s ease}
@@ -132,17 +134,9 @@ h1{margin:0;font-size:clamp(56px,8.6vw,116px);line-height:.95;letter-spacing:-.0
             <span class="rnum">01</span>
             <span class="rbody">
               <span class="rname">Opus</span>
-              <span class="rblurb">A home for every piece you've ever learned, on every instrument.</span>
+              <span class="rblurb">I've played flute for over ten years, and Opus is the app I wanted along the way: a place to rebuild everything you've ever played, on any instrument, and share it with a new teacher.</span>
             </span>
             <span class="rmeta">mobile · 2026</span>
-          </a>
-          <a href="#" class="row rise" style="animation-delay:1.5s" data-preview="rant app screen recording" data-bg="#D6E4EE">
-            <span class="rnum">02</span>
-            <span class="rbody">
-              <span class="rname">[rant app]</span>
-              <span class="rblurb">Type out a rant and watch it dissolve while a polar bear listens.</span>
-            </span>
-            <span class="rmeta">in progress</span>
           </a>
         </section>
 
@@ -157,9 +151,10 @@ h1{margin:0;font-size:clamp(56px,8.6vw,116px);line-height:.95;letter-spacing:-.0
 
       <aside class="rise" style="animation-delay:1.5s">
         <nav class="links" aria-label="Links">
+          <a class="lnk" id="resume-link" href="resume.pdf" target="_blank" rel="noopener noreferrer" style="font-weight:500">resume</a>
           <a class="lnk" href="https://www.linkedin.com/in/meghna-g22/" target="_blank" rel="noopener noreferrer">linkedin</a>
           <a class="lnk" href="https://github.com/mgopal7" target="_blank" rel="noopener noreferrer">github</a>
-          <a class="lnk" href="mailto:meghnagopalan22@gmail.com">email</a>
+          <a class="lnk" id="email-link" href="mailto:meghnagopalan22@gmail.com">email</a>
         </nav>
       </aside>
     </div>
@@ -287,6 +282,37 @@ h1{margin:0;font-size:clamp(56px,8.6vw,116px);line-height:.95;letter-spacing:-.0
       }
     }, 150);
   }
+
+  /* ---------- resume: show "soon" until resume.pdf is uploaded ---------- */
+  var resumeLink = document.getElementById('resume-link');
+  function markResumeSoon() {
+    resumeLink.classList.add('soon');
+    resumeLink.removeAttribute('href');
+    resumeLink.setAttribute('aria-disabled', 'true');
+    var note = document.createElement('span');
+    note.className = 'lnk-note';
+    note.textContent = 'soon';
+    resumeLink.appendChild(note);
+  }
+  if (location.protocol === 'file:') {
+    markResumeSoon();
+  } else {
+    fetch('resume.pdf', { method: 'HEAD', cache: 'no-store' })
+      .then(function (r) { if (!r.ok) markResumeSoon(); })
+      .catch(markResumeSoon);
+  }
+
+  /* ---------- email: copy address on click ---------- */
+  var emailLink = document.getElementById('email-link');
+  emailLink.addEventListener('click', function (e) {
+    var addr = 'meghnagopalan22@gmail.com';
+    if (!navigator.clipboard || !navigator.clipboard.writeText) return;
+    e.preventDefault();
+    navigator.clipboard.writeText(addr).then(function () {
+      emailLink.textContent = 'copied!';
+      setTimeout(function () { emailLink.textContent = 'email'; }, 1600);
+    }).catch(function () { window.location.href = 'mailto:' + addr; });
+  });
 
   /* ---------- custom cursor + project preview ---------- */
   if (finePointer) {
