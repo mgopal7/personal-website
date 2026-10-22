@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Opus — Meghna Gopalan</title>
+<meta name="description" content="Opus: a mobile app where musicians rebuild and share a record of every piece they've learned, by instrument.">
+<meta property="og:title" content="Opus — Meghna Gopalan">
+<meta property="og:description" content="A record of your repertoire. Try it in your browser.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8' shape-rendering='crispEdges'%3E%3Cpath fill='%23151413' d='M4 0h3v1H4zM3 1h6v1H3zM10 1h1v1h-1zM1 2h11v1H1zM0 3h12v2H0zM1 5h10v1H1z'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,800&family=Instrument+Serif:ital@0;1&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* Same tokens as ../index.html */
+:root{
+  --paper:#F4F2ED;
+  --ink:#151413;
+  --ink-2:#2D2B28;
+  --ink-3:#4A4843;
+  --muted:#6B6862;
+  --rule:#D9D5CC;
+  --matcha:#C9DBB2;
+  --hover:#ECE9E2;
+  --mono:'IBM Plex Mono',ui-monospace,monospace;
+  --serif:'Instrument Serif',Georgia,serif;
+  --sans:'Bricolage Grotesque',system-ui,sans-serif;
+}
+*{box-sizing:border-box}
+html{background:var(--paper)}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+a{color:var(--ink);text-decoration:none}
+::selection{background:var(--matcha);color:var(--ink)}
+
+.page{min-height:100vh;padding:28px 24px 72px}
+.wrap{max-width:1120px;margin:0 auto;display:flex;flex-direction:column;gap:72px}
+
+.topbar{display:flex;justify-content:space-between;align-items:center;font-family:var(--mono);font-size:12px;color:var(--muted)}
+.back{color:var(--muted)}
+.back:hover,.back:focus-visible{color:var(--ink)}
+
+/* Header: name in the homepage's bold sans, companion in italic serif */
+header{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:48px;align-items:end;padding-top:24px}
+h1{margin:0;font-size:clamp(64px,10vw,132px);line-height:.92;letter-spacing:-.035em;font-weight:800}
+.sub{display:block;margin-top:14px;font-family:var(--serif);font-style:italic;font-weight:400;font-size:clamp(28px,3.4vw,42px);letter-spacing:-.01em;color:var(--ink-2)}
+.facts{display:flex;flex-direction:column;gap:6px;font-family:var(--mono);font-size:12px;color:var(--muted);text-align:right;padding-bottom:8px}
+
+.lnk{align-self:flex-start;background-image:linear-gradient(var(--matcha),var(--matcha));background-size:0% 40%;background-repeat:no-repeat;background-position:0 85%;transition:background-size .3s ease}
+.lnk:hover,.lnk:focus-visible{background-size:100% 40%}
+.lnk:focus-visible,.back:focus-visible{outline:2px solid var(--ink);outline-offset:4px}
+
+/* Hero: the sign-up clip in a phone frame, beside the lede */
+.hero{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:72px;align-items:center}
+.lede{display:flex;flex-direction:column;gap:24px;max-width:560px}
+.lede p{margin:0;font-size:22px;line-height:1.45;color:var(--ink-2)}
+.cta{font-size:22px;font-weight:500}
+.cta-note{display:block;margin-top:6px;font-family:var(--mono);font-size:11px;color:var(--muted);font-weight:400}
+.phone{display:block;width:min(320px,78vw);aspect-ratio:390/844;border-radius:30px;border:1px solid var(--rule);background:#EFE4D2;box-shadow:0 18px 40px rgba(21,20,19,.10);overflow:hidden}
+.phone video,.phone img{display:block;width:100%;height:100%;object-fit:cover}
+figure{margin:0;display:flex;flex-direction:column;gap:12px;align-items:center}
+figcaption{font-family:var(--mono);font-size:11px;color:var(--muted)}
+
+.sec-head{display:flex;justify-content:space-between;align-items:center;padding-bottom:12px;border-bottom:1px solid var(--ink)}
+.sec-head h2{margin:0;font-family:var(--serif);font-style:italic;font-weight:400;font-size:26px}
+.sec-note{font-family:var(--mono);font-size:12px;color:var(--muted)}
+section{display:flex;flex-direction:column;gap:32px}
+
+/* Write-up */
+.prose{max-width:680px;font-size:18px;line-height:1.65;color:var(--ink-2)}
+.prose p{margin:0 0 1em}
+.prose h3{margin:1.6em 0 .4em;font-size:22px;font-weight:800;letter-spacing:-.02em;color:var(--ink)}
+.prose ul{margin:0 0 1em;padding-left:1.2em}
+.prose li{margin:.3em 0}
+.prose a{background-image:linear-gradient(var(--matcha),var(--matcha));background-size:100% 40%;background-repeat:no-repeat;background-position:0 85%}
+
+/* Screens */
+.screens{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:32px}
+.screens .phone{width:100%}
+
+/* Closing link */
+.closing{display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:16px;padding-top:24px;border-top:1px solid var(--rule)}
+.closing .cta{font-size:clamp(26px,3vw,34px);font-weight:800;letter-spacing:-.02em}
+
+#cursor{position:fixed;left:0;top:0;width:12px;height:12px;margin:-6px 0 0 -6px;border-radius:50%;background:var(--ink);border:1.5px solid var(--ink);pointer-events:none;z-index:60;opacity:0;transition:width .2s ease,height .2s ease,margin .2s ease,background .2s ease,opacity .2s ease}
+#cursor.big{width:34px;height:34px;margin:-17px 0 0 -17px;background:var(--matcha)}
+@media (hover:hover) and (pointer:fine){html.custom-cursor,html.custom-cursor a{cursor:none}}
+@media (hover:none),(pointer:coarse){#cursor{display:none}}
+
+@keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.rise{opacity:0;animation:rise .9s ease forwards}
+
+@media (max-width:860px){
+  header{grid-template-columns:1fr;gap:20px}
+  .facts{text-align:left;flex-direction:row;flex-wrap:wrap;gap:6px 16px}
+  .hero{grid-template-columns:1fr;gap:48px}
+  .hero figure{order:-1}
+}
+@media (max-width:640px){
+  .page{padding:20px 18px 56px}
+  .wrap{gap:56px}
+  .lede p{font-size:19px}
+  .prose{font-size:17px}
+  /* Three tall phones: swipe sideways instead of stacking */
+  .screens{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;gap:16px;margin:0 -18px;padding:0 18px 8px}
+  .screens figure{flex:0 0 70%;scroll-snap-align:center}
+}
+@media (prefers-reduced-motion:reduce){
+  .rise{animation:none;opacity:1}
+  .lnk,#cursor{transition:none}
+}
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="wrap">
+    <div class="topbar rise" style="animation-delay:.1s">
+      <a class="back" href="../">← meghna gopalan</a>
+      <span>project 01</span>
+    </div>
+
+    <header class="rise" style="animation-delay:.2s">
+      <h1>Opus<span class="sub">a record of your repertoire</span></h1>
+      <div class="facts">
+        <span>mobile · 2026</span>
+        <span>expo · react native · supabase</span>
+      </div>
+    </header>
+
+    <div class="hero">
+      <div class="lede rise" style="animation-delay:.35s">
+        <p>Every piece you've ever played.</p>
+        <a class="lnk cta" href="https://try-opus.netlify.app" target="_blank" rel="noopener noreferrer">try it in your browser ↗<span class="cta-note">try-opus.netlify.app · nothing leaves your browser</span></a>
+      </div>
+      <figure class="rise" style="animation-delay:.3s">
+        <div class="phone">
+          <video id="hero-video" src="sign-up.mp4" poster="sign-up-poster.jpg" autoplay muted loop playsinline preload="metadata" width="390" height="844" aria-label="Screen recording: creating an account in Opus, picking flute, and landing on the first Home screen"></video>
+        </div>
+        <figcaption>sign-up, from the web demo</figcaption>
+      </figure>
+    </div>
+
+    <section aria-labelledby="h-about" class="rise" style="animation-delay:.45s">
+      <div class="sec-head">
+        <h2 id="h-about">About</h2>
+        <span class="sec-note">the write-up</span>
+      </div>
+      <div class="prose">
+        <!-- WRITEUP:START -->
+        <p>i've played flute for over ten years, and every new teacher starts the same way: "so… what have you played?" it's hard to remember in the moment, and a lot of my old books weren't easy to get to.</p>
+        <p>opus is the list i wish i'd kept. pick your instruments, add the pieces you've learned, and share it in one link.</p>
+        <p>can't remember what you played? "jog my memory" plays short openings of the pieces most students learn at your level. if it sounds familiar, add it. if not, skip.</p>
+        <p>a few things i was strict about:</p>
+        <ul>
+          <li>only pieces you've fully learned. no "sort of" or "not sure."</li>
+          <li>adding is one tap. no save buttons.</li>
+          <li>a teacher can open your list without making an account.</li>
+        </ul>
+        <p>the demo runs right in your browser. make an account, add a few pieces, and share your list.</p>
+        <!-- WRITEUP:END -->
+      </div>
+    </section>
+
+    <section aria-labelledby="h-screens">
+      <div class="sec-head">
+        <h2 id="h-screens">Screens</h2>
+        <span class="sec-note">from the web demo, sample list</span>
+      </div>
+      <div class="screens">
+        <figure>
+          <div class="phone"><img src="home.png" width="1170" height="2532" loading="lazy" alt="Home: two instruments, flute and piano, each with six pieces and two performed"></div>
+          <figcaption>01 · home</figcaption>
+        </figure>
+        <figure>
+          <div class="phone"><img src="repertoire.png" width="1170" height="2532" loading="lazy" alt="Repertoire: the flute list with era, level and composer filters, two pieces tagged performed"></div>
+          <figcaption>02 · repertoire</figcaption>
+        </figure>
+        <figure>
+          <div class="phone"><img src="share-preview.png" width="1170" height="2532" loading="lazy" alt="Share: a preview of the public list, performed pieces first, with PDF and Copy link buttons"></div>
+          <figcaption>03 · share preview</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <div class="closing">
+      <a class="lnk cta" href="https://try-opus.netlify.app" target="_blank" rel="noopener noreferrer">try Opus ↗</a>
+      <a class="back" href="../">← back to all projects</a>
+    </div>
+  </div>
+</div>
+
+<div id="cursor" aria-hidden="true"></div>
+
+<script>
+(function () {
+  var reduce = false, finePointer = false;
+  try { reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) {}
+  try { finePointer = window.matchMedia('(hover: hover) and (pointer: fine)').matches; } catch (e) {}
+
+  /* Reduced motion: no autoplaying video; show controls instead. */
+  var video = document.getElementById('hero-video');
+  if (reduce) { video.removeAttribute('autoplay'); video.pause(); video.controls = true; }
+
+  /* Same custom cursor as the homepage. */
+  if (finePointer) {
+    document.documentElement.classList.add('custom-cursor');
+    var cur = document.getElementById('cursor');
+    document.addEventListener('mousemove', function (e) {
+      cur.style.opacity = '1';
+      cur.style.transform = 'translate(' + e.clientX + 'px,' + e.clientY + 'px)';
+    });
+    document.addEventListener('mouseleave', function () { cur.style.opacity = '0'; });
+    Array.prototype.forEach.call(document.querySelectorAll('a'), function (a) {
+      a.addEventListener('mouseenter', function () { cur.classList.add('big'); });
+      a.addEventListener('mouseleave', function () { cur.classList.remove('big'); });
+    });
+  }
+})();
+</script>
+</body>
+</html>
