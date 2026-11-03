@@ -76,12 +76,59 @@ score = color distance to the target (ΔE2000)
 
 ## Catalog
 
-31 real shades from 4 brands that run on Shopify: Kylie Cosmetics liners, Rare Beauty Kind Words lipsticks, Tower 28 ShineOn Lip Jelly, and Kosas Wet Lip Oil Gloss. Prices are from each brand's site, Oct 29, 2026.
+1,961 shades from 29 brands sold at Sephora and Ulta: 251 liners, 1,645 lipsticks and 64 glosses. Open the shade picker to filter by brand or search by shade or product name. Matches are listed closest-first.
+
+### Where the shades come from
+
+- **Makeup API dataset** (public copies on GitHub). Brand, product, shade name, hex color, price and product link, collected around 2017–2018.
+- **Ovilia/lipstick dataset** (GitHub). Hex colors for lipstick lines from Dior, Chanel, YSL and Givenchy, with series names translated to English.
+- **31 checked 2026 shades** from Kylie Cosmetics, Rare Beauty, Tower 28 and Kosas, with prices taken from each brand's site on Oct 29, 2026.
+
+`data/build_library.py` combines these sources. It keeps only brands sold at Sephora or Ulta and drops hex values that aren't plausible lip colors (for example near-white or neon). It guesses finish and coverage from the product name, removes duplicates, and points links to the brand's own site instead of resellers. Prices in currencies other than USD, GBP or CAD are dropped. In your collection, each piece also gets "also at Sephora / Ulta" search links.
+
+### Shopify tagging
+
+A brand is tagged **shopify store** when its official site runs on Shopify. Those pieces say "check out at" the brand's store, and the rest say "shop at" the brand's site. Tagged so far: Kylie Cosmetics, Rare Beauty, Tower 28, Kosas and ColourPop. ColourPop was detected from its product images, which are served from Shopify's CDN.
+
+| Brand | Liners | Lipsticks | Glosses | Shopify |
+|---|---|---|---|---|
+| NYX Professional Makeup | 163 | 475 | 30 |  |
+| Clinique | 28 | 181 | 8 |  |
+| Dior | 0 | 208 | 0 |  |
+| Smashbox | 15 | 145 | 0 |  |
+| YSL Beauty | 0 | 95 | 13 |  |
+| Revlon | 0 | 95 | 0 |  |
+| ColourPop | 34 | 52 | 0 | yes |
+| Maybelline | 4 | 59 | 0 |  |
+| Chanel | 0 | 59 | 0 |  |
+| Milani | 0 | 46 | 0 |  |
+| Givenchy | 0 | 45 | 0 |  |
+| L'Oréal Paris | 0 | 44 | 0 |  |
+| IMAN Cosmetics | 0 | 20 | 0 |  |
+| Burt's Bees | 0 | 18 | 0 |  |
+| CARGO | 0 | 16 | 0 |  |
+| Fenty Beauty | 0 | 14 | 0 |  |
+| e.l.f. Cosmetics | 0 | 13 | 0 |  |
+| Almay | 0 | 12 | 0 |  |
+| Rare Beauty | 0 | 11 | 0 | yes |
+| COVERGIRL | 0 | 11 | 0 |  |
+| Benefit Cosmetics | 0 | 10 | 0 |  |
+| Tower 28 | 0 | 0 | 8 | yes |
+| Kylie Cosmetics | 7 | 0 | 0 | yes |
+| Kosas | 0 | 0 | 5 | yes |
+| Glossier | 0 | 5 | 0 |  |
+| Mineral Fusion | 0 | 5 | 0 |  |
+| butter LONDON | 0 | 3 | 0 |  |
+| wet n wild | 0 | 3 | 0 |  |
+| Pacifica | 0 | 1 | 0 |  |
+
 
 ## Known limits and next steps
 
-- **Shade colors are estimates** from each brand's own shade description, not measured swatches. Next: pull swatch images and variant IDs from Shopify's Global Catalog and measure each shade's color from the swatch.
-- **Deep-skin range is thin.** The catalog has few deep nudes, so on deep skin everyday and 90s can share a lipstick. Adding more brands fixes this.
+- **Older dataset shades.** Most dataset shades are from 2017–2018, so some may be discontinued, and hex values come from the dataset rather than measured swatches.
+- **Missing brands.** MAC, NARS, Charlotte Tilbury, Huda Beauty, Too Faced, Urban Decay, Tarte, Anastasia, Pat McGrath, Makeup by Mario, Rhode and Summer Fridays aren't in the public data yet.
+- **Shade colors are estimates**, not measured swatches. Next: pull swatch images and variant IDs from Shopify's Global Catalog and measure each shade's color from the swatch.
+- **Deep-skin range is thin.** Few deep nudes in the data, so on deep skin everyday and 90s can share a lipstick. Adding the missing brands would fix this.
 - **Camera exposure.** Phones auto-brighten faces. The white-reference correction helps, but only when it finds clean eye whites or teeth. A smile helps.
 - **Rules are hand-tuned.** Next: thumbs up or down on each combo, then tune the weights from that feedback for each skin band.
 - **Checkout** links go to product pages until variant IDs are in. Then they become Shopify cart permalinks, one per brand.
