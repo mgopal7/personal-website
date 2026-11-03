@@ -1,0 +1,870 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<script>if (!/\/$/.test(location.pathname) && !/\.html$/.test(location.pathname)) location.replace(location.pathname + "/" + location.search + location.hash);</script>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Lippy Try-On</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kaushan+Script&family=Dancing+Script:wght@600;700&family=Courier+Prime:wght@400;700&display=swap">
+<style>
+/* Back to v1: blush paper, ink, lipstick red. Typewriter for everything you read and tap;
+   a lipstick-on-the-mirror script only for the wordmark and combo names. Red hand-drawn lips as the mark. */
+:root {
+  --blush: #FFF0F3;
+  --pink: #FFE1E8;
+  --ink: #16090C;
+  --red: #D7192F;
+  --wine: #A3122A;
+  --line: #E3C3CB;
+  --paper: #FFFFFF;
+  --muted: #5A3038;
+  --stage: #2A171B;
+  --script: 'Yellowtail', 'Brush Script MT', cursive;
+  --type: 'Courier Prime', 'Courier New', ui-monospace, monospace;
+  color-scheme: light;
+}
+*, *::before, *::after { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html { background: var(--blush); }
+body {
+  background: var(--blush); color: var(--ink); font-family: var(--type); font-size: 15px; line-height: 1.5;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 10px 48px;
+}
+.app { max-width: 520px; margin: 0 auto; display: flex; flex-direction: column; gap: 18px; }
+h1, h2, h3, p { margin: 0; }
+button, input, label, a { font-family: var(--type); }
+button:focus-visible, a:focus-visible, input:focus-visible, summary:focus-visible, .vh:focus-visible + label { outline: 3px solid var(--wine); outline-offset: 2px; }
+.vh { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+section { display: flex; flex-direction: column; gap: 16px; }
+
+/* top + step rail */
+.top { display: flex; align-items: center; justify-content: space-between; min-height: 52px; }
+.brand { display: inline-flex; align-items: flex-start; gap: 2px; background: none; border: none; padding: 0; cursor: pointer; font-family: var(--script); font-size: 40px; line-height: 1; color: var(--red); }
+.brand svg { width: 34px; height: auto; margin-top: 2px; transform: rotate(-9deg); }
+.bagbtn { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 16px; border-radius: 999px; border: 1px solid var(--line); box-shadow: 0 2px 8px rgba(163, 18, 42, 0.06); background: var(--paper); color: var(--ink); font-size: 14px; font-weight: 700; cursor: pointer; }
+.count { display: inline-flex; min-width: 22px; height: 22px; padding: 0 6px; border-radius: 999px; background: var(--red); color: #fff; font-size: 12px; align-items: center; justify-content: center; font-variant-numeric: tabular-nums; }
+.steps { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; }
+.step { display: flex; flex-direction: column; gap: 6px; align-items: flex-start; background: none; border: none; padding: 4px 0; color: var(--muted); font-size: 10px; white-space: nowrap; cursor: pointer; text-align: left; min-height: 36px; }
+.step::before { content: ""; display: block; width: 100%; height: 3px; border-radius: 4px; background: var(--line); }
+.step.done::before { background: var(--ink); }
+.step[aria-current="step"] { color: var(--ink); font-weight: 700; }
+.step[aria-current="step"]::before { background: var(--red); }
+.step:disabled { cursor: default; opacity: 0.6; }
+
+/* type */
+.eyebrow { font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--wine); font-weight: 700; }
+.title { font-size: clamp(26px, 7vw, 32px); font-weight: 700; line-height: 1.15; letter-spacing: -0.01em; text-wrap: balance; }
+.lede { color: var(--muted); font-size: 15px; line-height: 1.5; }
+.label { font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--wine); font-weight: 700; }
+.note { font-size: 12px; color: var(--muted); line-height: 1.5; }
+.status { font-size: 13px; color: var(--wine); min-height: 1.3em; }
+
+/* buttons: ink pills, red for the one thing to do next */
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 52px; padding: 0 20px; border-radius: 999px; border: 1px solid var(--line); background: var(--paper); color: var(--ink); font-size: 15px; font-weight: 700; letter-spacing: 0.02em; cursor: pointer; text-decoration: none; text-align: center; }
+.btn.ink { background: var(--ink); border-color: var(--ink); color: var(--blush); }
+.btn.primary { background: var(--red); border-color: var(--red); color: #fff; box-shadow: 0 8px 20px rgba(215, 25, 47, 0.22); }
+.btn.wide { width: 100%; }
+.btn.small { min-height: 44px; padding: 0 14px; font-size: 14px; }
+.btn[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: var(--blush); }
+
+/* start: v1 home on blush */
+.hero { display: flex; flex-direction: column; gap: 18px; padding-top: 8px; }
+.word { display: flex; align-items: flex-start; }
+.hero h1 { font-family: var(--script); font-weight: 400; font-size: clamp(104px, 32vw, 150px); line-height: 0.9; color: var(--red); letter-spacing: -0.01em; padding-right: 2px; }
+.hero .sketch { width: clamp(84px, 24vw, 116px); height: auto; margin-top: clamp(8px, 3vw, 18px); flex-shrink: 0; transform: rotate(-9deg); }
+.stack { font-size: 20px; line-height: 1.35; font-weight: 700; max-width: 26ch; text-wrap: balance; }
+.stack span { color: var(--red); }
+.sub { font-size: 15px; color: var(--muted); max-width: 34ch; }
+.startbtns { display: flex; flex-direction: column; gap: 10px; }
+.cam { display: flex; flex-direction: column; gap: 14px; }
+.cam video { width: 100%; aspect-ratio: 4 / 5; object-fit: cover; border-radius: 24px; background: var(--stage); transform: scaleX(-1); box-shadow: 0 14px 34px rgba(163, 18, 42, 0.16); }
+.camctl { display: flex; align-items: center; justify-content: space-between; }
+.shutter { width: 76px; height: 76px; border-radius: 50%; border: 5px solid var(--paper); background: var(--red); box-shadow: 0 0 0 3px var(--red), 0 10px 24px rgba(215, 25, 47, 0.3); cursor: pointer; }
+.tips { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.tip { background: var(--paper); border: 1px solid var(--line); border-radius: 12px; padding: 10px; font-size: 12px; line-height: 1.4; color: var(--muted); }
+.tip b { display: block; color: var(--ink); font-size: 13px; margin-bottom: 2px; }
+
+/* stage */
+.stage { position: relative; border-radius: 24px; overflow: hidden; background: var(--stage); box-shadow: 0 14px 34px rgba(163, 18, 42, 0.16); }
+.stage canvas { display: block; width: 100%; height: auto; cursor: crosshair; touch-action: none; }
+.stage canvas.dragging { cursor: grabbing; }
+.hint { position: absolute; left: 12px; right: 12px; bottom: 12px; padding: 8px 12px; border-radius: 999px; background: rgba(255, 240, 243, 0.94); color: var(--ink); font-size: 13px; text-align: center; pointer-events: none; }
+.stagebar { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+
+/* read */
+.readcard { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.cell { background: var(--paper); border: 1px solid var(--line); border-radius: 18px; box-shadow: 0 4px 14px rgba(163, 18, 42, 0.06); padding: 12px 10px; display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.cell .sw { width: 28px; height: 28px; border-radius: 50%; border: 1px solid var(--line); }
+.cell .v { font-size: 15px; font-weight: 700; line-height: 1.25; overflow-wrap: anywhere; }
+details.fix { border: 1px solid var(--line); border-radius: 18px; background: var(--paper); padding: 0 14px; }
+details.fix summary { min-height: 44px; display: flex; align-items: center; cursor: pointer; font-size: 14px; font-weight: 700; list-style: none; }
+details.fix summary::-webkit-details-marker { display: none; }
+details.fix summary::after { content: "+"; margin-left: auto; font-size: 20px; }
+details.fix[open] summary::after { content: "−"; }
+.fixbody { display: flex; flex-direction: column; gap: 12px; padding-bottom: 14px; }
+.slider { display: grid; grid-template-columns: 90px minmax(0, 1fr); align-items: center; gap: 10px; font-size: 13px; color: var(--muted); }
+.slider input { width: 100%; accent-color: var(--red); }
+
+/* combo cards */
+.cards { display: flex; flex-direction: column; gap: 16px; }
+.card { background: var(--paper); border: 1px solid var(--line); border-radius: 24px; box-shadow: 0 10px 28px rgba(163, 18, 42, 0.08); overflow: hidden; display: flex; flex-direction: column; }
+.cthumb { display: block; width: 100%; height: auto; aspect-ratio: 3 / 2; background: var(--stage); }
+.cbody { padding: 14px 16px 16px; display: flex; flex-direction: column; gap: 10px; }
+.chead { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+.cname { font-family: var(--script); font-weight: 400; font-size: 40px; line-height: 1; color: var(--red); }
+.cprice { font-size: 16px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.why { color: var(--muted); font-size: 13px; line-height: 1.5; }
+.trio ul { margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.trio li { list-style: none; display: grid; grid-template-columns: 22px 72px minmax(0, 1fr); gap: 8px; align-items: center; font-size: 14px; }
+.trio .k { font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--wine); font-weight: 700; }
+.d { width: 22px; height: 22px; border-radius: 50%; border: 1px solid var(--line); display: block; }
+.cactions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+
+/* try on */
+.switch { display: grid; grid-template-columns: 44px minmax(0, 1fr) 44px; align-items: center; gap: 8px; text-align: center; }
+.arrow { width: 44px; height: 44px; border-radius: 50%; border: 1px solid var(--line); box-shadow: 0 2px 8px rgba(163, 18, 42, 0.08); background: var(--paper); color: var(--ink); font-size: 20px; font-weight: 700; cursor: pointer; }
+.switch .cname { font-size: 46px; }
+.pieces { display: flex; flex-direction: column; gap: 8px; }
+.piece { display: grid; grid-template-columns: 30px minmax(0, 1fr) auto auto; gap: 10px; align-items: center; min-height: 60px; padding: 8px 14px; background: var(--paper); border: 1px solid var(--line); border-radius: 18px; }
+.piece .d { width: 30px; height: 30px; }
+.pname { display: flex; flex-direction: column; min-width: 0; }
+.pname .k { font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--wine); font-weight: 700; }
+.pname b { font-size: 15px; }
+.pname span { font-size: 12px; color: var(--muted); overflow-wrap: anywhere; }
+.price { font-size: 15px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.plink { font-size: 13px; color: var(--ink); min-height: 44px; display: inline-flex; align-items: center; }
+.editor { display: flex; flex-direction: column; gap: 10px; }
+.tabs { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px; background: var(--pink); border-radius: 999px; padding: 4px; }
+.tab { min-height: 44px; border-radius: 999px; border: none; background: transparent; color: var(--ink); cursor: pointer; font-size: 14px; font-weight: 700; }
+.tab[aria-pressed="true"] { background: var(--paper); color: var(--red); box-shadow: 0 2px 8px rgba(163, 18, 42, 0.12); }
+.swatches { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+.swb { display: flex; flex-direction: column; align-items: center; gap: 5px; background: none; border: none; padding: 4px 0; color: var(--ink); cursor: pointer; min-width: 0; }
+.swb .d { width: 46px; height: 46px; box-shadow: inset 0 -6px 10px rgba(0,0,0,0.22), inset 0 6px 8px rgba(255,255,255,0.25); }
+.swb[aria-pressed="true"] .d { outline: 2px solid var(--red); outline-offset: 3px; }
+.swb b { font-size: 12px; line-height: 1.2; text-align: center; }
+.swb span { font-size: 11px; color: var(--muted); text-align: center; }
+
+/* bag */
+.bagh { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+.sum { font-family: var(--script); font-size: 46px; line-height: 1; color: var(--red); font-variant-numeric: tabular-nums; }
+.progress { font-size: 13px; color: var(--muted); }
+.shop { background: var(--paper); border: 1px solid var(--line); border-radius: 24px; box-shadow: 0 10px 28px rgba(163, 18, 42, 0.08); padding: 14px; display: flex; flex-direction: column; gap: 4px; }
+.shoph { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; padding-bottom: 6px; }
+.shoph h3 { font-size: 17px; }
+.shoph span { font-size: 12px; color: var(--muted); }
+.bitem { display: grid; grid-template-columns: 24px minmax(0, 1fr) auto auto; gap: 10px; align-items: center; min-height: 52px; border-top: 1px solid var(--line); }
+.bitem .d { width: 24px; height: 24px; }
+.remove { min-height: 44px; padding: 0 6px; border: none; background: none; color: var(--muted); font-size: 12px; text-decoration: underline; cursor: pointer; }
+.shop .btn { margin-top: 10px; }
+.done { color: var(--wine); font-weight: 700; }
+.empty { background: var(--paper); border: 1px dashed var(--line); border-radius: 24px; padding: 24px 18px; display: flex; flex-direction: column; gap: 14px; text-align: center; align-items: center; }
+.foot { border-top: 1px solid var(--line); padding-top: 14px; margin-top: 8px; }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; scroll-behavior: auto !important; } }
+
+/* ---- lipstick layer: handwritten, waxy, a little dragged, like it was written on a mirror ---- */
+.gloss { position: relative; display: inline-block; font-family: 'Kaushan Script', 'Brush Script MT', cursive; font-weight: 400; color: #C8102E; background: none; filter: url(#waxy); }
+.gloss::after { content: none; }
+.brand { font-family: 'Kaushan Script', 'Brush Script MT', cursive; font-size: 36px; color: #C8102E; align-items: center; }
+.brand .gloss { filter: url(#waxySmall); }
+.hero h1.gloss { font-size: clamp(92px, 28vw, 136px); line-height: 1.05; letter-spacing: 0; padding: 0 6px 0 2px; transform: rotate(-4deg); transform-origin: left center; }
+.hero .word { align-items: center; gap: 2px; }
+.hero .sketch { margin-top: 0; width: clamp(100px, 29vw, 132px); }
+.cname { font-family: 'Kaushan Script', 'Brush Script MT', cursive; color: #C8102E; font-size: 34px; letter-spacing: 0; filter: url(#waxySmall); }
+.switch .cname { font-size: 38px; }
+.sum { font-family: 'Kaushan Script', 'Brush Script MT', cursive; color: #C8102E; font-size: 38px; filter: url(#waxySmall); }
+.steps { gap: 8px; }
+.step { gap: 8px; }
+.step::before { height: 12px; background: linear-gradient(180deg, rgba(255,255,255,0.6) 0%, rgba(255,255,255,0) 45%), var(--c); border-radius: 60% 40% 55% 45% / 70% 60% 40% 30%; transform: rotate(-2deg); opacity: 0.3; box-shadow: inset 0 -2px 3px rgba(0,0,0,0.12); }
+.step.done::before { opacity: 0.85; background: linear-gradient(180deg, rgba(255,255,255,0.6) 0%, rgba(255,255,255,0) 45%), var(--c); }
+.step[aria-current="step"]::before { opacity: 1; height: 14px; background: linear-gradient(180deg, rgba(255,255,255,0.75) 0%, rgba(255,255,255,0) 45%), var(--c); box-shadow: inset 0 -2px 3px rgba(0,0,0,0.15), 0 4px 10px rgba(200, 16, 46, 0.25); }
+.btn.ink, .btn.primary { background: linear-gradient(180deg, #E8364B 0%, #C8102E 55%, #8E0A20 100%); border-color: #8E0A20; color: #fff; box-shadow: inset 0 1px 0 rgba(255,255,255,0.35), 0 8px 20px rgba(200, 16, 46, 0.22); }
+.count { background: #C8102E; }
+#v-start .startbtns .btn { color: #FFFFFF; border: none; font-weight: 400; background: linear-gradient(180deg, #E8364B 0%, #C8102E 55%, #8E0A20 100%); box-shadow: inset 0 1px 0 rgba(255,255,255,0.35), 0 8px 20px rgba(200, 16, 46, 0.2); }
+.hero .stack { font-family: 'Dancing Script', 'Brush Script MT', cursive; font-weight: 700; font-size: clamp(32px, 9vw, 40px); line-height: 1.15; color: #C8102E; max-width: 16ch; filter: url(#waxySmall); transform: rotate(-2deg); transform-origin: left center; }
+.tab[aria-pressed="true"] { color: #C8102E; }
+.natural { display: flex; flex-direction: column; gap: 10px; }
+.notice { background: var(--paper); border: 1px solid #C8102E; border-radius: 18px; padding: 14px; display: flex; flex-direction: column; gap: 6px; }
+.notice .nt { font-weight: 700; font-size: 15px; color: #C8102E; }
+.natrow { display: flex; gap: 10px; flex-wrap: wrap; }
+.natb { display: flex; flex-direction: column; align-items: center; gap: 4px; background: none; border: none; padding: 2px; cursor: pointer; font-size: 11px; color: var(--muted); min-width: 44px; }
+.natb .d { width: 38px; height: 38px; }
+.natb.photo .d { outline: 1px dashed var(--muted); outline-offset: 2px; }
+.natb[aria-pressed="true"] { color: var(--ink); font-weight: 700; }
+.natb[aria-pressed="true"] .d { outline: 2px solid #C8102E; outline-offset: 3px; }
+.trio li { align-items: start; padding-top: 6px; }
+.trio li .d { margin-top: 1px; }
+.trio .r { grid-column: 2 / -1; font-size: 12px; color: var(--muted); line-height: 1.45; padding-bottom: 4px; }
+.why { font-weight: 700; color: var(--ink); }
+.layers { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.layer { display: flex; align-items: center; gap: 8px; min-height: 54px; padding: 0 10px; border-radius: 16px; border: 1px solid var(--line); background: var(--paper); color: var(--muted); cursor: pointer; text-align: left; }
+.layer .lt { display: flex; flex-direction: column; line-height: 1.2; }
+.layer .lt b { font-size: 13px; color: var(--ink); }
+.layer .lt span { font-size: 11px; }
+.layer[aria-pressed="true"] { border: 2px solid #C8102E; color: #C8102E; box-shadow: 0 4px 12px rgba(200, 16, 46, 0.12); }
+.layer[aria-pressed="false"] .d { opacity: 0.35; }
+.piece.off { opacity: 0.45; }
+.btn:disabled { opacity: 0.5; cursor: default; }
+
+.stage canvas.mirror { transform: scaleX(-1); }
+.live { position: absolute; left: 12px; top: 12px; display: inline-flex; gap: 6px; align-items: center; margin: 0; padding: 4px 10px; border-radius: 999px; background: rgba(255,255,255,0.9); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink); }
+.live span { width: 8px; height: 8px; border-radius: 50%; background: #C8102E; animation: blink 1.4s infinite; }
+@keyframes blink { 50% { opacity: 0.3; } }
+.combochips { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.cchip { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; padding: 10px 6px; border-radius: 16px; border: 1px solid var(--line); background: var(--paper); cursor: pointer; min-height: 76px; color: var(--ink); }
+.cchip .cname { font-size: 22px; line-height: 1; }
+.cchip .cdots { display: flex; gap: 4px; }
+.cchip .d { width: 14px; height: 14px; }
+.cchip[aria-pressed="true"] { border: 2px solid #C8102E; box-shadow: 0 6px 16px rgba(200, 16, 46, 0.14); }
+.whybox { background: var(--paper); border: 1px solid var(--line); border-radius: 18px; padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; }
+.whybox:empty { display: none; }
+.whyh { font-size: 13px; line-height: 1.45; }
+.whybox ul { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 6px; }
+.whybox li { display: grid; grid-template-columns: 70px minmax(0, 1fr); gap: 8px; font-size: 12px; line-height: 1.45; color: var(--muted); }
+.whybox .k { font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: #C8102E; font-weight: 700; }
+.swb:disabled { opacity: 0.4; cursor: default; }
+#camNote { text-align: center; }
+@media (prefers-reduced-motion: reduce) { .live span { animation: none; } }
+</style>
+<style>html,body{margin:0}img{max-width:100%}:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <filter id="waxy" x="-6%" y="-12%" width="112%" height="124%">
+    <feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="2" seed="4" result="grain"/>
+    <feDisplacementMap in="SourceGraphic" in2="grain" scale="3.5" xChannelSelector="R" yChannelSelector="G" result="rough"/>
+    <feTurbulence type="fractalNoise" baseFrequency="0.035 0.9" numOctaves="2" seed="11" result="drag"/>
+    <feColorMatrix in="drag" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  3.2 0 0 0 -0.5" result="dragA"/>
+    <feComposite in="rough" in2="dragA" operator="in" result="waxed"/>
+    <feGaussianBlur in="waxed" stdDeviation="0.4" result="soft"/>
+    <feMerge><feMergeNode in="soft"/><feMergeNode in="waxed"/></feMerge>
+  </filter>
+  <filter id="waxySmall" x="-6%" y="-12%" width="112%" height="124%">
+    <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed="5" result="grain"/>
+    <feDisplacementMap in="SourceGraphic" in2="grain" scale="1.6" xChannelSelector="R" yChannelSelector="G" result="rough"/>
+    <feTurbulence type="fractalNoise" baseFrequency="0.06 0.9" numOctaves="2" seed="13" result="drag"/>
+    <feColorMatrix in="drag" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  3 0 0 0 -0.45" result="dragA"/>
+    <feComposite in="rough" in2="dragA" operator="in"/>
+  </filter>
+</svg>
+<div class="app">
+  <header class="top">
+    <button class="brand" type="button" id="home" aria-label="Lippy, start over"><span class="gloss" data-text="lippy">lippy</span><svg class="" viewBox="0 0 200 140" aria-hidden="true"><defs><clipPath id="lp0c"><path d="M8 70 C 30 42, 54 14, 78 12 C 90 11, 96 23, 100 30 C 104 23, 110 11, 122 12 C 146 14, 170 42, 192 70 C 150 79, 120 72, 100 79 C 80 72, 50 79, 8 70 Z"/><path d="M8 70 C 50 79, 80 72, 100 79 C 120 72, 150 79, 192 70 C 178 114, 140 136, 100 136 C 60 136, 22 114, 8 70 Z"/></clipPath><pattern id="lp0h" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(-35)"><line x1="0" y1="0" x2="0" y2="7" stroke="#C8102E" stroke-width="2.2" stroke-linecap="round"/></pattern></defs><g filter="url(#waxySmall)"><g clip-path="url(#lp0c)"><rect x="0" y="0" width="200" height="140" fill="url(#lp0h)" opacity=".75"/></g><g fill="none" stroke="#C8102E" stroke-linecap="round" stroke-linejoin="round"><path d="M8 70 C 30 42, 54 14, 78 12 C 90 11, 96 23, 100 30 C 104 23, 110 11, 122 12 C 146 14, 170 42, 192 70" stroke-width="4"/><path d="M8 70 C 22 114, 60 136, 100 136 C 140 136, 178 114, 192 70" stroke-width="4"/><path d="M12 68 C 34 44, 56 18, 79 16 C 90 16, 96 26, 100 33 C 105 26, 111 16, 123 16 C 145 18, 167 44, 188 68" stroke-width="1.6" opacity=".6"/><path d="M16 70 C 50 78, 80 73, 100 78 C 120 73, 150 78, 184 70" stroke-width="3"/></g></g></svg></button>
+    <button class="bagbtn" type="button" id="bagBtn">collection <span class="count" id="bagCount">0</span></button>
+  </header>
+  <nav class="steps" id="steps" aria-label="Your progress"></nav>
+
+  <!-- START -->
+  <section id="v-start">
+    <div class="hero">
+      <div class="word"><h1 class="gloss" data-text="lippy">lippy</h1><svg class="sketch" viewBox="0 0 200 140" role="img" aria-label="Lips drawn in red lip pencil"><defs><clipPath id="lp1c"><path d="M8 70 C 30 42, 54 14, 78 12 C 90 11, 96 23, 100 30 C 104 23, 110 11, 122 12 C 146 14, 170 42, 192 70 C 150 79, 120 72, 100 79 C 80 72, 50 79, 8 70 Z"/><path d="M8 70 C 50 79, 80 72, 100 79 C 120 72, 150 79, 192 70 C 178 114, 140 136, 100 136 C 60 136, 22 114, 8 70 Z"/></clipPath><pattern id="lp1h" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(-35)"><line x1="0" y1="0" x2="0" y2="7" stroke="#C8102E" stroke-width="2.2" stroke-linecap="round"/></pattern></defs><g filter="url(#waxySmall)"><g clip-path="url(#lp1c)"><rect x="0" y="0" width="200" height="140" fill="url(#lp1h)" opacity=".75"/></g><g fill="none" stroke="#C8102E" stroke-linecap="round" stroke-linejoin="round"><path d="M8 70 C 30 42, 54 14, 78 12 C 90 11, 96 23, 100 30 C 104 23, 110 11, 122 12 C 146 14, 170 42, 192 70" stroke-width="4"/><path d="M8 70 C 22 114, 60 136, 100 136 C 140 136, 178 114, 192 70" stroke-width="4"/><path d="M12 68 C 34 44, 56 18, 79 16 C 90 16, 96 26, 100 33 C 105 26, 111 16, 123 16 C 145 18, 167 44, 188 68" stroke-width="1.6" opacity=".6"/><path d="M16 70 C 50 78, 80 73, 100 78 C 120 73, 150 78, 184 70" stroke-width="3"/></g></g></svg></div>
+      <p class="stack">Lip combos picked for you.</p>
+      <div class="startbtns" id="startBtns">
+        <button class="btn ink wide" type="button" id="liveBtn">try it on live</button>
+        <input class="vh" type="file" id="upload" accept="image/*">
+        <label class="btn wide" for="upload">upload a photo</label>
+      </div>
+      <p class="note" id="camNote" hidden></p>
+    </div>
+  </section>
+
+  <!-- TRY ON -->
+  <section id="v-tryon" hidden>
+    <div class="stage" id="stage">
+      <canvas id="view" width="720" height="900" aria-label="You, with the lip combo applied"></canvas>
+      <p class="live" id="liveTag" hidden><span aria-hidden="true"></span>live</p>
+      <p class="hint" id="hint" hidden></p>
+    </div>
+    <div class="stagebar">
+      <button class="btn small" type="button" id="before" aria-pressed="false">bare lips</button>
+      <button class="btn small" type="button" id="hold" aria-pressed="false">hold still</button>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <p class="label" id="combosLabel">reading your lips…</p>
+      <div class="combochips" id="comboChips" role="group" aria-label="Your 3 combos"></div>
+    </div>
+    <div class="whybox" id="whyBox"></div>
+
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <p class="label">mix and match: tap a layer to add or remove it</p>
+      <div class="layers" id="layers" role="group" aria-label="Layers on your lips"></div>
+    </div>
+    <div class="editor">
+      <p class="label">swap a shade</p>
+      <div class="tabs" id="tabs"></div>
+      <div class="swatches" id="swatches"></div>
+    </div>
+    <label class="slider" for="intensityRange">intensity <input type="range" id="intensityRange" min="20" max="100" value="80"></label>
+    <div class="pieces" id="pieces"></div>
+    <p class="status" id="tryStatus" role="status"></p>
+    <button class="btn primary wide" type="button" id="addBtn">lock it in</button>
+    <button class="btn wide" type="button" id="rereadBtn">re-read my lips</button>
+  </section>
+
+  <!-- COLLECTION -->
+  <section id="v-bag" hidden>
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <p class="eyebrow">your collection</p>
+      <div class="bagh"><h2 class="title">Your collection.</h2><p class="sum" id="bagSum">$0</p></div>
+      <p class="progress" id="bagProgress"></p>
+    </div>
+    <div id="bagList" style="display:flex;flex-direction:column;gap:14px"></div>
+    <p class="note">Each brand runs its own Shopify store, so you check out once per brand. Lippy never takes your payment.</p>
+    <button class="btn wide" type="button" id="bagBack">keep trying on</button>
+  </section>
+
+  <div class="foot" id="foot">
+    <p class="note">Prototype. Real shades from Kylie Cosmetics, Rare Beauty, Tower 28 and Kosas, all Shopify stores. Prices were taken from each brand's site on Oct 29, 2026. On-screen colors are estimated from shade descriptions, so check each shop's swatches before you buy.</p>
+  </div>
+  <video id="video" playsinline muted autoplay hidden></video>
+</div>
+
+<script>window.LIPPY_MP_JS = "mp/";</script>
+<script src="mp/face_mesh.js"></script>
+<script>
+(function () {
+  /*REC*/
+  var BR = {
+    ky: { brand: 'Kylie Cosmetics', short: 'Kylie', product: 'Precision Pout Lip Liner', domain: 'kyliecosmetics.com', url: 'https://kyliecosmetics.com/products/precision-pout-lip-liner', price: 19 },
+    rb: { brand: 'Rare Beauty', short: 'Rare Beauty', product: 'Kind Words Matte Lipstick', domain: 'rarebeauty.com', url: 'https://rarebeauty.com/products/kind-words-matte-lipstick', price: 20 },
+    t28: { brand: 'Tower 28', short: 'Tower 28', product: 'ShineOn Lip Jelly', domain: 'tower28beauty.com', url: 'https://www.tower28beauty.com/collections/shineon', price: 16 },
+    ko: { brand: 'Kosas', short: 'Kosas', product: 'Wet Lip Oil Gloss', domain: 'kosas.com', url: 'https://kosas.com/products/build-your-own-wet-lip-trio', price: 24 }
+  };
+  // variant: Shopify variant id, filled in from the catalog in the real build. null = link to the product page instead of a cart link.
+  function s(b, id, name, hex, cov, desc) { return Object.assign({ id: id, name: name, hex: hex, cov: cov, desc: desc, variant: null }, BR[b]); }
+  var SHADES = {
+    liner: [s('ky','moody-nude','Moody Nude','#9A6457',.9,'nude'), s('ky','chill-brown','Chill Brown','#7A4A3C',.9,'brown'), s('ky','cinnamon','Cinnamon','#8C4532',.9,'warm brown'), s('ky','sultry','Sultry','#5E2A2C',.9,'deep wine-brown'), s('ky','cocoa','Cocoa','#4A2A22',.9,'deep brown')],
+    lipstick: [s('rb','talented','Talented','#B98A78',.9,'true neutral beige'), s('rb','wise','Wise','#9B6450',.9,'warm brown nude'), s('rb','worthy','Worthy','#9E6A6E',.9,'muted mauve'), s('rb','lively','Lively','#C0606E',.9,'rose pink'), s('rb','bold','Bold','#8C2F45',.9,'deep berry rose'), s('rb','devoted','Devoted','#B3192B',.95,'true red'), s('rb','gifted','Gifted','#6B3A4A',.9,'deep dusty plum'), s('rb','strong','Strong','#5A3328',.9,'rich chocolate brown')],
+    gloss: [s('t28','chill','Chill','#F4ECEA',.05,'clear'), s('t28','sesame','Sesame','#C99A9E',.35,'milky mauve'), s('t28','wild','Wild','#C2385E',.45,'sheer-ish raspberry'), s('t28','cashew','Cashew','#A8706A',.35,'milky rosy brown'), s('t28','almond','Almond','#8A5A48',.35,'milky chocolate'), s('ko','malibu','Malibu','#E58FA6',.3,'surfy pink'), s('ko','cola','Cola','#7A3E32',.3,'sheer rich brown'), s('ko','jaws','Jaws','#A3121F',.4,'hot blood red')]
+  };
+  var LAYERS = ['liner', 'lipstick', 'gloss'];
+  function get(l, id) { return SHADES[l].filter(function (x) { return x.id === id; })[0]; }
+
+  var LIN = new Float32Array(256);
+  for (var q = 0; q < 256; q++) { var c0 = q / 255; LIN[q] = c0 <= 0.04045 ? c0 / 12.92 : Math.pow((c0 + 0.055) / 1.055, 2.4); }
+  function f(t) { return t > 0.008856 ? Math.cbrt(t) : 7.787 * t + 16 / 116; }
+  function linToLab(R, G, B) {
+    var x = (R * 0.4124 + G * 0.3576 + B * 0.1805) / 0.95047, y = R * 0.2126 + G * 0.7152 + B * 0.0722, z = (R * 0.0193 + G * 0.1192 + B * 0.9505) / 1.08883;
+    var fx = f(x), fy = f(y), fz = f(z);
+    return [116 * fy - 16, 500 * (fx - fy), 200 * (fy - fz)];
+  }
+  function hexLabRaw(hex) { return linToLab(LIN[parseInt(hex.substr(1, 2), 16)], LIN[parseInt(hex.substr(3, 2), 16)], LIN[parseInt(hex.substr(5, 2), 16)]); }
+  function dE(p, q2) { var a = p[0] - q2[0], b = p[1] - q2[1], c = p[2] - q2[2]; return Math.sqrt(a * a + b * b + c * c); }
+  function hue(lab) { return Math.atan2(lab[2], lab[1]) * 180 / Math.PI; } // signed: berry/plum shades go slightly negative
+  function chroma(lab) { return Math.sqrt(lab[1] * lab[1] + lab[2] * lab[2]); }
+  function best(list, score, skip) {
+    var pool = list.filter(function (x) { return !skip || skip.indexOf(x.id) < 0; });
+    if (!pool.length) pool = list;
+    var top = null, ts = Infinity;
+    pool.forEach(function (x) { var v = score(x, hexLabRaw(x.hex)); if (v < ts) { ts = v; top = x; } });
+    return top;
+  }
+  function linerFor(lipstick, deeper, skip) {
+    var L = hexLabRaw(lipstick.hex), t = [L[0] - deeper, L[1] * 0.85, L[2] + 2];
+    return best(SHADES.liner, function (x, lab) { return dE(lab, t); }, skip);
+  }
+
+  // read = { lip: Lab, skin: Lab }. Returns depth/undertone labels plus three combos.
+  function describe(read) {
+    var sL = read.skin[0], h = hue(read.skin);
+    var depth = sL > 68 ? 'light' : sL > 56 ? 'light-medium' : sL > 44 ? 'medium' : sL > 32 ? 'tan to deep' : 'deep';
+    var tone = h > 57 ? 'warm' : h < 47 ? 'cool' : 'neutral';
+    var lh = hue(read.lip), lc = chroma(read.lip), lL = read.lip[0];
+    var lipWord = (lL > 58 ? 'soft ' : lL < 40 ? 'deep ' : '') + (lc < 14 ? 'neutral' : lh < 22 ? 'rosy berry' : lh < 38 ? 'rosy' : lh < 52 ? 'rosy brown' : 'warm brown');
+    return { depth: depth, tone: tone, lipWord: lipWord.trim() };
+  }
+
+  // Natural lips sit a little darker and pinker than the skin around them, with soft color.
+  // Lipstick usually breaks that: very saturated, lighter than skin, an odd hue, or very shiny.
+  function detectProduct(read) {
+    var lip = read.lip, sk = read.skin, c = chroma(lip), h = hue(lip), why = [];
+    if (c > 36) why.push('very saturated');
+    if (lip[0] > sk[0] + 1) why.push('lighter than your skin');
+    if (h < 2 || h > 62) why.push('a shade lips don’t usually have');
+    if (sk[0] > 50 && sk[0] - lip[0] > 30) why.push('much darker than your skin');
+    return { lipstick: why.length > 0, glossy: (read.shine || 0) > 0.1, why: why };
+  }
+  // When lip color is already on, estimate the natural lip from the skin around it:
+  // bare lips sit a little darker and pinker than skin; the gap is bigger on lighter skin,
+  // and deeper skin tends toward browner, less pink lips.
+  function predictNatural(sk) {
+    var t = Math.max(0, Math.min(1, (70 - sk[0]) / 40));
+    return [Math.max(12, sk[0] - (4 + 0.12 * sk[0])), sk[1] + 14 - 4 * t, sk[2] - 6 + 2 * t];
+  }
+
+  function recommend(read, seen) {
+    seen = seen || { lipstick: [] };
+    var info = describe(read), used = seen.lipstick.slice(), out = [];
+    var lip = read.lip, sk = read.skin;
+
+    // 1. your lips, but better: lipstick closest to a slightly richer version of your own lip color
+    var t1 = [lip[0] - 4, lip[1] * 1.12, lip[2]];
+    var ls1 = best(SHADES.lipstick, function (x, lab) { return dE(lab, t1) + (chroma(lab) > 50 ? 30 : 0); }, used);
+    used.push(ls1.id);
+    var ln1 = linerFor(ls1, 10);
+    var L1 = hexLabRaw(ls1.hex), g1t = [L1[0] + 12, L1[1], L1[2]];
+    var g1 = best(SHADES.gloss.filter(function (x) { return x.cov <= 0.35; }), function (x, lab) { return x.id === 'chill' ? 20 : dE(lab, g1t); });
+    out.push({ key: 'everyday', name: 'everyday', kicker: 'your lips, but better', picks: { liner: ln1.id, lipstick: ls1.id, gloss: g1.id },
+      why: 'Built from your natural lip color.',
+      how: { lipstick: ls1.name + ' is the closest shade to your natural ' + info.lipWord + ' lip color, one step richer.',
+             liner: ln1.name + ' is one step deeper than ' + ls1.name + ', so the edge looks defined, not drawn on.',
+             gloss: g1.id === 'chill' ? 'Chill is clear, so you get shine without changing the color.' : g1.name + ' is a sheer tint in the same family, for shine without changing the color.' } });
+
+    // 2. 90s brown: dark brown edge, nude picked for skin depth, sheer gloss
+    var nt = [Math.max(28, Math.min(66, sk[0] - 10)), 18, 16];
+    var ls2 = best(SHADES.lipstick.filter(function (x) { var lab = hexLabRaw(x.hex); return chroma(lab) < 32 && hue(lab) >= 25; }), function (x, lab) { return dE(lab, nt); }, used);
+    used.push(ls2.id);
+    var L2 = hexLabRaw(ls2.hex);
+    var ln2 = best(SHADES.liner, function (x, lab) { return Math.abs(lab[0] - Math.max(22, L2[0] - 24)) + (lab[2] < 10 ? 15 : 0); });
+    var g2t = [Math.max(30, sk[0] - 4), 16, 14];
+    var g2 = best(SHADES.gloss, function (x, lab) { return x.id === 'chill' ? 22 : (x.cov > 0.4 ? 99 : dE(lab, g2t)); });
+    out.push({ key: '90s', name: '90s brown', kicker: 'the TikTok classic', picks: { liner: ln2.id, lipstick: ls2.id, gloss: g2.id },
+      why: 'Built from your skin depth.',
+      how: { liner: ln2.name + ' is a deep brown, for the dark blended edge 90s lips are known for.',
+             lipstick: ls2.name + ' is a nude picked for ' + info.depth + ' skin, so it won’t wash you out.',
+             gloss: g2.id === 'chill' ? 'Chill adds clear shine on top.' : g2.name + ' (' + g2.desc + ') is sheer, so it adds shine and keeps the brown tone.' } });
+
+    // 3. night out: a red or berry matched to undertone and depth
+    var th = info.tone === 'warm' ? 30 : info.tone === 'cool' ? 8 : 18, tL = Math.max(28, Math.min(48, sk[0] * 0.6));
+    var ls3 = best(SHADES.lipstick.filter(function (x) { var lab = hexLabRaw(x.hex); return chroma(lab) >= 20 && lab[0] < 50 && hue(lab) < 35; }), function (x, lab) { return Math.abs(hue(lab) - th) + 0.9 * Math.abs(lab[0] - tL); }, used);
+    used.push(ls3.id);
+    var ln3 = linerFor(ls3, 12);
+    var L3 = hexLabRaw(ls3.hex);
+    var g3 = best(SHADES.gloss, function (x, lab) { return x.id === 'chill' ? 18 : (x.cov < 0.3 ? 99 : dE(lab, L3)); });
+    out.push({ key: 'night', name: 'night out', kicker: 'the statement', picks: { liner: ln3.id, lipstick: ls3.id, gloss: g3.id },
+      why: 'Built from your undertone.',
+      how: { lipstick: ls3.name + ' (' + ls3.desc + ') is the bold shade closest to your ' + info.tone + ' undertone and ' + info.depth + ' skin.',
+             liner: ln3.name + ' is the liner closest to ' + ls3.name + ', one step deeper, to keep the edge crisp.',
+             gloss: g3.id === 'chill' ? 'Chill adds clear shine so the color stays true.' : g3.name + ' is the tinted gloss closest to ' + ls3.name + ', for a wet finish.' } });
+
+    return { info: info, combos: out };
+  }
+  /*ENDREC*/
+
+  // ---------- color math ----------
+  function finv(t) { var t3 = t * t * t; return t3 > 0.008856 ? t3 : (t - 16 / 116) / 7.787; }
+  function gam(v) { v = v <= 0.0031308 ? 12.92 * v : 1.055 * Math.pow(v, 1 / 2.4) - 0.055; return v < 0 ? 0 : v > 1 ? 255 : v * 255; }
+  function labToRgb(L, a, b, out, o) {
+    var fy = (L + 16) / 116, fx = fy + a / 500, fz = fy - b / 200;
+    var x = finv(fx) * 0.95047, y = finv(fy), z = finv(fz) * 1.08883;
+    out[o] = gam(3.2406 * x - 1.5372 * y - 0.4986 * z);
+    out[o + 1] = gam(-0.9689 * x + 1.8758 * y + 0.0415 * z);
+    out[o + 2] = gam(0.0557 * x - 0.2040 * y + 1.0570 * z);
+  }
+  function pxLab(d, o) { return linToLab(LIN[d[o]], LIN[d[o + 1]], LIN[d[o + 2]]); }
+
+  // ---------- face tracking ----------
+  var MP_JS = window.LIPPY_MP_JS || 'https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh@0.4.1633559619/';
+  var LIP_OUT = [61, 146, 91, 181, 84, 17, 314, 405, 321, 375, 291, 409, 270, 269, 267, 0, 37, 39, 40, 185];
+  var LIP_IN = [78, 95, 88, 178, 87, 14, 317, 402, 318, 324, 308, 415, 310, 311, 312, 13, 82, 81, 80, 191];
+  var CHEEKS = [50, 280, 205, 425];
+  var fm = null, fmReady = null, onFace = null;
+  function getFaceMesh() {
+    if (fmReady) return fmReady;
+    fmReady = new Promise(function (res) {
+      if (!window.FaceMesh) { res(null); return; }
+      try {
+        var m = new window.FaceMesh({ locateFile: function (f) { return /\.js$/.test(f) ? MP_JS + f : 'mp/' + f + (/\.wasm$/.test(f) ? '' : '.wasm'); } });
+        m.setOptions({ maxNumFaces: 1, refineLandmarks: false, minDetectionConfidence: 0.5, minTrackingConfidence: 0.5 });
+        m.onResults(function (r) { if (onFace) onFace(r.image, r.multiFaceLandmarks && r.multiFaceLandmarks[0] || null); });
+        var t = setTimeout(function () { res(null); }, 25000);
+        m.initialize().then(function () { clearTimeout(t); fm = m; res(m); }, function () { clearTimeout(t); res(null); });
+      } catch (e) { res(null); }
+    });
+    return fmReady;
+  }
+
+  // ---------- canvases ----------
+  var view = document.getElementById('view'), vctx = view.getContext('2d');
+  var frameC = document.createElement('canvas'), fctx = frameC.getContext('2d', { willReadFrequently: true });
+  var maskC = document.createElement('canvas'), mctx = maskC.getContext('2d', { willReadFrequently: true });
+  var bandC = document.createElement('canvas'), bctx = bandC.getContext('2d', { willReadFrequently: true });
+  var holdC = document.createElement('canvas'), hctx = holdC.getContext('2d');
+  var W = 0, H = 0, lastLm = null, lastSrc = null;
+  var hint = document.getElementById('hint');
+  function setHint(t) { hint.textContent = t || ''; hint.hidden = !t; }
+  function size(w, h) {
+    if (w === W && h === H) return;
+    W = w; H = h;
+    [frameC, maskC, bandC].forEach(function (c) { c.width = W; c.height = H; });
+  }
+  function pts(lm, ids, k, cx, cy) { return ids.map(function (i) { var x = lm[i].x * W, y = lm[i].y * H; return [cx + (x - cx) * k, cy + (y - cy) * k]; }); }
+  function path(c, p) { c.beginPath(); p.forEach(function (q, j) { if (j) c.lineTo(q[0], q[1]); else c.moveTo(q[0], q[1]); }); c.closePath(); }
+
+  // lip outline + liner band for this frame
+  function lipMasks(lm) {
+    var cx = 0, cy = 0;
+    LIP_OUT.forEach(function (i) { cx += lm[i].x; cy += lm[i].y; }); cx = cx / LIP_OUT.length * W; cy = cy / LIP_OUT.length * H;
+    var out = pts(lm, LIP_OUT, 0.985, cx, cy), inn = pts(lm, LIP_IN, 1.0, cx, cy);
+    var x0 = W, x1 = 0, y0 = H, y1 = 0;
+    out.forEach(function (p) { if (p[0] < x0) x0 = p[0]; if (p[0] > x1) x1 = p[0]; if (p[1] < y0) y0 = p[1]; if (p[1] > y1) y1 = p[1]; });
+    var pad = 6, bb = { x: Math.max(0, Math.floor(x0 - pad)), y: Math.max(0, Math.floor(y0 - pad)) };
+    bb.w = Math.min(W, Math.ceil(x1 + pad)) - bb.x; bb.h = Math.min(H, Math.ceil(y1 + pad)) - bb.y;
+    if (bb.w < 8 || bb.h < 4) return null;
+    var lipH = y1 - y0, edge = Math.max(0.8, lipH * 0.035);
+    mctx.clearRect(0, 0, W, H);
+    mctx.filter = 'blur(' + edge.toFixed(1) + 'px)';
+    mctx.fillStyle = '#fff'; path(mctx, out); mctx.fill();
+    mctx.globalCompositeOperation = 'destination-out'; path(mctx, inn); mctx.fill();
+    mctx.globalCompositeOperation = 'source-over'; mctx.filter = 'none';
+    bctx.clearRect(0, 0, W, H);
+    bctx.filter = 'blur(' + Math.max(1, lipH * 0.05).toFixed(1) + 'px)';
+    bctx.strokeStyle = '#fff'; bctx.lineWidth = Math.max(2, lipH * 0.16); bctx.lineJoin = 'round';
+    path(bctx, out); bctx.stroke();
+    bctx.filter = 'none';
+    bctx.globalCompositeOperation = 'destination-in'; bctx.drawImage(maskC, 0, 0);
+    bctx.globalCompositeOperation = 'source-over';
+    return bb;
+  }
+
+  // read natural lip + skin color from a frame (used for the 3 combos)
+  function readColors(lm, bb) {
+    var fd = fctx.getImageData(0, 0, W, H).data, md = mctx.getImageData(bb.x, bb.y, bb.w, bb.h).data;
+    var lipL = [], lipA = [], lipB = [], hi = 0;
+    for (var y = 0; y < bb.h; y++) for (var x = 0; x < bb.w; x++) {
+      if (md[(y * bb.w + x) * 4 + 3] < 230) continue;
+      var lab = pxLab(fd, ((bb.y + y) * W + bb.x + x) * 4); lipL.push(lab[0]); lipA.push(lab[1]); lipB.push(lab[2]);
+    }
+    var mL = median(lipL.slice());
+    for (var i = 0; i < lipL.length; i++) if (lipL[i] > mL + 22) hi++;
+    var sL = [], sA = [], sB = [], r = Math.max(2, Math.round(bb.w * 0.05));
+    CHEEKS.forEach(function (k) {
+      var cx = Math.round(lm[k].x * W), cy = Math.round(lm[k].y * H);
+      for (var yy = cy - r; yy <= cy + r; yy++) for (var xx = cx - r; xx <= cx + r; xx++) {
+        if (xx < 0 || yy < 0 || xx >= W || yy >= H) continue;
+        var lab2 = pxLab(fd, (yy * W + xx) * 4); sL.push(lab2[0]); sA.push(lab2[1]); sB.push(lab2[2]);
+      }
+    });
+    if (lipL.length < 30 || sL.length < 9) return null;
+    return { lip: [mL, median(lipA), median(lipB)], skin: [median(sL), median(sA), median(sB)], shine: hi / lipL.length };
+  }
+
+  // recolor the lips for this frame
+  var LCACHE = {};
+  function shadeLab(hex) { return LCACHE[hex] || (LCACHE[hex] = hexLabRaw(hex)); }
+  function paintLips(bb) {
+    var picks = activePicks(), show = st.show, K = st.intensity / 100;
+    if (!picks || st.before || !(show.liner || show.lipstick || show.gloss || st.natural)) return;
+    var img = fctx.getImageData(bb.x, bb.y, bb.w, bb.h), d = img.data;
+    var md = mctx.getImageData(bb.x, bb.y, bb.w, bb.h).data, bd = bctx.getImageData(bb.x, bb.y, bb.w, bb.h).data;
+    var n = bb.w * bb.h, Ls = new Float32Array(n), As = new Float32Array(n), Bs = new Float32Array(n), hist = new Uint32Array(101), cnt = 0, sum = 0, i, o;
+    for (i = 0; i < n; i++) {
+      if (md[i * 4 + 3] < 3) continue;
+      var lab = pxLab(d, i * 4); Ls[i] = lab[0]; As[i] = lab[1]; Bs[i] = lab[2];
+      if (md[i * 4 + 3] > 200) { hist[Math.max(0, Math.min(100, Math.round(lab[0])))]++; cnt++; sum += lab[0]; }
+    }
+    if (!cnt) return;
+    var meanL = sum / cnt, acc = 0, hiT = 100, hiMax = 100, p82 = cnt * 0.82, p99 = cnt * 0.99;
+    for (i = 0; i <= 100; i++) { acc += hist[i]; if (hiT === 100 && acc >= p82) hiT = i; if (acc >= p99) { hiMax = i; break; } }
+    var span = Math.max(1, hiMax - hiT);
+    var ln = get('liner', picks.liner), lp = get('lipstick', picks.lipstick), gl = get('gloss', picks.gloss);
+    var LN = shadeLab(ln.hex), LP = shadeLab(lp.hex), GL = shadeLab(gl.hex);
+    var NB = st.natural, flat = NB && st.product && st.product.glossy, mA = st.read ? st.read.lipRawA : 0, mB = st.read ? st.read.lipRawB : 0;
+    for (i = 0; i < n; i++) {
+      var m = md[i * 4 + 3] / 255; if (m < 0.012) continue;
+      var L0 = Ls[i], L = L0, a = As[i], b = Bs[i], w, tl;
+      if (NB) {
+        L = L0 + ((NB[0] + (L0 - meanL) * 0.8) - L0) * m; a += ((NB[1] + (As[i] - mA) * 0.3) - a) * m; b += ((NB[2] + (Bs[i] - mB) * 0.3) - b) * m;
+        if (flat) L -= Math.max(0, L0 - hiT) * 0.6 * m;
+      }
+      if (show.lipstick) { w = lp.cov * m * K; tl = LP[0] + (L0 - meanL); L += (tl - L) * w * 0.65; a += (LP[1] - a) * w; b += (LP[2] - b) * w; }
+      var bw = bd[i * 4 + 3] / 255;
+      if (show.liner && bw > 0.01) { w = bw * 0.62 * K; tl = LN[0] + (L0 - meanL) * 0.8; L += (tl - L) * w * 0.7; a += (LN[1] - a) * w; b += (LN[2] - b) * w; }
+      var hl = Math.max(0, Math.min(1, (L0 - hiT) / span)); hl = hl * hl * (3 - 2 * hl); if (flat) hl *= 0.4;
+      if (show.gloss) { w = gl.cov * m * 0.5 * K; a += (GL[1] - a) * w; b += (GL[2] - b) * w; L += (GL[0] - L) * w * 0.3; L += (100 - L) * hl * 0.45 * m + 1.5 * m * (1 - hl); }
+      else if (show.lipstick) { L -= hl * 5 * m; }
+      labToRgb(L, a, b, d, i * 4);
+    }
+    fctx.putImageData(img, bb.x, bb.y);
+  }
+
+  // the view follows your face: head and shoulders, smoothed so it doesn't jitter
+  var VW = 720, VH = 900, camv = null;
+  function present(lm) {
+    if (view.width !== VW) { view.width = VW; view.height = VH; }
+    var tx = W / 2, ty = H / 2, th = H;
+    if (lm) {
+      var x0 = 1, x1 = 0, y0 = 1, y1 = 0;
+      for (var k = 0; k < lm.length; k += 3) { var q = lm[k]; if (q.x < x0) x0 = q.x; if (q.x > x1) x1 = q.x; if (q.y < y0) y0 = q.y; if (q.y > y1) y1 = q.y; }
+      var fh = (y1 - y0) * H; th = fh * 1.75; tx = (x0 + x1) / 2 * W; ty = (y0 + y1) / 2 * H + fh * 0.12;
+    }
+    var tw = th * VW / VH;
+    if (tw > W) { tw = W; th = tw * VH / VW; }
+    if (th > H) { th = H; tw = th * VW / VH; }
+    if (!camv || st.mode !== 'live') camv = { x: tx, y: ty, h: th };
+    else { camv.x += (tx - camv.x) * 0.25; camv.y += (ty - camv.y) * 0.25; camv.h += (th - camv.h) * 0.25; }
+    var h = Math.min(camv.h, H), w = h * VW / VH; if (w > W) { w = W; h = w * VH / VW; }
+    var sx = Math.max(0, Math.min(W - w, camv.x - w / 2)), sy = Math.max(0, Math.min(H - h, camv.y - h / 2));
+    vctx.fillStyle = '#2A171B'; vctx.fillRect(0, 0, VW, VH);
+    vctx.imageSmoothingQuality = 'high';
+    vctx.drawImage(frameC, sx, sy, w, h, 0, 0, VW, VH);
+  }
+
+  // one frame in: draw it, find lips, read colors once, paint
+  var stable = 0;
+  function drawFrame(src, lm) {
+    var w = src.videoWidth || src.width, h = src.videoHeight || src.height;
+    if (!w || !h) return;
+    size(w, h);
+    fctx.drawImage(src, 0, 0, W, H);
+    lastSrc = src; lastLm = lm;
+    if (!lm) { stable = 0; present(null); setHint(st.mode === 'live' ? 'looking for your face…' : 'couldn’t find a face. Try a clearer, front-facing photo.'); return; }
+    var bb = lipMasks(lm);
+    if (!bb) { present(lm); return; }
+    stable++;
+    if (!st.read && (st.mode !== 'live' || stable > 12)) {
+      var rd = readColors(lm, bb);
+      if (rd) { takeRead(rd); }
+    }
+    setHint(st.read ? '' : 'hold still, reading your lips…');
+    paintLips(bb);
+    present(lm);
+  }
+  function takeRead(rd) {
+    st.read = { lip: rd.lip, skin: rd.skin, shine: rd.shine, lipRawA: rd.lip[1], lipRawB: rd.lip[2] };
+    st.product = detectProduct(st.read);
+    st.natural = st.product.lipstick ? predictNatural(st.read.skin) : st.product.glossy ? st.read.lip.slice() : null;
+    var eff = st.natural ? { lip: st.natural, skin: st.read.skin } : st.read;
+    var r = recommend(eff, { lipstick: [] });
+    st.info = r.info; st.combos = r.combos; st.active = 0;
+    drawUI();
+  }
+  // redraw after a control changes (needed when frozen or using a photo)
+  function redraw() { if (st.mode !== 'live' || st.held) { if (st.held) drawFrame(holdC, lastLm); else if (lastSrc) drawFrame(lastSrc, lastLm); } }
+
+  // ---------- live loop ----------
+  var stream = null, busy = false, raf = 0, video = document.getElementById('video');
+  function loop() {
+    raf = requestAnimationFrame(loop);
+    if (busy || st.held || !fm || video.readyState < 2) return;
+    busy = true;
+    fm.send({ image: video }).then(function () { busy = false; }, function () { busy = false; });
+  }
+  function startLive() {
+    var note = document.getElementById('camNote');
+    var md = navigator.mediaDevices;
+    if (!md || !md.getUserMedia) { note.hidden = false; note.textContent = 'This browser can’t open the camera here. Upload a photo instead.'; return; }
+    note.hidden = false; note.textContent = 'Opening your camera…';
+    md.getUserMedia({ video: { facingMode: 'user', width: { ideal: 960 }, height: { ideal: 720 } }, audio: false }).then(function (s) {
+      stream = s; video.srcObject = s;
+      var pl = video.play(); if (pl && pl.catch) pl.catch(function () {});
+      note.hidden = true;
+      resetSession('live');
+      showView('tryon');
+      setHint('starting the try-on…');
+      getFaceMesh().then(function (m) {
+        if (!m) { setHint('Face tracking couldn’t load. Check your connection and reload.'); return; }
+        onFace = drawFrame; m.reset(); cancelAnimationFrame(raf); loop();
+      });
+    }).catch(function () {
+      note.hidden = false;
+      note.textContent = 'Camera’s blocked here. In this preview Lippy can’t use your camera; on the Lippy website it can. Upload a photo instead.';
+    });
+  }
+  function stopLive() { cancelAnimationFrame(raf); if (stream) { stream.getTracks().forEach(function (t) { t.stop(); }); stream = null; } }
+  function usePhoto(file) {
+    stopLive();
+    var img = new Image();
+    img.onload = function () {
+      var sc = Math.min(1, 1100 / Math.max(img.naturalWidth, img.naturalHeight));
+      holdC.width = Math.round(img.naturalWidth * sc); holdC.height = Math.round(img.naturalHeight * sc);
+      hctx.drawImage(img, 0, 0, holdC.width, holdC.height);
+      resetSession('photo');
+      showView('tryon');
+      setHint('finding your lips…');
+      getFaceMesh().then(function (m) {
+        if (!m) { setHint('Face tracking couldn’t load. Check your connection and reload.'); return; }
+        onFace = function (src, lm) { drawFrame(holdC, lm); };
+        m.reset(); m.send({ image: holdC });
+      });
+    };
+    img.src = URL.createObjectURL(file);
+  }
+  function resetSession(mode) {
+    st.mode = mode; st.read = null; st.combos = []; st.active = 0; st.held = mode === 'photo'; st.before = false; stable = 0; lastLm = null; camv = null;
+    st.show = { liner: true, lipstick: true, gloss: true };
+    view.classList.toggle('mirror', mode === 'live');
+    document.getElementById('liveTag').hidden = mode !== 'live';
+    document.getElementById('hold').hidden = mode !== 'live';
+    syncButtons(); drawUI();
+  }
+
+
+  // ---------- state + helpers ----------
+  var st = { view: 'start', mode: null, read: null, product: null, natural: null, info: null, combos: [], active: 0, layer: 'lipstick', show: { liner: true, lipstick: true, gloss: true }, intensity: 80, before: false, held: false, opened: {} };
+  function median(arr) { if (!arr.length) return 0; arr.sort(function (a, b) { return a - b; }); return arr[arr.length >> 1]; }
+  function activePicks() { return st.combos[st.active] ? st.combos[st.active].picks : null; }
+  function el(tag, attrs, kids) {
+    var e = document.createElement(tag);
+    for (var k in attrs) { if (k === 'text') e.textContent = attrs[k]; else e.setAttribute(k, attrs[k]); }
+    (kids || []).forEach(function (c) { if (c) e.appendChild(typeof c === 'string' ? document.createTextNode(c) : c); });
+    return e;
+  }
+  function dot(hex) { var d = el('span', { class: 'd', 'aria-hidden': 'true' }); d.style.background = hex; return d; }
+
+  // ---------- views ----------
+  var STEPS = ['start', 'tryon', 'bag'], STEP_LABEL = { start: 'camera', tryon: 'try on', bag: 'collection' };
+  var SWATCH = ['#C99A84', '#C2385E', '#8C2F45'];
+  function showView(v) {
+    if (v === 'tryon' && !st.mode) v = 'start';
+    st.view = v;
+    STEPS.forEach(function (k) { document.getElementById('v-' + k).hidden = k !== v; });
+    var start = v === 'start';
+    document.getElementById('home').style.visibility = start ? 'hidden' : 'visible';
+    document.getElementById('bagBtn').style.visibility = start ? 'hidden' : 'visible';
+    document.getElementById('steps').hidden = start;
+    document.getElementById('foot').hidden = start;
+    if (v === 'bag') drawBag();
+    drawSteps();
+    window.scrollTo(0, 0);
+  }
+  function drawSteps() {
+    var nav = document.getElementById('steps'); nav.textContent = '';
+    STEPS.forEach(function (k, i) {
+      var b = el('button', { type: 'button', class: 'step' + (i < STEPS.indexOf(st.view) ? ' done' : ''), text: STEP_LABEL[k] });
+      b.style.setProperty('--c', SWATCH[i]);
+      if (k === st.view) b.setAttribute('aria-current', 'step');
+      if (k === 'tryon' && !st.mode) b.disabled = true;
+      b.onclick = function () { if (k === 'start') stopLive(); showView(k); };
+      nav.appendChild(b);
+    });
+  }
+
+  // ---------- try-on controls ----------
+  function drawUI() {
+    var chips = document.getElementById('comboChips'), lab = document.getElementById('combosLabel');
+    chips.textContent = '';
+    lab.textContent = st.combos.length ? 'your 3 combos' + (st.product && st.product.lipstick ? ' · natural lip estimated (you’re wearing lip color)' : '') : 'reading your lips…';
+    st.combos.forEach(function (c, idx) {
+      var b = el('button', { type: 'button', class: 'cchip', 'aria-pressed': String(idx === st.active) }, [
+        el('span', { class: 'cname', text: c.name }),
+        el('span', { class: 'cdots', 'aria-hidden': 'true' }, LAYERS.map(function (l) { return dot(get(l, c.picks[l]).hex); }))
+      ]);
+      b.onclick = function () { st.active = idx; st.before = false; syncButtons(); drawUI(); redraw(); };
+      chips.appendChild(b);
+    });
+    var c = st.combos[st.active], why = document.getElementById('whyBox'); why.textContent = '';
+    if (c) {
+      why.appendChild(el('p', { class: 'whyh' }, [el('b', { text: c.kicker + '. ' }), c.why + ' Here’s why each piece:']));
+      why.appendChild(el('ul', {}, LAYERS.map(function (l) { return el('li', {}, [el('span', { class: 'k', text: l }), el('span', { text: c.how[l] })]); })));
+    }
+    var show = st.show, layersEl = document.getElementById('layers'); layersEl.textContent = '';
+    LAYERS.forEach(function (l) {
+      var x = c ? get(l, c.picks[l]) : null;
+      var b3 = el('button', { type: 'button', class: 'layer', 'aria-pressed': String(!!show[l]) }, [dot(x ? x.hex : '#ddd'), el('span', { class: 'lt' }, [el('b', { text: l }), el('span', { text: show[l] ? 'on' : 'off' })])]);
+      b3.onclick = function () { st.show = Object.assign({}, show); st.show[l] = !show[l]; st.before = false; syncButtons(); drawUI(); redraw(); };
+      layersEl.appendChild(b3);
+    });
+    var tabs = document.getElementById('tabs'); tabs.textContent = '';
+    LAYERS.forEach(function (l) {
+      var b = el('button', { type: 'button', class: 'tab', 'aria-pressed': String(l === st.layer), text: l });
+      b.onclick = function () { st.layer = l; drawUI(); };
+      tabs.appendChild(b);
+    });
+    var sws = document.getElementById('swatches'); sws.textContent = '';
+    SHADES[st.layer].forEach(function (x) {
+      var b = el('button', { type: 'button', class: 'swb', 'aria-pressed': String(!!c && c.picks[st.layer] === x.id), 'aria-label': x.brand + ' ' + x.name + ', $' + x.price }, [dot(x.hex), el('b', { text: x.name }), el('span', { text: x.short })]);
+      b.disabled = !c;
+      b.onclick = function () { if (!c) return; c.picks[st.layer] = x.id; c.edited = true; st.show = Object.assign({}, st.show); st.show[st.layer] = true; st.before = false; syncButtons(); drawUI(); redraw(); };
+      sws.appendChild(b);
+    });
+    var pieces = document.getElementById('pieces'); pieces.textContent = '';
+    if (c) LAYERS.forEach(function (l) {
+      var x = get(l, c.picks[l]);
+      pieces.appendChild(el('div', { class: 'piece' + (show[l] ? '' : ' off') }, [dot(x.hex),
+        el('div', { class: 'pname' }, [el('span', { class: 'k', text: l }), el('b', { text: x.name }), el('span', { text: x.brand + ' · ' + x.product })]),
+        el('span', { class: 'price', text: '$' + x.price }),
+        el('a', { class: 'plink', href: x.url, target: '_blank', rel: 'noopener', text: 'view', 'aria-label': 'View ' + x.brand + ' ' + x.name + ' at ' + x.domain })]));
+    });
+    var on = LAYERS.filter(function (l) { return show[l]; }), ab = document.getElementById('addBtn');
+    var cost = c ? on.reduce(function (t2, l) { return t2 + get(l, c.picks[l]).price; }, 0) : 0;
+    var inBag = c && on.length && comboInBag(c, on);
+    ab.disabled = !c || !on.length;
+    ab.textContent = !c ? 'lock it in' : !on.length ? 'turn on a layer to lock it in' : inBag ? 'locked in · see collection' : 'lock in ' + (on.length === 3 ? 'all 3' : on.length === 1 ? 'the ' + on[0] : on.join(' + ')) + ' · $' + cost;
+  }
+  function syncButtons() {
+    var b = document.getElementById('before'); b.setAttribute('aria-pressed', String(st.before)); b.textContent = st.before ? 'show combo' : 'bare lips';
+    var h = document.getElementById('hold'); h.setAttribute('aria-pressed', String(st.held && st.mode === 'live')); h.textContent = st.held && st.mode === 'live' ? 'go live again' : 'hold still';
+  }
+  document.getElementById('before').onclick = function () { st.before = !st.before; syncButtons(); redraw(); };
+  document.getElementById('hold').onclick = function () {
+    if (st.mode !== 'live') return;
+    if (!st.held) { holdC.width = W; holdC.height = H; hctx.drawImage(lastSrc && lastSrc.videoWidth ? lastSrc : video, 0, 0, W, H); st.held = true; redraw(); }
+    else { st.held = false; }
+    syncButtons();
+  };
+  document.getElementById('intensityRange').oninput = function (e) { st.intensity = +e.target.value; redraw(); };
+  document.getElementById('rereadBtn').onclick = function () {
+    st.read = null; st.combos = []; stable = 0; drawUI();
+    if (st.mode === 'photo' && fm) { fm.reset(); fm.send({ image: holdC }); } else if (st.held) redraw();
+  };
+  document.getElementById('addBtn').onclick = function () {
+    var c = st.combos[st.active], on = LAYERS.filter(function (l) { return st.show[l]; });
+    if (!c || !on.length) return;
+    if (comboInBag(c, on)) { stopLive(); showView('bag'); return; }
+    addCombo(c, on);
+    document.getElementById('tryStatus').textContent = 'Locked in. Keep trying, or open your collection to check out.';
+    drawUI();
+  };
+
+  // ---------- collection ----------
+  var memBag = [];
+  function loadBag() { try { var v = JSON.parse(localStorage.getItem('lippy-bag') || 'null'); return Array.isArray(v) ? v : memBag; } catch (e) { return memBag; } }
+  function storeBag(b) { memBag = b; try { localStorage.setItem('lippy-bag', JSON.stringify(b)); } catch (e) {} drawBagCount(); }
+  function comboInBag(c, layers) { var bag = loadBag(); return (layers || LAYERS).every(function (l) { return bag.some(function (x) { return x.layer === l && x.id === c.picks[l]; }); }); }
+  function addCombo(c, layers) {
+    var bag = loadBag(), added = 0;
+    (layers || LAYERS).forEach(function (l) { if (!bag.some(function (x) { return x.layer === l && x.id === c.picks[l]; })) { bag.push({ layer: l, id: c.picks[l], qty: 1 }); added++; } });
+    storeBag(bag); return added;
+  }
+  function drawBagCount() { document.getElementById('bagCount').textContent = loadBag().reduce(function (s2, x) { return s2 + x.qty; }, 0); }
+  function checkoutUrl(domain, items) {
+    // real build: one Shopify cart permalink per store, using variant ids from the catalog
+    if (items.every(function (it) { return it.shade.variant; })) return 'https://' + domain + '/cart/' + items.map(function (it) { return it.shade.variant + ':' + it.qty; }).join(',');
+    return items[0].shade.url;
+  }
+  function drawBag() {
+    var bag = loadBag(), list = document.getElementById('bagList'); list.textContent = '';
+    var groups = {}, order = [], grand = 0;
+    bag.forEach(function (x) {
+      var sh = get(x.layer, x.id); if (!sh) return;
+      if (!groups[sh.domain]) { groups[sh.domain] = []; order.push(sh.domain); }
+      groups[sh.domain].push({ shade: sh, layer: x.layer, qty: x.qty });
+    });
+    var openedN = order.filter(function (d) { return st.opened[d]; }).length;
+    document.getElementById('bagProgress').textContent = order.length ? 'checked out at ' + openedN + ' of ' + order.length + (order.length === 1 ? ' shop' : ' shops') : '';
+    if (!order.length) {
+      var go = el('button', { type: 'button', class: 'btn primary', text: 'try something on' });
+      go.onclick = function () { showView(st.mode ? 'tryon' : 'start'); };
+      list.appendChild(el('div', { class: 'empty' }, [el('p', { class: 'lede', text: 'Nothing locked in yet. Lock in a combo, or just the pieces you like, and they land here grouped by brand.' }), go]));
+    }
+    order.forEach(function (dom) {
+      var items = groups[dom], sub = 0;
+      var rows = items.map(function (it) {
+        sub += it.shade.price * it.qty;
+        var rm = el('button', { type: 'button', class: 'remove', text: 'remove', 'aria-label': 'Remove ' + it.shade.name });
+        rm.onclick = function () { storeBag(loadBag().filter(function (x) { return !(x.layer === it.layer && x.id === it.shade.id); })); drawBag(); };
+        return el('div', { class: 'bitem' }, [dot(it.shade.hex), el('div', { class: 'pname' }, [el('span', { class: 'k', text: it.layer }), el('b', { text: it.shade.name }), el('span', { text: it.shade.product })]), el('span', { class: 'price', text: '$' + it.shade.price }), rm]);
+      });
+      grand += sub;
+      var opened = !!st.opened[dom];
+      var co = el('a', { class: 'btn ' + (opened ? '' : 'primary') + ' wide', href: checkoutUrl(dom, items), target: '_blank', rel: 'noopener', text: (opened ? 'opened · ' : 'check out at ') + dom + ' · $' + sub });
+      co.addEventListener('click', function () { st.opened[dom] = true; setTimeout(drawBag, 50); });
+      list.appendChild(el('div', { class: 'shop' }, [el('div', { class: 'shoph' }, [el('h3', { text: items[0].shade.brand }), el('span', { class: opened ? 'done' : '', text: opened ? 'opened' : items.length + (items.length === 1 ? ' piece' : ' pieces') })])].concat(rows).concat([co])));
+    });
+    document.getElementById('bagSum').textContent = '$' + grand;
+  }
+
+  // ---------- nav ----------
+  document.getElementById('bagBtn').onclick = function () { st.held = st.held || false; showView('bag'); };
+  document.getElementById('bagBack').onclick = function () { showView(st.mode ? 'tryon' : 'start'); };
+  document.getElementById('home').onclick = function () { stopLive(); showView('start'); };
+  document.getElementById('liveBtn').onclick = startLive;
+  document.getElementById('upload').onchange = function (e) { var f = e.target.files && e.target.files[0]; if (f) usePhoto(f); e.target.value = ''; };
+
+  drawBagCount(); syncButtons(); drawUI(); showView('start');
+})();
+</script>
+</body>
+</html>
