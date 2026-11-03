@@ -224,6 +224,11 @@ details.fix[open] summary::after { content: "−"; }
 .swb:disabled { opacity: 0.4; cursor: default; }
 #camNote { text-align: center; }
 @media (prefers-reduced-motion: reduce) { .live span { animation: none; } }
+details.how { border-top: 1px solid var(--line); padding-top: 6px; }
+details.how summary { min-height: 40px; display: flex; align-items: center; cursor: pointer; font-size: 12px; font-weight: 700; color: #C8102E; list-style: none; }
+details.how summary::-webkit-details-marker { display: none; }
+details.how summary::after { content: "+"; margin-left: auto; }
+details.how[open] summary::after { content: "\2212"; }
 </style>
 <style>html,body{margin:0}img{max-width:100%}:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}</style>
 </head>
@@ -325,6 +330,7 @@ details.fix[open] summary::after { content: "−"; }
 <script>
 (function () {
   /*REC*/
+  // ---------- shades: real products from Shopify stores; colors estimated from each brand's shade description ----------
   var BR = {
     ky: { brand: 'Kylie Cosmetics', short: 'Kylie', product: 'Precision Pout Lip Liner', domain: 'kyliecosmetics.com', url: 'https://kyliecosmetics.com/products/precision-pout-lip-liner', price: 19 },
     rb: { brand: 'Rare Beauty', short: 'Rare Beauty', product: 'Kind Words Matte Lipstick', domain: 'rarebeauty.com', url: 'https://rarebeauty.com/products/kind-words-matte-lipstick', price: 20 },
@@ -334,13 +340,31 @@ details.fix[open] summary::after { content: "−"; }
   // variant: Shopify variant id, filled in from the catalog in the real build. null = link to the product page instead of a cart link.
   function s(b, id, name, hex, cov, desc) { return Object.assign({ id: id, name: name, hex: hex, cov: cov, desc: desc, variant: null }, BR[b]); }
   var SHADES = {
-    liner: [s('ky','moody-nude','Moody Nude','#9A6457',.9,'nude'), s('ky','chill-brown','Chill Brown','#7A4A3C',.9,'brown'), s('ky','cinnamon','Cinnamon','#8C4532',.9,'warm brown'), s('ky','sultry','Sultry','#5E2A2C',.9,'deep wine-brown'), s('ky','cocoa','Cocoa','#4A2A22',.9,'deep brown')],
-    lipstick: [s('rb','talented','Talented','#B98A78',.9,'true neutral beige'), s('rb','wise','Wise','#9B6450',.9,'warm brown nude'), s('rb','worthy','Worthy','#9E6A6E',.9,'muted mauve'), s('rb','lively','Lively','#C0606E',.9,'rose pink'), s('rb','bold','Bold','#8C2F45',.9,'deep berry rose'), s('rb','devoted','Devoted','#B3192B',.95,'true red'), s('rb','gifted','Gifted','#6B3A4A',.9,'deep dusty plum'), s('rb','strong','Strong','#5A3328',.9,'rich chocolate brown')],
-    gloss: [s('t28','chill','Chill','#F4ECEA',.05,'clear'), s('t28','sesame','Sesame','#C99A9E',.35,'milky mauve'), s('t28','wild','Wild','#C2385E',.45,'sheer-ish raspberry'), s('t28','cashew','Cashew','#A8706A',.35,'milky rosy brown'), s('t28','almond','Almond','#8A5A48',.35,'milky chocolate'), s('ko','malibu','Malibu','#E58FA6',.3,'surfy pink'), s('ko','cola','Cola','#7A3E32',.3,'sheer rich brown'), s('ko','jaws','Jaws','#A3121F',.4,'hot blood red')]
+    liner: [
+      s('ky', 'comes-naturally', 'Comes Naturally', '#A8706A', .9, 'rosy nude'), s('ky', 'moody-nude', 'Moody Nude', '#9A6457', .9, 'nude'),
+      s('ky', 'cappuccino', 'Cappuccino', '#8A5A46', .9, 'medium brown'), s('ky', 'cinnamon', 'Cinnamon', '#8C4532', .9, 'warm brown'),
+      s('ky', 'chill-brown', 'Chill Brown', '#7A4A3C', .9, 'brown'), s('ky', 'sultry', 'Sultry', '#5E2A2C', .9, 'deep wine-brown'),
+      s('ky', 'cocoa', 'Cocoa', '#4A2A22', .9, 'deep brown')],
+    lipstick: [
+      s('rb', 'talented', 'Talented', '#B98A78', .9, 'true neutral beige'), s('rb', 'creative', 'Creative', '#C98A75', .9, 'muted peach'),
+      s('rb', 'lively', 'Lively', '#C0606E', .9, 'rose pink'), s('rb', 'humble', 'Humble', '#A86872', .9, 'rose mauve'),
+      s('rb', 'worthy', 'Worthy', '#9E6A6E', .9, 'muted mauve'), s('rb', 'fun', 'Fun', '#977076', .9, 'neutral mauve'),
+      s('rb', 'wise', 'Wise', '#9B6450', .9, 'warm brown nude'), s('rb', 'devoted', 'Devoted', '#B3192B', .95, 'true red'),
+      s('rb', 'bold', 'Bold', '#8C2F45', .9, 'deep berry rose'), s('rb', 'gifted', 'Gifted', '#6B3A4A', .9, 'deep dusty plum'),
+      s('rb', 'strong', 'Strong', '#5A3328', .9, 'rich chocolate brown')],
+    gloss: [
+      s('t28', 'chill', 'Chill', '#F4ECEA', .05, 'clear'), s('t28', 'xoxo', 'XOXO', '#E8A0AE', .25, 'sheer pink'),
+      s('t28', 'oat', 'Oat', '#DDAA98', .35, 'milky peachy pink'), s('t28', 'coconut', 'Coconut', '#D9A2A6', .35, 'milky rosy pink'),
+      s('t28', 'sesame', 'Sesame', '#C99A9E', .35, 'milky mauve'), s('t28', 'cashew', 'Cashew', '#A8706A', .35, 'milky rosy brown'),
+      s('t28', 'almond', 'Almond', '#8A5A48', .35, 'milky chocolate'), s('t28', 'wild', 'Wild', '#C2385E', .45, 'sheer-ish raspberry'),
+      s('ko', 'dip', 'Dip', '#C28E7E', .3, 'bikini nude'), s('ko', 'malibu', 'Malibu', '#E58FA6', .3, 'surfy pink'),
+      s('ko', 'cola', 'Cola', '#7A3E32', .3, 'sheer rich brown'), s('ko', 'slushy', 'Slushy', '#B52638', .35, 'sheer cherry red'),
+      s('ko', 'jaws', 'Jaws', '#A3121F', .4, 'hot blood red')]
   };
   var LAYERS = ['liner', 'lipstick', 'gloss'];
   function get(l, id) { return SHADES[l].filter(function (x) { return x.id === id; })[0]; }
 
+  // ---------- color math ----------
   var LIN = new Float32Array(256);
   for (var q = 0; q < 256; q++) { var c0 = q / 255; LIN[q] = c0 <= 0.04045 ? c0 / 12.92 : Math.pow((c0 + 0.055) / 1.055, 2.4); }
   function f(t) { return t > 0.008856 ? Math.cbrt(t) : 7.787 * t + 16 / 116; }
@@ -349,32 +373,44 @@ details.fix[open] summary::after { content: "−"; }
     var fx = f(x), fy = f(y), fz = f(z);
     return [116 * fy - 16, 500 * (fx - fy), 200 * (fy - fz)];
   }
-  function hexLabRaw(hex) { return linToLab(LIN[parseInt(hex.substr(1, 2), 16)], LIN[parseInt(hex.substr(3, 2), 16)], LIN[parseInt(hex.substr(5, 2), 16)]); }
-  function dE(p, q2) { var a = p[0] - q2[0], b = p[1] - q2[1], c = p[2] - q2[2]; return Math.sqrt(a * a + b * b + c * c); }
-  function hue(lab) { return Math.atan2(lab[2], lab[1]) * 180 / Math.PI; } // signed: berry/plum shades go slightly negative
+  var HEXLAB = {};
+  function hexLabRaw(hex) { return HEXLAB[hex] || (HEXLAB[hex] = linToLab(LIN[parseInt(hex.substr(1, 2), 16)], LIN[parseInt(hex.substr(3, 2), 16)], LIN[parseInt(hex.substr(5, 2), 16)])); }
+  function hue(lab) { return Math.atan2(lab[2], lab[1]) * 180 / Math.PI; } // signed: berry and plum go slightly negative
   function chroma(lab) { return Math.sqrt(lab[1] * lab[1] + lab[2] * lab[2]); }
-  function best(list, score, skip) {
-    var pool = list.filter(function (x) { return !skip || skip.indexOf(x.id) < 0; });
-    if (!pool.length) pool = list;
-    var top = null, ts = Infinity;
-    pool.forEach(function (x) { var v = score(x, hexLabRaw(x.hex)); if (v < ts) { ts = v; top = x; } });
-    return top;
-  }
-  function linerFor(lipstick, deeper, skip) {
-    var L = hexLabRaw(lipstick.hex), t = [L[0] - deeper, L[1] * 0.85, L[2] + 2];
-    return best(SHADES.liner, function (x, lab) { return dE(lab, t); }, skip);
+  // CIEDE2000: how different two colors look to a person (more accurate than straight-line distance, especially for reds and pinks)
+  function dE00(l1, l2) {
+    var L1 = l1[0], a1 = l1[1], b1 = l1[2], L2 = l2[0], a2 = l2[1], b2 = l2[2], P7 = Math.pow(25, 7);
+    var Cb = (Math.hypot(a1, b1) + Math.hypot(a2, b2)) / 2, Cb7 = Math.pow(Cb, 7), G = 0.5 * (1 - Math.sqrt(Cb7 / (Cb7 + P7)));
+    var a1p = (1 + G) * a1, a2p = (1 + G) * a2, C1p = Math.hypot(a1p, b1), C2p = Math.hypot(a2p, b2);
+    var h1p = Math.atan2(b1, a1p); if (h1p < 0) h1p += 2 * Math.PI;
+    var h2p = Math.atan2(b2, a2p); if (h2p < 0) h2p += 2 * Math.PI;
+    var dLp = L2 - L1, dCp = C2p - C1p, dhp = 0;
+    if (C1p * C2p !== 0) { dhp = h2p - h1p; if (dhp > Math.PI) dhp -= 2 * Math.PI; else if (dhp < -Math.PI) dhp += 2 * Math.PI; }
+    var dHp = 2 * Math.sqrt(C1p * C2p) * Math.sin(dhp / 2);
+    var Lbp = (L1 + L2) / 2, Cbp = (C1p + C2p) / 2, hbp = h1p + h2p;
+    if (C1p * C2p !== 0) { hbp = (h1p + h2p) / 2; if (Math.abs(h1p - h2p) > Math.PI) hbp += (h1p + h2p < 2 * Math.PI) ? Math.PI : -Math.PI; }
+    var T = 1 - 0.17 * Math.cos(hbp - Math.PI / 6) + 0.24 * Math.cos(2 * hbp) + 0.32 * Math.cos(3 * hbp + Math.PI / 30) - 0.20 * Math.cos(4 * hbp - 63 * Math.PI / 180);
+    var dTh = (30 * Math.PI / 180) * Math.exp(-Math.pow((hbp * 180 / Math.PI - 275) / 25, 2));
+    var Cbp7 = Math.pow(Cbp, 7), Rc = 2 * Math.sqrt(Cbp7 / (Cbp7 + P7));
+    var Sl = 1 + 0.015 * Math.pow(Lbp - 50, 2) / Math.sqrt(20 + Math.pow(Lbp - 50, 2)), Sc = 1 + 0.045 * Cbp, Sh = 1 + 0.015 * Cbp * T, Rt = -Math.sin(2 * dTh) * Rc;
+    return Math.sqrt(Math.pow(dLp / Sl, 2) + Math.pow(dCp / Sc, 2) + Math.pow(dHp / Sh, 2) + Rt * (dCp / Sc) * (dHp / Sh));
   }
 
-  // read = { lip: Lab, skin: Lab }. Returns depth/undertone labels plus three combos.
+  // ---------- reading skin ----------
+  // ITA (Individual Typology Angle): the standard dermatology measure of how light or deep skin is.
+  function ita(skin) { return Math.atan((skin[0] - 50) / Math.max(1, skin[2])) * 180 / Math.PI; }
+  var BANDS = [
+    { min: 55, name: 'very light', bold: [32, 50] }, { min: 41, name: 'light', bold: [30, 48] },
+    { min: 28, name: 'medium', bold: [27, 45] }, { min: 10, name: 'tan', bold: [23, 41] },
+    { min: -30, name: 'brown', bold: [18, 36] }, { min: -999, name: 'deep', bold: [12, 31] }];
+  function bandOf(skin) { var t = ita(skin); for (var k = 0; k < BANDS.length; k++) if (t > BANDS[k].min) return BANDS[k]; return BANDS[BANDS.length - 1]; }
   function describe(read) {
-    var sL = read.skin[0], h = hue(read.skin);
-    var depth = sL > 68 ? 'light' : sL > 56 ? 'light-medium' : sL > 44 ? 'medium' : sL > 32 ? 'tan to deep' : 'deep';
+    var sk = read.skin, h = hue(sk), band = bandOf(sk);
     var tone = h > 57 ? 'warm' : h < 47 ? 'cool' : 'neutral';
     var lh = hue(read.lip), lc = chroma(read.lip), lL = read.lip[0];
     var lipWord = (lL > 58 ? 'soft ' : lL < 40 ? 'deep ' : '') + (lc < 14 ? 'neutral' : lh < 22 ? 'rosy berry' : lh < 38 ? 'rosy' : lh < 52 ? 'rosy brown' : 'warm brown');
-    return { depth: depth, tone: tone, lipWord: lipWord.trim() };
+    return { depth: band.name, band: band, ita: Math.round(ita(sk)), tone: tone, lipWord: lipWord.trim() };
   }
-
   // Natural lips sit a little darker and pinker than the skin around them, with soft color.
   // Lipstick usually breaks that: very saturated, lighter than skin, an odd hue, or very shiny.
   function detectProduct(read) {
@@ -385,56 +421,75 @@ details.fix[open] summary::after { content: "−"; }
     if (sk[0] > 50 && sk[0] - lip[0] > 30) why.push('much darker than your skin');
     return { lipstick: why.length > 0, glossy: (read.shine || 0) > 0.1, why: why };
   }
-  // When lip color is already on, estimate the natural lip from the skin around it:
-  // bare lips sit a little darker and pinker than skin; the gap is bigger on lighter skin,
-  // and deeper skin tends toward browner, less pink lips.
+  // When lip color is already on, estimate the natural lip from the skin around it.
   function predictNatural(sk) {
     var t = Math.max(0, Math.min(1, (70 - sk[0]) / 40));
     return [Math.max(12, sk[0] - (4 + 0.12 * sk[0])), sk[1] + 14 - 4 * t, sk[2] - 6 + 2 * t];
   }
 
+  // ---------- scoring ----------
+  function outside(v, lo, hi) { return v < lo ? lo - v : v > hi ? v - hi : 0; }
+  function rank(list, score, skip) {
+    var pool = list.filter(function (x) { return !skip || skip.indexOf(x.id) < 0; });
+    return pool.map(function (x) { return { x: x, s: score(x, hexLabRaw(x.hex)) }; }).sort(function (a, b) { return a.s - b.s; });
+  }
+  // undertone fit: warm skin suits peach/brown nudes, cool skin suits rose/mauve
+  function tonePenalty(tone, lab) { var h = hue(lab); return tone === 'warm' ? Math.max(0, 25 - h) * 0.4 : tone === 'cool' ? Math.max(0, h - 30) * 0.4 : 0; }
+  function pickLiner(ls, deeperBy) {
+    var L = hexLabRaw(ls.hex), t = [L[0] - deeperBy, L[1] * 0.9, L[2] + 2];
+    return rank(SHADES.liner, function (x, lab) { return dE00(lab, t) + 2.5 * outside(L[0] - lab[0], 5, 20); })[0].x;
+  }
+  // milky light glosses go chalky on skin deeper than they are
+  function chalky(x, lab, sk) { return x.cov >= 0.3 && lab[0] > sk[0] + 4 ? 25 : 0; }
+
   function recommend(read, seen) {
     seen = seen || { lipstick: [] };
     var info = describe(read), used = seen.lipstick.slice(), out = [];
-    var lip = read.lip, sk = read.skin;
+    var lip = read.lip, sk = read.skin, sL = sk[0];
+    var tooLight = function (lab) { return lab[0] > sL - 3 ? 40 : 0; }; // a lipstick lighter than your skin reads chalky
 
-    // 1. your lips, but better: lipstick closest to a slightly richer version of your own lip color
-    var t1 = [lip[0] - 4, lip[1] * 1.12, lip[2]];
-    var ls1 = best(SHADES.lipstick, function (x, lab) { return dE(lab, t1) + (chroma(lab) > 50 ? 30 : 0); }, used);
-    used.push(ls1.id);
-    var ln1 = linerFor(ls1, 10);
-    var L1 = hexLabRaw(ls1.hex), g1t = [L1[0] + 12, L1[1], L1[2]];
-    var g1 = best(SHADES.gloss.filter(function (x) { return x.cov <= 0.35; }), function (x, lab) { return x.id === 'chill' ? 20 : dE(lab, g1t); });
+    // 1. everyday: your natural lip, a little richer, never lighter than your lips or skin
+    var hiL = Math.min(lip[0], sL - 4), t1 = [lip[0] - 4, lip[1] * 1.1, lip[2]];
+    var lipC = chroma(lip);
+    // everyday stays close to your own lip saturation: no jump to a bright berry or red
+    var nudes = SHADES.lipstick.filter(function (x) { var lab = hexLabRaw(x.hex); return chroma(lab) < 34 && hue(lab) >= 12; });
+    var nt = [sL - 14, 17, 16];
+    var score2 = function (x, lab) { return dE00(lab, nt) + 2.5 * outside(lab[0], sL - 26, sL - 7) + tooLight(lab) + tonePenalty(info.tone, lab) * 0.6; };
+    var score1 = function (x, lab) { return dE00(lab, t1) + 2.5 * outside(lab[0], hiL - 12, hiL + 3) + tooLight(lab) + tonePenalty(info.tone, lab) + 0.8 * Math.max(0, chroma(lab) - (lipC + 10)); };
+    // choose everyday + 90s lipsticks together: the pair with the best combined fit, two different shades when possible
+    var e1 = rank(SHADES.lipstick, score1, used), e2 = rank(nudes, score2, used), bestPair = null;
+    e1.forEach(function (a) { e2.forEach(function (b) { if (a.x.id === b.x.id) return; var t = a.s + b.s; if (!bestPair || t < bestPair.t) bestPair = { a: a.x, b: b.x, t: t }; }); });
+    var same = e1[0].s + rank(nudes, score2, used).filter(function (b) { return b.x.id === e1[0].x.id; }).concat([{ s: 999 }])[0].s;
+    var ls1 = bestPair && bestPair.t < same + 25 ? bestPair.a : e1[0].x, ls2 = bestPair && bestPair.t < same + 25 ? bestPair.b : e1[0].x;
+    used.push(ls1.id); used.push(ls2.id);
+    var ln1 = pickLiner(ls1, 10), L1 = hexLabRaw(ls1.hex);
+    var g1 = rank(SHADES.gloss.filter(function (x) { return x.cov <= 0.35; }), function (x, lab) { if (ls1.id === ls2.id && x.id === 'chill') return 0; // same lipstick as 90s: keep everyday clear and simple
+       return x.id === 'chill' ? 14 : dE00(lab, [L1[0] + 8, L1[1], L1[2]]) + chalky(x, lab, sk); })[0].x;
     out.push({ key: 'everyday', name: 'everyday', kicker: 'your lips, but better', picks: { liner: ln1.id, lipstick: ls1.id, gloss: g1.id },
       why: 'Built from your natural lip color.',
-      how: { lipstick: ls1.name + ' is the closest shade to your natural ' + info.lipWord + ' lip color, one step richer.',
-             liner: ln1.name + ' is one step deeper than ' + ls1.name + ', so the edge looks defined, not drawn on.',
+      how: { lipstick: ls1.name + ' is the closest shade to your natural ' + info.lipWord + ' lip color, a touch richer and never lighter than your lips.',
+             liner: ln1.name + ' sits one step deeper than ' + ls1.name + ', so the edge looks defined, not drawn on.',
              gloss: g1.id === 'chill' ? 'Chill is clear, so you get shine without changing the color.' : g1.name + ' is a sheer tint in the same family, for shine without changing the color.' } });
 
-    // 2. 90s brown: dark brown edge, nude picked for skin depth, sheer gloss
-    var nt = [Math.max(28, Math.min(66, sk[0] - 10)), 18, 16];
-    var ls2 = best(SHADES.lipstick.filter(function (x) { var lab = hexLabRaw(x.hex); return chroma(lab) < 32 && hue(lab) >= 25; }), function (x, lab) { return dE(lab, nt); }, used);
-    used.push(ls2.id);
+    // 2. 90s brown: a nude that sits deeper than your skin, and a dark brown edge
     var L2 = hexLabRaw(ls2.hex);
-    var ln2 = best(SHADES.liner, function (x, lab) { return Math.abs(lab[0] - Math.max(22, L2[0] - 24)) + (lab[2] < 10 ? 15 : 0); });
-    var g2t = [Math.max(30, sk[0] - 4), 16, 14];
-    var g2 = best(SHADES.gloss, function (x, lab) { return x.id === 'chill' ? 22 : (x.cov > 0.4 ? 99 : dE(lab, g2t)); });
+    var ln2 = rank(SHADES.liner, function (x, lab) { return 2.5 * outside(L2[0] - lab[0], 12, 26) + (hue(lab) < 20 ? 10 : 0) + Math.abs(chroma(lab) - 18) * 0.3; })[0].x;
+    var g2 = rank(SHADES.gloss.filter(function (x) { return x.cov <= 0.4; }), function (x, lab) { return x.id === 'chill' ? 16 : dE00(lab, [sL - 8, 16, 14]) + chalky(x, lab, sk); })[0].x;
     out.push({ key: '90s', name: '90s brown', kicker: 'the TikTok classic', picks: { liner: ln2.id, lipstick: ls2.id, gloss: g2.id },
       why: 'Built from your skin depth.',
-      how: { liner: ln2.name + ' is a deep brown, for the dark blended edge 90s lips are known for.',
-             lipstick: ls2.name + ' is a nude picked for ' + info.depth + ' skin, so it won’t wash you out.',
+      how: { liner: ln2.name + ' is a deep brown, ' + Math.round(L2[0] - hexLabRaw(ln2.hex)[0]) + ' steps darker than the lipstick, for the dark blended 90s edge.',
+             lipstick: ls2.name + ' is a nude picked to sit deeper than ' + info.depth + ' skin (ITA ' + info.ita + '°), so it won’t wash you out.',
              gloss: g2.id === 'chill' ? 'Chill adds clear shine on top.' : g2.name + ' (' + g2.desc + ') is sheer, so it adds shine and keeps the brown tone.' } });
 
-    // 3. night out: a red or berry matched to undertone and depth
-    var th = info.tone === 'warm' ? 30 : info.tone === 'cool' ? 8 : 18, tL = Math.max(28, Math.min(48, sk[0] * 0.6));
-    var ls3 = best(SHADES.lipstick.filter(function (x) { var lab = hexLabRaw(x.hex); return chroma(lab) >= 20 && lab[0] < 50 && hue(lab) < 35; }), function (x, lab) { return Math.abs(hue(lab) - th) + 0.9 * Math.abs(lab[0] - tL); }, used);
-    used.push(ls3.id);
-    var ln3 = linerFor(ls3, 12);
-    var L3 = hexLabRaw(ls3.hex);
-    var g3 = best(SHADES.gloss, function (x, lab) { return x.id === 'chill' ? 18 : (x.cov < 0.3 ? 99 : dE(lab, L3)); });
+    // 3. night out: a bold shade at the right depth for your skin, leaning with your undertone
+    var th = info.tone === 'warm' ? 28 : info.tone === 'cool' ? 6 : 16, bd = info.band.bold;
+    var r3 = rank(SHADES.lipstick.filter(function (x) { var lab = hexLabRaw(x.hex); return chroma(lab) >= 20 && hue(lab) < 35; }), function (x, lab) { return 0.5 * Math.abs(hue(lab) - th) + 2 * outside(lab[0], bd[0], bd[1]) + tooLight(lab); }, used);
+    var ls3 = (r3[0] || rank(SHADES.lipstick, function (x, lab) { return -chroma(lab); }, used)[0]).x; used.push(ls3.id);
+    var ln3 = pickLiner(ls3, 9), L3 = hexLabRaw(ls3.hex);
+    var g3 = rank(SHADES.gloss, function (x, lab) { return x.id === 'chill' ? 14 : (x.cov < 0.3 ? 99 : dE00(lab, L3) + chalky(x, lab, sk)); })[0].x;
     out.push({ key: 'night', name: 'night out', kicker: 'the statement', picks: { liner: ln3.id, lipstick: ls3.id, gloss: g3.id },
-      why: 'Built from your undertone.',
-      how: { lipstick: ls3.name + ' (' + ls3.desc + ') is the bold shade closest to your ' + info.tone + ' undertone and ' + info.depth + ' skin.',
+      why: 'Built from your undertone and skin depth.',
+      how: { lipstick: ls3.name + ' (' + ls3.desc + ') leans ' + (th >= 25 ? 'warm' : th <= 10 ? 'cool' : 'balanced') + ' for your ' + info.tone + ' undertone, at a depth that pops on ' + info.depth + ' skin.',
              liner: ln3.name + ' is the liner closest to ' + ls3.name + ', one step deeper, to keep the edge crisp.',
              gloss: g3.id === 'chill' ? 'Chill adds clear shine so the color stays true.' : g3.name + ' is the tinted gloss closest to ' + ls3.name + ', for a wet finish.' } });
 
@@ -518,7 +573,13 @@ details.fix[open] summary::after { content: "−"; }
     return bb;
   }
 
-  // read natural lip + skin color from a frame (used for the 3 combos)
+  // read natural lip + skin color from one frame (used for the 3 combos)
+  var EYES = [[33, 133], [362, 263]];
+  function trimmed(Ls, As, Bs) { // ignore the brightest and darkest 20% (shine and shadow)
+    var idx = Ls.map(function (v, k) { return k; }).sort(function (a, b) { return Ls[a] - Ls[b]; });
+    var keep = idx.slice(Math.floor(idx.length * 0.2), Math.ceil(idx.length * 0.8));
+    return [median(keep.map(function (k) { return Ls[k]; })), median(keep.map(function (k) { return As[k]; })), median(keep.map(function (k) { return Bs[k]; }))];
+  }
   function readColors(lm, bb) {
     var fd = fctx.getImageData(0, 0, W, H).data, md = mctx.getImageData(bb.x, bb.y, bb.w, bb.h).data;
     var lipL = [], lipA = [], lipB = [], hi = 0;
@@ -526,19 +587,63 @@ details.fix[open] summary::after { content: "−"; }
       if (md[(y * bb.w + x) * 4 + 3] < 230) continue;
       var lab = pxLab(fd, ((bb.y + y) * W + bb.x + x) * 4); lipL.push(lab[0]); lipA.push(lab[1]); lipB.push(lab[2]);
     }
+    if (lipL.length < 30) return null;
     var mL = median(lipL.slice());
     for (var i = 0; i < lipL.length; i++) if (lipL[i] > mL + 22) hi++;
-    var sL = [], sA = [], sB = [], r = Math.max(2, Math.round(bb.w * 0.05));
-    CHEEKS.forEach(function (k) {
-      var cx = Math.round(lm[k].x * W), cy = Math.round(lm[k].y * H);
-      for (var yy = cy - r; yy <= cy + r; yy++) for (var xx = cx - r; xx <= cx + r; xx++) {
+    function patch(px, py, r, out) {
+      for (var yy = Math.round(py) - r; yy <= Math.round(py) + r; yy++) for (var xx = Math.round(px) - r; xx <= Math.round(px) + r; xx++) {
         if (xx < 0 || yy < 0 || xx >= W || yy >= H) continue;
-        var lab2 = pxLab(fd, (yy * W + xx) * 4); sL.push(lab2[0]); sA.push(lab2[1]); sB.push(lab2[2]);
+        out.push(pxLab(fd, (yy * W + xx) * 4));
       }
+    }
+    var sk = [], r = Math.max(2, Math.round(bb.w * 0.05));
+    CHEEKS.forEach(function (k) { patch(lm[k].x * W, lm[k].y * H, r, sk); });
+    if (sk.length < 9) return null;
+    var skin = trimmed(sk.map(function (c) { return c[0]; }), sk.map(function (c) { return c[1]; }), sk.map(function (c) { return c[2]; }));
+    // a white reference tells us the light's color and how bright the camera made everything:
+    // the whites of the eyes, plus teeth when you're smiling
+    var wh = [];
+    EYES.forEach(function (e) {
+      var ax = lm[e[0]].x * W, ay = lm[e[0]].y * H, bx = lm[e[1]].x * W, by = lm[e[1]].y * H, ew = Math.hypot(bx - ax, by - ay), re = Math.max(1, Math.round(ew * 0.07));
+      [0.2, 0.8].forEach(function (t) { patch(ax + (bx - ax) * t, ay + (by - ay) * t, re, wh); });
     });
-    if (lipL.length < 30 || sL.length < 9) return null;
-    return { lip: [mL, median(lipA), median(lipB)], skin: [median(sL), median(sA), median(sB)], shine: hi / lipL.length };
+    var mouth = mouthPixels(lm);
+    for (var mI = 0; mI < mouth.length; mI++) wh.push(pxLab(fd, mouth[mI] * 4));
+    wh = wh.filter(function (c) { return Math.hypot(c[1], c[2]) < 14; }).sort(function (a, b) { return b[0] - a[0]; });
+    wh = wh.slice(0, Math.floor(wh.length * 0.3));
+    var ref = null;
+    if (wh.length >= 15) {
+      var refL = median(wh.map(function (c) { return c[0]; }));
+      // only trust it if it's clearly brighter than skin; otherwise we probably sampled skin or eyelid
+      if (refL > skin[0] + 6) ref = { L: refL, a: median(wh.map(function (c) { return c[1]; })), b: median(wh.map(function (c) { return c[2]; })) };
+    }
+    return { lip: trimmed(lipL, lipA, lipB), skin: skin, shine: hi / lipL.length, ref: ref };
   }
+  // pixels inside the mouth opening (teeth when smiling)
+  var mouthC = document.createElement('canvas'), mouthX = mouthC.getContext('2d', { willReadFrequently: true });
+  function mouthPixels(lm) {
+    if (mouthC.width !== W || mouthC.height !== H) { mouthC.width = W; mouthC.height = H; }
+    var p = LIP_IN.map(function (i) { return [lm[i].x * W, lm[i].y * H]; }), x0 = W, x1 = 0, y0 = H, y1 = 0;
+    p.forEach(function (q) { if (q[0] < x0) x0 = q[0]; if (q[0] > x1) x1 = q[0]; if (q[1] < y0) y0 = q[1]; if (q[1] > y1) y1 = q[1]; });
+    x0 = Math.max(0, Math.floor(x0)); y0 = Math.max(0, Math.floor(y0)); var w = Math.min(W, Math.ceil(x1)) - x0, h = Math.min(H, Math.ceil(y1)) - y0;
+    if (w < 4 || h < 3) return [];
+    mouthX.clearRect(x0, y0, w, h); mouthX.fillStyle = '#fff'; path(mouthX, p); mouthX.fill();
+    var d = mouthX.getImageData(x0, y0, w, h).data, out = [];
+    for (var k = 0; k < w * h; k++) if (d[k * 4 + 3] > 200) out.push((y0 + Math.floor(k / w)) * W + x0 + (k % w));
+    return out;
+  }
+  // combine ~24 frames: the median of each value, so one bad frame can't skew the read
+  function combineReads(fr) {
+    function med3(key) { return [0, 1, 2].map(function (k) { return median(fr.map(function (r) { return r[key][k]; })); }); }
+    var refs = fr.filter(function (r) { return r.ref; }), ref = null;
+    if (refs.length >= fr.length / 3) ref = { L: median(refs.map(function (r) { return r.ref.L; })), a: median(refs.map(function (r) { return r.ref.a; })), b: median(refs.map(function (r) { return r.ref.b; })) };
+    return { lip: med3('lip'), skin: med3('skin'), shine: median(fr.map(function (r) { return r.shine; })), ref: ref };
+  }
+  // exposure: rescale lightness as if the white reference were a standard white (Y 0.62, about L 83)
+  function Yof(L) { var t = (L + 16) / 116; return t * t * t; }
+  function Lof(Y) { return Math.max(0, Math.min(100, 116 * Math.cbrt(Math.max(0, Y)) - 16)); }
+  function toTrueL(L) { return st.expo ? Lof(Yof(L) / Yof(st.expo) * 0.62) : L; }
+  function toPhotoL(L) { return st.expo ? Lof(Yof(L) / 0.62 * Yof(st.expo)) : L; }
 
   // recolor the lips for this frame
   var LCACHE = {};
@@ -559,8 +664,9 @@ details.fix[open] summary::after { content: "−"; }
     for (i = 0; i <= 100; i++) { acc += hist[i]; if (hiT === 100 && acc >= p82) hiT = i; if (acc >= p99) { hiMax = i; break; } }
     var span = Math.max(1, hiMax - hiT);
     var ln = get('liner', picks.liner), lp = get('lipstick', picks.lipstick), gl = get('gloss', picks.gloss);
-    var LN = shadeLab(ln.hex), LP = shadeLab(lp.hex), GL = shadeLab(gl.hex);
-    var NB = st.natural, flat = NB && st.product && st.product.glossy, mA = st.read ? st.read.lipRawA : 0, mB = st.read ? st.read.lipRawB : 0;
+    var c0 = st.cast ? st.cast[0] : 0, c1 = st.cast ? st.cast[1] : 0, lit = function (v) { return [toPhotoL(v[0]), v[1] + c0, v[2] + c1]; };
+    var LN = lit(shadeLab(ln.hex)), LP = lit(shadeLab(lp.hex)), GL = lit(shadeLab(gl.hex));
+    var NB = st.natural ? lit(st.natural) : null, flat = NB && st.product && st.product.glossy, mA = st.read ? st.read.lipRawA : 0, mB = st.read ? st.read.lipRawB : 0;
     for (i = 0; i < n; i++) {
       var m = md[i * 4 + 3] / 255; if (m < 0.012) continue;
       var L0 = Ls[i], L = L0, a = As[i], b = Bs[i], w, tl;
@@ -602,7 +708,7 @@ details.fix[open] summary::after { content: "−"; }
   }
 
   // one frame in: draw it, find lips, read colors once, paint
-  var stable = 0;
+  var stable = 0, frames = [];
   function drawFrame(src, lm) {
     var w = src.videoWidth || src.width, h = src.videoHeight || src.height;
     if (!w || !h) return;
@@ -613,16 +719,19 @@ details.fix[open] summary::after { content: "−"; }
     var bb = lipMasks(lm);
     if (!bb) { present(lm); return; }
     stable++;
-    if (!st.read && (st.mode !== 'live' || stable > 12)) {
+    if (!st.read && (st.mode !== 'live' || stable > 6)) {
       var rd = readColors(lm, bb);
-      if (rd) { takeRead(rd); }
+      if (rd) { frames.push(rd); if (st.mode !== 'live' || frames.length >= 24) takeRead(combineReads(frames)); }
     }
-    setHint(st.read ? '' : 'hold still, reading your lips…');
+    setHint(st.read ? '' : 'hold still, reading your lips…' + (st.mode === 'live' && frames.length ? ' ' + Math.round(frames.length / 24 * 100) + '%' : ''));
     paintLips(bb);
     present(lm);
   }
   function takeRead(rd) {
-    st.read = { lip: rd.lip, skin: rd.skin, shine: rd.shine, lipRawA: rd.lip[1], lipRawB: rd.lip[2] };
+    // with a trusted white reference: remove the light's tint and the camera's brightness; without one, use the colors as seen
+    var cast = rd.ref ? [Math.max(-8, Math.min(8, rd.ref.a - 1)), Math.max(-8, Math.min(8, rd.ref.b - 6))] : [0, 0];
+    st.cast = cast; st.expo = rd.ref ? rd.ref.L : null;
+    st.read = { lip: [toTrueL(rd.lip[0]), rd.lip[1] - cast[0], rd.lip[2] - cast[1]], skin: [toTrueL(rd.skin[0]), rd.skin[1] - cast[0], rd.skin[2] - cast[1]], shine: rd.shine, lipRawA: rd.lip[1], lipRawB: rd.lip[2], ref: !!rd.ref };
     st.product = detectProduct(st.read);
     st.natural = st.product.lipstick ? predictNatural(st.read.skin) : st.product.glossy ? st.read.lip.slice() : null;
     var eff = st.natural ? { lip: st.natural, skin: st.read.skin } : st.read;
@@ -682,7 +791,7 @@ details.fix[open] summary::after { content: "−"; }
     img.src = URL.createObjectURL(file);
   }
   function resetSession(mode) {
-    st.mode = mode; st.read = null; st.combos = []; st.active = 0; st.held = mode === 'photo'; st.before = false; stable = 0; lastLm = null; camv = null;
+    st.mode = mode; st.read = null; st.combos = []; st.active = 0; st.held = mode === 'photo'; st.before = false; stable = 0; frames = []; lastLm = null; camv = null; st.cast = null; st.expo = null;
     st.show = { liner: true, lipstick: true, gloss: true };
     view.classList.toggle('mirror', mode === 'live');
     document.getElementById('liveTag').hidden = mode !== 'live';
@@ -735,7 +844,7 @@ details.fix[open] summary::after { content: "−"; }
   function drawUI() {
     var chips = document.getElementById('comboChips'), lab = document.getElementById('combosLabel');
     chips.textContent = '';
-    lab.textContent = st.combos.length ? 'your 3 combos' + (st.product && st.product.lipstick ? ' · natural lip estimated (you’re wearing lip color)' : '') : 'reading your lips…';
+    lab.textContent = st.combos.length ? 'your 3 combos · ' + st.info.depth + ' skin, ' + st.info.tone + ' undertone' + (st.product && st.product.lipstick ? ' · natural lip estimated (you’re wearing lip color)' : '') : 'reading your lips…';
     st.combos.forEach(function (c, idx) {
       var b = el('button', { type: 'button', class: 'cchip', 'aria-pressed': String(idx === st.active) }, [
         el('span', { class: 'cname', text: c.name }),
@@ -748,6 +857,9 @@ details.fix[open] summary::after { content: "−"; }
     if (c) {
       why.appendChild(el('p', { class: 'whyh' }, [el('b', { text: c.kicker + '. ' }), c.why + ' Here’s why each piece:']));
       why.appendChild(el('ul', {}, LAYERS.map(function (l) { return el('li', {}, [el('span', { class: 'k', text: l }), el('span', { text: c.how[l] })]); })));
+      var i2 = st.info;
+      why.appendChild(el('details', { class: 'how' }, [el('summary', { text: 'how we matched you' }),
+        el('p', { class: 'note', text: (st.read && st.read.ref ? 'We corrected for your lighting and camera brightness using the whites of your eyes (and teeth, if you smiled), then read' : 'We read') + ' about a second of video: your skin from both cheeks and your natural lip color from inside your lip line, ignoring shine and shadow. Your skin measured ' + i2.depth + ' (ITA ' + i2.ita + '°) with a ' + i2.tone + ' undertone. Every shade was scored on how close it is to the look’s target color, whether its depth fits your skin, and whether it suits your undertone. Lipsticks lighter than your skin are ruled out, since they read chalky.' })]));
     }
     var show = st.show, layersEl = document.getElementById('layers'); layersEl.textContent = '';
     LAYERS.forEach(function (l) {
@@ -796,7 +908,7 @@ details.fix[open] summary::after { content: "−"; }
   };
   document.getElementById('intensityRange').oninput = function (e) { st.intensity = +e.target.value; redraw(); };
   document.getElementById('rereadBtn').onclick = function () {
-    st.read = null; st.combos = []; stable = 0; drawUI();
+    st.read = null; st.combos = []; stable = 0; frames = []; drawUI();
     if (st.mode === 'photo' && fm) { fm.reset(); fm.send({ image: holdC }); } else if (st.held) redraw();
   };
   document.getElementById('addBtn').onclick = function () {
