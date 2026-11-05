@@ -2,1009 +2,215 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<script>if (!/\/$/.test(location.pathname) && !/\.html$/.test(location.pathname)) location.replace(location.pathname + "/" + location.search + location.hash);</script>
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Lippy Try-On</title>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kaushan+Script&family=Dancing+Script:wght@600;700&family=Courier+Prime:wght@400;700&display=swap">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lippy — Meghna Gopalan</title>
+<meta name="description" content="Lippy: a web app that picks liner, lipstick and gloss combos for your lips and lets you try them on live.">
+<meta property="og:title" content="Lippy — Meghna Gopalan">
+<meta property="og:description" content="Lip combos picked for you, tried on live.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8' shape-rendering='crispEdges'%3E%3Cpath fill='%23151413' d='M4 0h3v1H4zM3 1h6v1H3zM10 1h1v1h-1zM1 2h11v1H1zM0 3h12v2H0zM1 5h10v1H1z'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,800&family=Instrument+Serif:ital@0;1&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-/* Back to v1: blush paper, ink, lipstick red. Typewriter for everything you read and tap;
-   a lipstick-on-the-mirror script only for the wordmark and combo names. Red hand-drawn lips as the mark. */
-:root {
-  --blush: #FFF0F3;
-  --pink: #FFE1E8;
-  --ink: #16090C;
-  --red: #D7192F;
-  --wine: #A3122A;
-  --line: #E3C3CB;
-  --paper: #FFFFFF;
-  --muted: #5A3038;
-  --stage: #2A171B;
-  --script: 'Yellowtail', 'Brush Script MT', cursive;
-  --type: 'Courier Prime', 'Courier New', ui-monospace, monospace;
-  color-scheme: light;
+/* Same tokens as ../index.html */
+:root{
+  --paper:#F4F2ED;
+  --ink:#151413;
+  --ink-2:#2D2B28;
+  --ink-3:#4A4843;
+  --muted:#6B6862;
+  --rule:#D9D5CC;
+  --matcha:#F7C6D0;
+  --hover:#ECE9E2;
+  --mono:'IBM Plex Mono',ui-monospace,monospace;
+  --serif:'Instrument Serif',Georgia,serif;
+  --sans:'Bricolage Grotesque',system-ui,sans-serif;
 }
-*, *::before, *::after { box-sizing: border-box; }
-[hidden] { display: none !important; }
-html { background: var(--blush); }
-body {
-  background: var(--blush); color: var(--ink); font-family: var(--type); font-size: 15px; line-height: 1.5;
-  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 10px 48px;
+*{box-sizing:border-box}
+html{background:var(--paper)}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+a{color:var(--ink);text-decoration:none}
+::selection{background:var(--matcha);color:var(--ink)}
+
+.page{min-height:100vh;padding:28px 24px 72px}
+.wrap{max-width:1120px;margin:0 auto;display:flex;flex-direction:column;gap:72px}
+
+.topbar{display:flex;justify-content:space-between;align-items:center;font-family:var(--mono);font-size:12px;color:var(--muted)}
+.back{color:var(--muted)}
+.back:hover,.back:focus-visible{color:var(--ink)}
+
+/* Header: name in the homepage's bold sans, companion in italic serif */
+header{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:48px;align-items:end;padding-top:24px}
+h1{margin:0;font-size:clamp(64px,10vw,132px);line-height:.92;letter-spacing:-.035em;font-weight:800}
+.sub{display:block;margin-top:14px;font-family:var(--serif);font-style:italic;font-weight:400;font-size:clamp(28px,3.4vw,42px);letter-spacing:-.01em;color:var(--ink-2)}
+.facts{display:flex;flex-direction:column;gap:6px;font-family:var(--mono);font-size:12px;color:var(--muted);text-align:right;padding-bottom:8px}
+
+.lnk{align-self:flex-start;background-image:linear-gradient(var(--matcha),var(--matcha));background-size:0% 40%;background-repeat:no-repeat;background-position:0 85%;transition:background-size .3s ease}
+.lnk:hover,.lnk:focus-visible{background-size:100% 40%}
+.lnk:focus-visible,.back:focus-visible{outline:2px solid var(--ink);outline-offset:4px}
+
+/* Hero: the sign-up clip in a phone frame, beside the lede */
+.hero{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:72px;align-items:center}
+.lede{display:flex;flex-direction:column;gap:24px;max-width:560px}
+.lede p{margin:0;font-size:22px;line-height:1.45;color:var(--ink-2)}
+.cta{font-size:22px;font-weight:500}
+.cta-note{display:block;margin-top:6px;font-family:var(--mono);font-size:11px;color:var(--muted);font-weight:400}
+.phone{display:block;width:min(320px,78vw);aspect-ratio:390/844;border-radius:30px;border:1px solid var(--rule);background:#EFE4D2;box-shadow:0 18px 40px rgba(21,20,19,.10);overflow:hidden}
+.phone video,.phone img{display:block;width:100%;height:100%;object-fit:cover}
+figure{margin:0;display:flex;flex-direction:column;gap:12px;align-items:center}
+figcaption{font-family:var(--mono);font-size:11px;color:var(--muted)}
+
+.sec-head{display:flex;justify-content:space-between;align-items:center;padding-bottom:12px;border-bottom:1px solid var(--ink)}
+.sec-head h2{margin:0;font-family:var(--serif);font-style:italic;font-weight:400;font-size:26px}
+.sec-note{font-family:var(--mono);font-size:12px;color:var(--muted)}
+section{display:flex;flex-direction:column;gap:32px}
+
+/* Write-up */
+.prose{max-width:680px;font-size:18px;line-height:1.65;color:var(--ink-2)}
+.prose p{margin:0 0 1em}
+.prose h3{margin:1.6em 0 .4em;font-size:22px;font-weight:800;letter-spacing:-.02em;color:var(--ink)}
+.prose ul{margin:0 0 1em;padding-left:1.2em}
+.prose li{margin:.3em 0}
+.prose a{background-image:linear-gradient(var(--matcha),var(--matcha));background-size:100% 40%;background-repeat:no-repeat;background-position:0 85%}
+
+/* Screens */
+.screens{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:32px}
+.screens .phone{width:100%}
+
+/* Closing link */
+.closing{display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:16px;padding-top:24px;border-top:1px solid var(--rule)}
+.closing .cta{font-size:clamp(26px,3vw,34px);font-weight:800;letter-spacing:-.02em}
+
+#cursor{position:fixed;left:0;top:0;width:12px;height:12px;margin:-6px 0 0 -6px;border-radius:50%;background:var(--ink);border:1.5px solid var(--ink);pointer-events:none;z-index:60;opacity:0;transition:width .2s ease,height .2s ease,margin .2s ease,background .2s ease,opacity .2s ease}
+#cursor.big{width:34px;height:34px;margin:-17px 0 0 -17px;background:var(--matcha)}
+@media (hover:hover) and (pointer:fine){html.custom-cursor,html.custom-cursor a{cursor:none}}
+@media (hover:none),(pointer:coarse){#cursor{display:none}}
+
+@keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.rise{opacity:0;animation:rise .9s ease forwards}
+
+@media (max-width:860px){
+  header{grid-template-columns:1fr;gap:20px}
+  .facts{text-align:left;flex-direction:row;flex-wrap:wrap;gap:6px 16px}
+  .hero{grid-template-columns:1fr;gap:48px}
+  .hero figure{order:-1}
 }
-.app { max-width: 520px; margin: 0 auto; display: flex; flex-direction: column; gap: 18px; }
-h1, h2, h3, p { margin: 0; }
-button, input, label, a { font-family: var(--type); }
-button:focus-visible, a:focus-visible, input:focus-visible, summary:focus-visible, .vh:focus-visible + label { outline: 3px solid var(--wine); outline-offset: 2px; }
-.vh { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
-section { display: flex; flex-direction: column; gap: 16px; }
-
-/* top + step rail */
-.top { display: flex; align-items: center; justify-content: space-between; min-height: 52px; }
-.brand { display: inline-flex; align-items: flex-start; gap: 2px; background: none; border: none; padding: 0; cursor: pointer; font-family: var(--script); font-size: 40px; line-height: 1; color: var(--red); }
-.brand svg { width: 34px; height: auto; margin-top: 2px; transform: rotate(-9deg); }
-.bagbtn { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 16px; border-radius: 999px; border: 1px solid var(--line); box-shadow: 0 2px 8px rgba(163, 18, 42, 0.06); background: var(--paper); color: var(--ink); font-size: 14px; font-weight: 700; cursor: pointer; }
-.count { display: inline-flex; min-width: 22px; height: 22px; padding: 0 6px; border-radius: 999px; background: var(--red); color: #fff; font-size: 12px; align-items: center; justify-content: center; font-variant-numeric: tabular-nums; }
-.steps { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; }
-.step { display: flex; flex-direction: column; gap: 6px; align-items: flex-start; background: none; border: none; padding: 4px 0; color: var(--muted); font-size: 10px; white-space: nowrap; cursor: pointer; text-align: left; min-height: 36px; }
-.step::before { content: ""; display: block; width: 100%; height: 3px; border-radius: 4px; background: var(--line); }
-.step.done::before { background: var(--ink); }
-.step[aria-current="step"] { color: var(--ink); font-weight: 700; }
-.step[aria-current="step"]::before { background: var(--red); }
-.step:disabled { cursor: default; opacity: 0.6; }
-
-/* type */
-.eyebrow { font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--wine); font-weight: 700; }
-.title { font-size: clamp(26px, 7vw, 32px); font-weight: 700; line-height: 1.15; letter-spacing: -0.01em; text-wrap: balance; }
-.lede { color: var(--muted); font-size: 15px; line-height: 1.5; }
-.label { font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--wine); font-weight: 700; }
-.note { font-size: 12px; color: var(--muted); line-height: 1.5; }
-.status { font-size: 13px; color: var(--wine); min-height: 1.3em; }
-
-/* buttons: ink pills, red for the one thing to do next */
-.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 52px; padding: 0 20px; border-radius: 999px; border: 1px solid var(--line); background: var(--paper); color: var(--ink); font-size: 15px; font-weight: 700; letter-spacing: 0.02em; cursor: pointer; text-decoration: none; text-align: center; }
-.btn.ink { background: var(--ink); border-color: var(--ink); color: var(--blush); }
-.btn.primary { background: var(--red); border-color: var(--red); color: #fff; box-shadow: 0 8px 20px rgba(215, 25, 47, 0.22); }
-.btn.wide { width: 100%; }
-.btn.small { min-height: 44px; padding: 0 14px; font-size: 14px; }
-.btn[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: var(--blush); }
-
-/* start: v1 home on blush */
-.hero { display: flex; flex-direction: column; gap: 18px; padding-top: 8px; }
-.word { display: flex; align-items: flex-start; }
-.hero h1 { font-family: var(--script); font-weight: 400; font-size: clamp(104px, 32vw, 150px); line-height: 0.9; color: var(--red); letter-spacing: -0.01em; padding-right: 2px; }
-.hero .sketch { width: clamp(84px, 24vw, 116px); height: auto; margin-top: clamp(8px, 3vw, 18px); flex-shrink: 0; transform: rotate(-9deg); }
-.stack { font-size: 20px; line-height: 1.35; font-weight: 700; max-width: 26ch; text-wrap: balance; }
-.stack span { color: var(--red); }
-.sub { font-size: 15px; color: var(--muted); max-width: 34ch; }
-.startbtns { display: flex; flex-direction: column; gap: 10px; }
-.cam { display: flex; flex-direction: column; gap: 14px; }
-.cam video { width: 100%; aspect-ratio: 4 / 5; object-fit: cover; border-radius: 24px; background: var(--stage); transform: scaleX(-1); box-shadow: 0 14px 34px rgba(163, 18, 42, 0.16); }
-.camctl { display: flex; align-items: center; justify-content: space-between; }
-.shutter { width: 76px; height: 76px; border-radius: 50%; border: 5px solid var(--paper); background: var(--red); box-shadow: 0 0 0 3px var(--red), 0 10px 24px rgba(215, 25, 47, 0.3); cursor: pointer; }
-.tips { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
-.tip { background: var(--paper); border: 1px solid var(--line); border-radius: 12px; padding: 10px; font-size: 12px; line-height: 1.4; color: var(--muted); }
-.tip b { display: block; color: var(--ink); font-size: 13px; margin-bottom: 2px; }
-
-/* stage */
-.stage { position: relative; border-radius: 24px; overflow: hidden; background: var(--stage); box-shadow: 0 14px 34px rgba(163, 18, 42, 0.16); }
-.stage canvas { display: block; width: 100%; height: auto; cursor: crosshair; touch-action: none; }
-.stage canvas.dragging { cursor: grabbing; }
-.hint { position: absolute; left: 12px; right: 12px; bottom: 12px; padding: 8px 12px; border-radius: 999px; background: rgba(255, 240, 243, 0.94); color: var(--ink); font-size: 13px; text-align: center; pointer-events: none; }
-.stagebar { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
-
-/* read */
-.readcard { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
-.cell { background: var(--paper); border: 1px solid var(--line); border-radius: 18px; box-shadow: 0 4px 14px rgba(163, 18, 42, 0.06); padding: 12px 10px; display: flex; flex-direction: column; gap: 6px; min-width: 0; }
-.cell .sw { width: 28px; height: 28px; border-radius: 50%; border: 1px solid var(--line); }
-.cell .v { font-size: 15px; font-weight: 700; line-height: 1.25; overflow-wrap: anywhere; }
-details.fix { border: 1px solid var(--line); border-radius: 18px; background: var(--paper); padding: 0 14px; }
-details.fix summary { min-height: 44px; display: flex; align-items: center; cursor: pointer; font-size: 14px; font-weight: 700; list-style: none; }
-details.fix summary::-webkit-details-marker { display: none; }
-details.fix summary::after { content: "+"; margin-left: auto; font-size: 20px; }
-details.fix[open] summary::after { content: "−"; }
-.fixbody { display: flex; flex-direction: column; gap: 12px; padding-bottom: 14px; }
-.slider { display: grid; grid-template-columns: 90px minmax(0, 1fr); align-items: center; gap: 10px; font-size: 13px; color: var(--muted); }
-.slider input { width: 100%; accent-color: var(--red); }
-
-/* combo cards */
-.cards { display: flex; flex-direction: column; gap: 16px; }
-.card { background: var(--paper); border: 1px solid var(--line); border-radius: 24px; box-shadow: 0 10px 28px rgba(163, 18, 42, 0.08); overflow: hidden; display: flex; flex-direction: column; }
-.cthumb { display: block; width: 100%; height: auto; aspect-ratio: 3 / 2; background: var(--stage); }
-.cbody { padding: 14px 16px 16px; display: flex; flex-direction: column; gap: 10px; }
-.chead { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
-.cname { font-family: var(--script); font-weight: 400; font-size: 40px; line-height: 1; color: var(--red); }
-.cprice { font-size: 16px; font-weight: 700; font-variant-numeric: tabular-nums; }
-.why { color: var(--muted); font-size: 13px; line-height: 1.5; }
-.trio ul { margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
-.trio li { list-style: none; display: grid; grid-template-columns: 22px 72px minmax(0, 1fr); gap: 8px; align-items: center; font-size: 14px; }
-.trio .k { font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--wine); font-weight: 700; }
-.d { width: 22px; height: 22px; border-radius: 50%; border: 1px solid var(--line); display: block; }
-.cactions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
-
-/* try on */
-.switch { display: grid; grid-template-columns: 44px minmax(0, 1fr) 44px; align-items: center; gap: 8px; text-align: center; }
-.arrow { width: 44px; height: 44px; border-radius: 50%; border: 1px solid var(--line); box-shadow: 0 2px 8px rgba(163, 18, 42, 0.08); background: var(--paper); color: var(--ink); font-size: 20px; font-weight: 700; cursor: pointer; }
-.switch .cname { font-size: 46px; }
-.pieces { display: flex; flex-direction: column; gap: 8px; }
-.piece { display: grid; grid-template-columns: 30px minmax(0, 1fr) auto auto; gap: 10px; align-items: center; min-height: 60px; padding: 8px 14px; background: var(--paper); border: 1px solid var(--line); border-radius: 18px; }
-.piece .d { width: 30px; height: 30px; }
-.pname { display: flex; flex-direction: column; min-width: 0; }
-.pname .k { font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--wine); font-weight: 700; }
-.pname b { font-size: 15px; }
-.pname span { font-size: 12px; color: var(--muted); overflow-wrap: anywhere; }
-.price { font-size: 15px; font-weight: 700; font-variant-numeric: tabular-nums; }
-.plink { font-size: 13px; color: var(--ink); min-height: 44px; display: inline-flex; align-items: center; }
-.editor { display: flex; flex-direction: column; gap: 10px; }
-.tabs { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px; background: var(--pink); border-radius: 999px; padding: 4px; }
-.tab { min-height: 44px; border-radius: 999px; border: none; background: transparent; color: var(--ink); cursor: pointer; font-size: 14px; font-weight: 700; }
-.tab[aria-pressed="true"] { background: var(--paper); color: var(--red); box-shadow: 0 2px 8px rgba(163, 18, 42, 0.12); }
-.swatches { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
-.swb { display: flex; flex-direction: column; align-items: center; gap: 5px; background: none; border: none; padding: 4px 0; color: var(--ink); cursor: pointer; min-width: 0; }
-.swb .d { width: 46px; height: 46px; box-shadow: inset 0 -6px 10px rgba(0,0,0,0.22), inset 0 6px 8px rgba(255,255,255,0.25); }
-.swb[aria-pressed="true"] .d { outline: 2px solid var(--red); outline-offset: 3px; }
-.swb b { font-size: 12px; line-height: 1.2; text-align: center; }
-.swb span { font-size: 11px; color: var(--muted); text-align: center; }
-
-/* bag */
-.bagh { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
-.sum { font-family: var(--script); font-size: 46px; line-height: 1; color: var(--red); font-variant-numeric: tabular-nums; }
-.progress { font-size: 13px; color: var(--muted); }
-.shop { background: var(--paper); border: 1px solid var(--line); border-radius: 24px; box-shadow: 0 10px 28px rgba(163, 18, 42, 0.08); padding: 14px; display: flex; flex-direction: column; gap: 4px; }
-.shoph { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; padding-bottom: 6px; }
-.shoph h3 { font-size: 17px; }
-.shoph span { font-size: 12px; color: var(--muted); }
-.bitem { display: grid; grid-template-columns: 24px minmax(0, 1fr) auto auto; gap: 10px; align-items: center; min-height: 52px; border-top: 1px solid var(--line); }
-.bitem .d { width: 24px; height: 24px; }
-.remove { min-height: 44px; padding: 0 6px; border: none; background: none; color: var(--muted); font-size: 12px; text-decoration: underline; cursor: pointer; }
-.shop .btn { margin-top: 10px; }
-.done { color: var(--wine); font-weight: 700; }
-.empty { background: var(--paper); border: 1px dashed var(--line); border-radius: 24px; padding: 24px 18px; display: flex; flex-direction: column; gap: 14px; text-align: center; align-items: center; }
-.foot { border-top: 1px solid var(--line); padding-top: 14px; margin-top: 8px; }
-@media (prefers-reduced-motion: reduce) { * { transition: none !important; scroll-behavior: auto !important; } }
-
-/* ---- lipstick layer: handwritten, waxy, a little dragged, like it was written on a mirror ---- */
-.gloss { position: relative; display: inline-block; font-family: 'Kaushan Script', 'Brush Script MT', cursive; font-weight: 400; color: #C8102E; background: none; filter: url(#waxy); }
-.gloss::after { content: none; }
-.brand { font-family: 'Kaushan Script', 'Brush Script MT', cursive; font-size: 36px; color: #C8102E; align-items: center; }
-.brand .gloss { filter: url(#waxySmall); }
-.hero h1.gloss { font-size: clamp(92px, 28vw, 136px); line-height: 1.05; letter-spacing: 0; padding: 0 6px 0 2px; transform: rotate(-4deg); transform-origin: left center; }
-.hero .word { align-items: center; gap: 2px; }
-.hero .sketch { margin-top: 0; width: clamp(100px, 29vw, 132px); }
-.cname { font-family: 'Kaushan Script', 'Brush Script MT', cursive; color: #C8102E; font-size: 34px; letter-spacing: 0; filter: url(#waxySmall); }
-.switch .cname { font-size: 38px; }
-.sum { font-family: 'Kaushan Script', 'Brush Script MT', cursive; color: #C8102E; font-size: 38px; filter: url(#waxySmall); }
-.steps { gap: 8px; }
-.step { gap: 8px; }
-.step::before { height: 12px; background: linear-gradient(180deg, rgba(255,255,255,0.6) 0%, rgba(255,255,255,0) 45%), var(--c); border-radius: 60% 40% 55% 45% / 70% 60% 40% 30%; transform: rotate(-2deg); opacity: 0.3; box-shadow: inset 0 -2px 3px rgba(0,0,0,0.12); }
-.step.done::before { opacity: 0.85; background: linear-gradient(180deg, rgba(255,255,255,0.6) 0%, rgba(255,255,255,0) 45%), var(--c); }
-.step[aria-current="step"]::before { opacity: 1; height: 14px; background: linear-gradient(180deg, rgba(255,255,255,0.75) 0%, rgba(255,255,255,0) 45%), var(--c); box-shadow: inset 0 -2px 3px rgba(0,0,0,0.15), 0 4px 10px rgba(200, 16, 46, 0.25); }
-.btn.ink, .btn.primary { background: linear-gradient(180deg, #E8364B 0%, #C8102E 55%, #8E0A20 100%); border-color: #8E0A20; color: #fff; box-shadow: inset 0 1px 0 rgba(255,255,255,0.35), 0 8px 20px rgba(200, 16, 46, 0.22); }
-.count { background: #C8102E; }
-#v-start .startbtns .btn { color: #FFFFFF; border: none; font-weight: 400; background: linear-gradient(180deg, #E8364B 0%, #C8102E 55%, #8E0A20 100%); box-shadow: inset 0 1px 0 rgba(255,255,255,0.35), 0 8px 20px rgba(200, 16, 46, 0.2); }
-.hero .stack { font-family: 'Dancing Script', 'Brush Script MT', cursive; font-weight: 700; font-size: clamp(32px, 9vw, 40px); line-height: 1.15; color: #C8102E; max-width: 16ch; filter: url(#waxySmall); transform: rotate(-2deg); transform-origin: left center; }
-.tab[aria-pressed="true"] { color: #C8102E; }
-.natural { display: flex; flex-direction: column; gap: 10px; }
-.notice { background: var(--paper); border: 1px solid #C8102E; border-radius: 18px; padding: 14px; display: flex; flex-direction: column; gap: 6px; }
-.notice .nt { font-weight: 700; font-size: 15px; color: #C8102E; }
-.natrow { display: flex; gap: 10px; flex-wrap: wrap; }
-.natb { display: flex; flex-direction: column; align-items: center; gap: 4px; background: none; border: none; padding: 2px; cursor: pointer; font-size: 11px; color: var(--muted); min-width: 44px; }
-.natb .d { width: 38px; height: 38px; }
-.natb.photo .d { outline: 1px dashed var(--muted); outline-offset: 2px; }
-.natb[aria-pressed="true"] { color: var(--ink); font-weight: 700; }
-.natb[aria-pressed="true"] .d { outline: 2px solid #C8102E; outline-offset: 3px; }
-.trio li { align-items: start; padding-top: 6px; }
-.trio li .d { margin-top: 1px; }
-.trio .r { grid-column: 2 / -1; font-size: 12px; color: var(--muted); line-height: 1.45; padding-bottom: 4px; }
-.why { font-weight: 700; color: var(--ink); }
-.layers { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
-.layer { display: flex; align-items: center; gap: 8px; min-height: 54px; padding: 0 10px; border-radius: 16px; border: 1px solid var(--line); background: var(--paper); color: var(--muted); cursor: pointer; text-align: left; }
-.layer .lt { display: flex; flex-direction: column; line-height: 1.2; }
-.layer .lt b { font-size: 13px; color: var(--ink); }
-.layer .lt span { font-size: 11px; }
-.layer[aria-pressed="true"] { border: 2px solid #C8102E; color: #C8102E; box-shadow: 0 4px 12px rgba(200, 16, 46, 0.12); }
-.layer[aria-pressed="false"] .d { opacity: 0.35; }
-.piece.off { opacity: 0.45; }
-.btn:disabled { opacity: 0.5; cursor: default; }
-
-.stage canvas.mirror { transform: scaleX(-1); }
-.live { position: absolute; left: 12px; top: 12px; display: inline-flex; gap: 6px; align-items: center; margin: 0; padding: 4px 10px; border-radius: 999px; background: rgba(255,255,255,0.9); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink); }
-.live span { width: 8px; height: 8px; border-radius: 50%; background: #C8102E; animation: blink 1.4s infinite; }
-@keyframes blink { 50% { opacity: 0.3; } }
-.combochips { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
-.cchip { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; padding: 10px 6px; border-radius: 16px; border: 1px solid var(--line); background: var(--paper); cursor: pointer; min-height: 76px; color: var(--ink); }
-.cchip .cname { font-size: 22px; line-height: 1; }
-.cchip .cdots { display: flex; gap: 4px; }
-.cchip .d { width: 14px; height: 14px; }
-.cchip[aria-pressed="true"] { border: 2px solid #C8102E; box-shadow: 0 6px 16px rgba(200, 16, 46, 0.14); }
-.whybox { background: var(--paper); border: 1px solid var(--line); border-radius: 18px; padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; }
-.whybox:empty { display: none; }
-.whyh { font-size: 13px; line-height: 1.45; }
-.whybox ul { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 6px; }
-.whybox li { display: grid; grid-template-columns: 70px minmax(0, 1fr); gap: 8px; font-size: 12px; line-height: 1.45; color: var(--muted); }
-.whybox .k { font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: #C8102E; font-weight: 700; }
-.swb:disabled { opacity: 0.4; cursor: default; }
-#camNote { text-align: center; }
-@media (prefers-reduced-motion: reduce) { .live span { animation: none; } }
-details.how { border-top: 1px solid var(--line); padding-top: 6px; }
-details.how summary { min-height: 40px; display: flex; align-items: center; cursor: pointer; font-size: 12px; font-weight: 700; color: #C8102E; list-style: none; }
-details.how summary::-webkit-details-marker { display: none; }
-details.how summary::after { content: "+"; margin-left: auto; }
-details.how[open] summary::after { content: "\2212"; }
-.pickbar { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr); gap: 8px; }
-.pickbar select, .pickbar input { min-height: 44px; border-radius: 12px; border: 1px solid var(--line); background: var(--paper); color: var(--ink); font: 13px var(--type, inherit); padding: 0 10px; min-width: 0; }
-.shopify { margin-left: 6px; padding: 1px 6px; border-radius: 999px; background: #E8F3E0; color: #2E5B1E; font-size: 10px; letter-spacing: 0.04em; text-transform: none; font-weight: 700; }
-.findat { margin: 6px 0 0; font-size: 12px; color: var(--muted); text-align: center; }
-.findat a { color: var(--ink); }
+@media (max-width:640px){
+  .page{padding:20px 18px 56px}
+  .wrap{gap:56px}
+  .lede p{font-size:19px}
+  .prose{font-size:17px}
+  /* Three tall phones: swipe sideways instead of stacking */
+  .screens{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;gap:16px;margin:0 -18px;padding:0 18px 8px}
+  .screens figure{flex:0 0 70%;scroll-snap-align:center}
+}
+@media (prefers-reduced-motion:reduce){
+  .rise{animation:none;opacity:1}
+  .lnk,#cursor{transition:none}
+}
 </style>
-<style>html,body{margin:0}img{max-width:100%}:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}</style>
 </head>
 <body>
+<div class="page">
+  <div class="wrap">
+    <div class="topbar rise" style="animation-delay:.1s">
+      <a class="back" href="../">← meghna gopalan</a>
+      <span>project 02</span>
+    </div>
 
-<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
-  <filter id="waxy" x="-6%" y="-12%" width="112%" height="124%">
-    <feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="2" seed="4" result="grain"/>
-    <feDisplacementMap in="SourceGraphic" in2="grain" scale="3.5" xChannelSelector="R" yChannelSelector="G" result="rough"/>
-    <feTurbulence type="fractalNoise" baseFrequency="0.035 0.9" numOctaves="2" seed="11" result="drag"/>
-    <feColorMatrix in="drag" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  3.2 0 0 0 -0.5" result="dragA"/>
-    <feComposite in="rough" in2="dragA" operator="in" result="waxed"/>
-    <feGaussianBlur in="waxed" stdDeviation="0.4" result="soft"/>
-    <feMerge><feMergeNode in="soft"/><feMergeNode in="waxed"/></feMerge>
-  </filter>
-  <filter id="waxySmall" x="-6%" y="-12%" width="112%" height="124%">
-    <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed="5" result="grain"/>
-    <feDisplacementMap in="SourceGraphic" in2="grain" scale="1.6" xChannelSelector="R" yChannelSelector="G" result="rough"/>
-    <feTurbulence type="fractalNoise" baseFrequency="0.06 0.9" numOctaves="2" seed="13" result="drag"/>
-    <feColorMatrix in="drag" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  3 0 0 0 -0.45" result="dragA"/>
-    <feComposite in="rough" in2="dragA" operator="in"/>
-  </filter>
-</svg>
-<div class="app">
-  <header class="top">
-    <button class="brand" type="button" id="home" aria-label="Lippy, start over"><span class="gloss" data-text="lippy">lippy</span><svg class="" viewBox="0 0 200 140" aria-hidden="true"><defs><clipPath id="lp0c"><path d="M8 70 C 30 42, 54 14, 78 12 C 90 11, 96 23, 100 30 C 104 23, 110 11, 122 12 C 146 14, 170 42, 192 70 C 150 79, 120 72, 100 79 C 80 72, 50 79, 8 70 Z"/><path d="M8 70 C 50 79, 80 72, 100 79 C 120 72, 150 79, 192 70 C 178 114, 140 136, 100 136 C 60 136, 22 114, 8 70 Z"/></clipPath><pattern id="lp0h" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(-35)"><line x1="0" y1="0" x2="0" y2="7" stroke="#C8102E" stroke-width="2.2" stroke-linecap="round"/></pattern></defs><g filter="url(#waxySmall)"><g clip-path="url(#lp0c)"><rect x="0" y="0" width="200" height="140" fill="url(#lp0h)" opacity=".75"/></g><g fill="none" stroke="#C8102E" stroke-linecap="round" stroke-linejoin="round"><path d="M8 70 C 30 42, 54 14, 78 12 C 90 11, 96 23, 100 30 C 104 23, 110 11, 122 12 C 146 14, 170 42, 192 70" stroke-width="4"/><path d="M8 70 C 22 114, 60 136, 100 136 C 140 136, 178 114, 192 70" stroke-width="4"/><path d="M12 68 C 34 44, 56 18, 79 16 C 90 16, 96 26, 100 33 C 105 26, 111 16, 123 16 C 145 18, 167 44, 188 68" stroke-width="1.6" opacity=".6"/><path d="M16 70 C 50 78, 80 73, 100 78 C 120 73, 150 78, 184 70" stroke-width="3"/></g></g></svg></button>
-    <button class="bagbtn" type="button" id="bagBtn">collection <span class="count" id="bagCount">0</span></button>
-  </header>
-  <nav class="steps" id="steps" aria-label="Your progress"></nav>
+    <header class="rise" style="animation-delay:.2s">
+      <h1>Lippy<span class="sub">liner, lipstick and gloss, tried on together</span></h1>
+      <div class="facts">
+        <span>web · 2026</span>
+        <span>mediapipe · cielab color · shopify</span>
+      </div>
+    </header>
 
-  <!-- START -->
-  <section id="v-start">
     <div class="hero">
-      <div class="word"><h1 class="gloss" data-text="lippy">lippy</h1><svg class="sketch" viewBox="0 0 200 140" role="img" aria-label="Lips drawn in red lip pencil"><defs><clipPath id="lp1c"><path d="M8 70 C 30 42, 54 14, 78 12 C 90 11, 96 23, 100 30 C 104 23, 110 11, 122 12 C 146 14, 170 42, 192 70 C 150 79, 120 72, 100 79 C 80 72, 50 79, 8 70 Z"/><path d="M8 70 C 50 79, 80 72, 100 79 C 120 72, 150 79, 192 70 C 178 114, 140 136, 100 136 C 60 136, 22 114, 8 70 Z"/></clipPath><pattern id="lp1h" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(-35)"><line x1="0" y1="0" x2="0" y2="7" stroke="#C8102E" stroke-width="2.2" stroke-linecap="round"/></pattern></defs><g filter="url(#waxySmall)"><g clip-path="url(#lp1c)"><rect x="0" y="0" width="200" height="140" fill="url(#lp1h)" opacity=".75"/></g><g fill="none" stroke="#C8102E" stroke-linecap="round" stroke-linejoin="round"><path d="M8 70 C 30 42, 54 14, 78 12 C 90 11, 96 23, 100 30 C 104 23, 110 11, 122 12 C 146 14, 170 42, 192 70" stroke-width="4"/><path d="M8 70 C 22 114, 60 136, 100 136 C 140 136, 178 114, 192 70" stroke-width="4"/><path d="M12 68 C 34 44, 56 18, 79 16 C 90 16, 96 26, 100 33 C 105 26, 111 16, 123 16 C 145 18, 167 44, 188 68" stroke-width="1.6" opacity=".6"/><path d="M16 70 C 50 78, 80 73, 100 78 C 120 73, 150 78, 184 70" stroke-width="3"/></g></g></svg></div>
-      <p class="stack">Lip combos picked for you.</p>
-      <div class="startbtns" id="startBtns">
-        <button class="btn ink wide" type="button" id="liveBtn">try it on live</button>
-        <input class="vh" type="file" id="upload" accept="image/*">
-        <label class="btn wide" for="upload">upload a photo</label>
+      <div class="lede rise" style="animation-delay:.35s">
+        <p>Lip combos picked for you, tried on live.</p>
+        <a class="lnk cta" href="app/">try it live ↗<span class="cta-note">best on your phone · your camera stays on your device</span></a>
       </div>
-      <p class="note" id="camNote" hidden></p>
-    </div>
-  </section>
-
-  <!-- TRY ON -->
-  <section id="v-tryon" hidden>
-    <div class="stage" id="stage">
-      <canvas id="view" width="720" height="900" aria-label="You, with the lip combo applied"></canvas>
-      <p class="live" id="liveTag" hidden><span aria-hidden="true"></span>live</p>
-      <p class="hint" id="hint" hidden></p>
-    </div>
-    <div class="stagebar">
-      <button class="btn small" type="button" id="before" aria-pressed="false">bare lips</button>
-      <button class="btn small" type="button" id="hold" aria-pressed="false">hold still</button>
+      <figure class="rise" style="animation-delay:.3s">
+        <div class="phone"><img src="tryon.jpg" width="1170" height="2532" alt="Lippy try-on: a sample face wearing the everyday combo, with the three combos below"></div>
+        <figcaption>try-on, sample face</figcaption>
+      </figure>
     </div>
 
-    <div style="display:flex;flex-direction:column;gap:8px">
-      <p class="label" id="combosLabel">reading your lips…</p>
-      <div class="combochips" id="comboChips" role="group" aria-label="Your 3 combos"></div>
-    </div>
-    <div class="whybox" id="whyBox"></div>
-
-    <div style="display:flex;flex-direction:column;gap:8px">
-      <p class="label">mix and match: tap a layer to add or remove it</p>
-      <div class="layers" id="layers" role="group" aria-label="Layers on your lips"></div>
-    </div>
-    <div class="editor">
-      <p class="label">swap a shade · 1,961 shades from 29 brands</p>
-      <div class="tabs" id="tabs"></div>
-      <div class="pickbar">
-        <label class="vh" for="brandSel">Brand</label>
-        <select id="brandSel"></select>
-        <label class="vh" for="shadeSearch">Search shades</label>
-        <input id="shadeSearch" type="search" placeholder="search a shade or product" autocomplete="off">
+    <section aria-labelledby="h-about" class="rise" style="animation-delay:.45s">
+      <div class="sec-head">
+        <h2 id="h-about">About</h2>
       </div>
-      <p class="note" id="pickNote"></p>
-      <div class="swatches" id="swatches"></div>
-    </div>
-    <label class="slider" for="intensityRange">intensity <input type="range" id="intensityRange" min="20" max="100" value="80"></label>
-    <div class="pieces" id="pieces"></div>
-    <p class="status" id="tryStatus" role="status"></p>
-    <button class="btn primary wide" type="button" id="addBtn">lock it in</button>
-    <button class="btn wide" type="button" id="rereadBtn">re-read my lips</button>
-  </section>
+      <div class="prose">
+        <!-- WRITEUP:START -->
+        <p>finding the right lip combo is really hard. when i find something i like in a store, i can only try on one product at a time, but the look i'm after is a liner, a lipstick and a gloss together, usually from three different brands.</p>
+        <p>lippy puts all three on your face at once. it reads your lips and skin through your camera and picks three combos for you: everyday, 90s brown and night out. you see them live, and you can turn the liner, lipstick and gloss on and off to see what each one adds.</p>
+        <p>the matching is skin-aware. lippy measures how light or deep your skin is and its undertone, so a tan or deep skin tone never gets a nude that washes it out. it picks from about 2,000 shades from 35 brands sold at sephora and ulta.</p>
+        <p>when you like a look, lock it in. it goes on your vanity with a picture of you wearing it, and every piece links to the brand's own store, so you check out once per brand. a lot of them run on shopify.</p>
+        <p>a few things i was strict about:</p>
+        <ul>
+          <li>lippy detects your natural lip color. you never pick it yourself.</li>
+          <li>if you're already wearing lip color, it reads past it.</li>
+          <li>your camera stays on your device. nothing is uploaded.</li>
+        </ul>
+        <p>try it on your phone. it takes about a second to read your lips.</p>
+        <!-- WRITEUP:END -->
+      </div>
+    </section>
 
-  <!-- COLLECTION -->
-  <section id="v-bag" hidden>
-    <div style="display:flex;flex-direction:column;gap:8px">
-      <p class="eyebrow">your collection</p>
-      <div class="bagh"><h2 class="title">Your collection.</h2><p class="sum" id="bagSum">$0</p></div>
-      <p class="progress" id="bagProgress"></p>
-    </div>
-    <div id="bagList" style="display:flex;flex-direction:column;gap:14px"></div>
-    <p class="note">Each brand runs its own Shopify store, so you check out once per brand. Lippy never takes your payment.</p>
-    <button class="btn wide" type="button" id="bagBack">keep trying on</button>
-  </section>
+    <section aria-labelledby="h-screens">
+      <div class="sec-head">
+        <h2 id="h-screens">Screens</h2>
+        <span class="sec-note">sample face</span>
+      </div>
+      <div class="screens">
+        <figure>
+          <div class="phone"><img src="mix.jpg" width="1170" height="2532" loading="lazy" alt="Mix and match: liner, lipstick and gloss toggles, and a shade picker filtered by brand"></div>
+          <figcaption>01 · mix and match</figcaption>
+        </figure>
+        <figure>
+          <div class="phone"><img src="vanity.jpg" width="1170" height="2532" loading="lazy" alt="Vanity: three saved looks, each a mirror with its products on a shelf"></div>
+          <figcaption>02 · your vanity</figcaption>
+        </figure>
+        <figure>
+          <div class="phone"><img src="get-the-look.jpg" width="1170" height="2532" loading="lazy" alt="Get the look: each piece with a buy button and an I have it toggle, then one checkout per brand"></div>
+          <figcaption>03 · get the look</figcaption>
+        </figure>
+      </div>
+    </section>
 
-  <div class="foot" id="foot">
-    <p class="note">Prototype. 1,961 shades from 29 brands sold at Sephora and Ulta, from public shade datasets plus 31 shades checked on brand sites in Oct 2026. Some older shades may be discontinued, and on-screen colors are estimates, so check each shop's swatches before you buy.</p>
+    <div class="closing">
+      <a class="lnk cta" href="app/">try Lippy ↗</a>
+      <a class="back" href="../">← back to all projects</a>
+    </div>
   </div>
-  <video id="video" playsinline muted autoplay hidden></video>
 </div>
 
-<script>window.LIPPY_MP_JS = "mp/";</script>
-<script src="mp/face_mesh.js"></script>
+<div id="cursor" aria-hidden="true"></div>
+
 <script>
 (function () {
-  /*REC*/
-  // ---------- shade library: ~2,000 real shades from Sephora and Ulta brands (see README for sources) ----------
-  var LIB = {"products":[["liner","Kylie Cosmetics","Precision Pout Lip Liner","matte",0.9,19,"USD","https://kyliecosmetics.com/products/precision-pout-lip-liner","kyliecosmetics.com",1,"brand site, Oct 2026"],["lipstick","Rare Beauty","Kind Words Matte Lipstick","matte",0.9,20,"USD","https://rarebeauty.com/products/kind-words-matte-lipstick","rarebeauty.com",1,"brand site, Oct 2026"],["lipstick","Rare Beauty","Kind Words Matte Lipstick","matte",0.95,20,"USD","https://rarebeauty.com/products/kind-words-matte-lipstick","rarebeauty.com",1,"brand site, Oct 2026"],["gloss","Tower 28","ShineOn Lip Jelly","gloss",0.05,16,"USD","https://www.tower28beauty.com/collections/shineon","tower28beauty.com",1,"brand site, Oct 2026"],["gloss","Tower 28","ShineOn Lip Jelly","gloss",0.25,16,"USD","https://www.tower28beauty.com/collections/shineon","tower28beauty.com",1,"brand site, Oct 2026"],["gloss","Tower 28","ShineOn Lip Jelly","gloss",0.35,16,"USD","https://www.tower28beauty.com/collections/shineon","tower28beauty.com",1,"brand site, Oct 2026"],["gloss","Tower 28","ShineOn Lip Jelly","gloss",0.45,16,"USD","https://www.tower28beauty.com/collections/shineon","tower28beauty.com",1,"brand site, Oct 2026"],["gloss","Kosas","Wet Lip Oil Gloss","gloss",0.3,24,"USD","https://kosas.com/products/build-your-own-wet-lip-trio","kosas.com",1,"brand site, Oct 2026"],["gloss","Kosas","Wet Lip Oil Gloss","gloss",0.35,24,"USD","https://kosas.com/products/build-your-own-wet-lip-trio","kosas.com",1,"brand site, Oct 2026"],["gloss","Kosas","Wet Lip Oil Gloss","gloss",0.4,24,"USD","https://kosas.com/products/build-your-own-wet-lip-trio","kosas.com",1,"brand site, Oct 2026"],["liner","ColourPop","Lippie Pencil","matte",0.9,5.0,"CAD","https://colourpop.com/collections/lippie-pencil","colourpop.com",1,"Makeup API dataset (2017–2018)"],["lipstick","ColourPop","Blotted Lip","sheer",0.5,5.5,"CAD","https://colourpop.com/collections/lippie-stix?filter=blotted-lip","colourpop.com",1,"Makeup API dataset (2017–2018)"],["lipstick","ColourPop","Lippie Stix","satin",0.85,5.5,"CAD","https://colourpop.com/collections/lippie-stix","colourpop.com",1,"Makeup API dataset (2017–2018)"],["lipstick","Glossier","Generation G","satin",0.85,20.0,"USD","https://www.glossier.com/products/generation-g","glossier.com",0,"Makeup API dataset (2017–2018)"],["gloss","Clinique","Chubby Plump & Shine Liquid Lip Plumping Gloss","gloss",0.3,17.5,"USD","https://www.clinique.com/product/1603/45451/makeup/lip-glosses/chubby-plump-shine-liquid-lip-plumping-gloss","clinique.com",0,"Makeup API dataset (2017–2018)"],["liner","Clinique","Quickliner For Lips","matte",0.9,17.5,"USD","https://www.clinique.com/product/1604/4771/makeup/lip-liner/quickliner-for-lips","clinique.com",0,"Makeup API dataset (2017–2018)"],["liner","Clinique","Quickliner For Lips Intense","matte",0.9,17.5,"USD","https://www.clinique.com/product/1604/37967/makeup/lip-liner/quickliner-for-lips-intense","clinique.com",0,"Makeup API dataset (2017–2018)"],["lipstick","Clinique","Almost Lipstick","gloss",0.55,17.5,"USD","https://www.clinique.com/product/1605/4772/makeup/lipsticks/almost-lipstick","clinique.com",0,"Makeup API dataset (2017–2018)"],["lipstick","Clinique","Butter Shine Lipstick","gloss",0.55,8.5,"USD","https://www.clinique.com/product/1605/5072/makeup/lipsticks/butter-shine-lipstick","clinique.com",0,"Makeup API dataset (2017–2018)"],["lipstick","Clinique","High Impact Lip Colour","satin",0.85,17.5,"USD","https://www.clinique.com/product/1605/5778/makeup/lipsticks/high-impact-lip-colour","clinique.com",0,"Makeup API dataset (2017–2018)"],["lipstick","Clinique","Chubby Stick Intense Moisturizing Lip Colour Balm","sheer",0.5,17.0,"USD","https://www.clinique.com/product/1605/24146/makeup/lipsticks/chubby-stick-intense-moisturizing-lip-colour-balm","clinique.com",0,"Makeup API dataset (2017–2018)"],["lipstick","Clinique","Long Last Soft Matte Lipstick","matte",0.95,17.5,"USD","https://www.clinique.com/product/1605/31112/makeup/lipsticks/long-last-soft-matte-lipstick","clinique.com",0,"Makeup API dataset (2017–2018)"],["lipstick","Clinique","Long Last Lipstick","sheer",0.5,17.0,"USD","https://www.clinique.com/product/1605/5404/makeup/lipsticks/long-last-lipstick","clinique.com",0,"Makeup API dataset (2017–2018)"],["lipstick","Clinique","Clinique Pop Liquid Matte Lip Colour + Primer","matte",0.95,18.5,"USD","https://www.clinique.com/product/1605/42886/makeup/lipsticks/clinique-pop-liquidtm-matte-lip-colour-primer","clinique.com",0,"Makeup API dataset (2017–2018)"],["lipstick","Clinique","Chubby Stick Baby Tint Moisturizing Lip Colour Balm","sheer",0.5,17.5,"USD","https://www.clinique.com/product/1605/30955/makeup/lipsticks/chubby-stick-baby-tint-moisturizing-lip-colour-balm","clinique.com",0,"Makeup API dataset (2017–2018)"],["lipstick","Clinique","Clinique + Jonathan Adler: Pop Lip Colour + Primer","satin",0.85,15.4,"USD","https://www.clinique.com/product/1605/49842/makeup/lipsticks/clinique-jonathan-adler-pop-lip-colour-primer","clinique.com",0,"Makeup API dataset (2017–2018)"],["lipstick","Clinique","Different Lipstick","satin",0.85,17.5,"USD","https://www.clinique.com/product/1605/5887/makeup/lipsticks/different-lipstick","clinique.com",0,"Makeup API dataset (2017–2018)"],["lipstick","Clinique","Clinique Pop Lacquer Lip Colour + Primer","gloss",0.55,18.5,"USD","https://www.clinique.com/product/1605/39139/makeup/lipsticks/clinique-poptm-lacquer-lip-colour-primer","clinique.com",0,"Makeup API dataset (2017–2018)"],["lipstick","Clinique","Clinique Pop Glaze Sheer Lip Colour + Primer","sheer",0.5,18.5,"USD","https://www.clinique.com/product/1605/39138/makeup/lipsticks/clinique-pop-glaze-sheer-lip-colour-primer","clinique.com",0,"Makeup API dataset (2017–2018)"],["lipstick","Clinique","Chubby Stick Moisturizing Lip Colour Balm","sheer",0.5,17.5,"USD","https://www.clinique.com/product/1605/15520/makeup/lipsticks/chubby-stick-moisturizing-lip-colour-balm","clinique.com",0,"Makeup API dataset (2017–2018)"],["lipstick","Clinique","Clinique Pop Matte Lip Colour + Primer","matte",0.95,18.5,"USD","https://www.clinique.com/product/1605/42767/makeup/lipsticks/clinique-poptm-matte-lip-colour-primer","clinique.com",0,"Makeup API dataset (2017–2018)"],["lipstick","Clinique","Clinique Pop Lip Colour + Primer","matte",0.95,18.5,"USD","https://www.clinique.com/product/1605/35082/makeup/lipsticks/clinique-pop-lip-colour-primer","clinique.com",0,"Makeup API dataset (2017–2018)"],["lipstick","Clinique","Clinique Pop Lip Shadow Cushion Matte Lip Powder","matte",0.95,19.5,"USD","https://www.clinique.com/product/1605/45673/makeup/lipsticks/clinique-pop-lip-shadow-cushion-matte-lip-powder","clinique.com",0,"Makeup API dataset (2017–2018)"],["lipstick","NYX Professional Makeup","Luv Out Loud Liquid Lipstick","matte",0.95,7.0,"USD","https://www.nyxcosmetics.com/luv-out-loud-liquid-lipstick/NYX_512.html?cgid=lipstick","nyxcosmetics.com",0,"Makeup API dataset (2017–2018)"],["lipstick","NYX Professional Makeup","Simply Pink Lip Cream","gloss",0.55,6.5,"USD","https://www.nyxcosmetics.com/simply-pink-lip-cream/NYX_162.html?cgid=lipstick","nyxcosmetics.com",0,"Makeup API dataset (2017–2018)"],["lipstick","NYX Professional Makeup","Simply Red Lip Cream","matte",0.95,6.5,"USD","https://www.nyxcosmetics.com/simply-red-lip-cream/NYX_163.html?cgid=lipstick","nyxcosmetics.com",0,"Makeup API dataset (2017–2018)"],["lipstick","NYX Professional Makeup","Simply Nude Lip Cream","matte",0.95,6.5,"USD","https://www.nyxcosmetics.com/simply-nude-lip-cream/NYX_161.html?cgid=lipstick","nyxcosmetics.com",0,"Makeup API dataset (2017–2018)"],["lipstick","NYX Professional Makeup","Macaron Lippies","satin",0.85,6.5,"USD","https://www.nyxcosmetics.com/macaron-lippies/NYX_145.html?cgid=lipstick","nyxcosmetics.com",0,"Makeup API dataset (2017–2018)"],["lipstick","NYX Professional Makeup","In Your Element Lipstick - Metal","satin",0.85,9.0,"USD","https://www.nyxcosmetics.com/in-your-element-lipstick-metal/NYX_554.html?cgid=lipstick","nyxcosmetics.com",0,"Makeup API dataset (2017–2018)"],["lipstick","NYX Professional Makeup","Wicked Lippies","matte",0.95,6.5,"USD","https://www.nyxcosmetics.com/wicked-lippies/NYX_165.html?cgid=lipstick","nyxcosmetics.com",0,"Makeup API dataset (2017–2018)"],["lipstick","NYX Professional Makeup","Simply Vamp Lip Cream","matte",0.95,6.5,"USD","https://www.nyxcosmetics.com/simply-vamp-lip-cream/NYX_164.html?cgid=lipstick","nyxcosmetics.com",0,"Makeup API dataset (2017–2018)"],["lipstick","NYX Professional Makeup","In Your Element Lipstick - Water","satin",0.85,9.0,"USD","https://www.nyxcosmetics.com/in-your-element-lipstick-water/NYX_556.html?cgid=lipstick","nyxcosmetics.com",0,"Makeup API dataset (2017–2018)"],["lipstick","NYX Professional Makeup","In Your Element Lipstick - Wind","satin",0.85,9.0,"USD","https://www.nyxcosmetics.com/in-your-element-lipstick-wind/NYX_553.html?cgid=lipstick","nyxcosmetics.com",0,"Makeup API dataset (2017–2018)"],["lipstick","NYX Professional Makeup","In Your Element Lipstick - Fire","satin",0.85,9.0,"USD","https://www.nyxcosmetics.com/in-your-element-lipstick-fire/NYX_555.html?cgid=lipstick","nyxcosmetics.com",0,"Makeup API dataset (2017–2018)"],["lipstick","NYX Professional Makeup","In Your Element Lipstick - Air","satin",0.85,9.0,"USD","https://www.nyxcosmetics.com/in-your-element-lipstick-air/NYX_558.html?cgid=lipstick","nyxcosmetics.com",0,"Makeup API dataset (2017–2018)"],["lipstick","NYX Professional Makeup","In Your Element Lipstick - Earth","satin",0.85,9.0,"USD","https://www.nyxcosmetics.com/in-your-element-lipstick-earth/NYX_557.html?cgid=lipstick","nyxcosmetics.com",0,"Makeup API dataset (2017–2018)"],["lipstick","NYX Professional Makeup","Butter Lipstick","satin",0.85,6.5,"USD","https://www.nyxcosmetics.com/butter-lipstick/NYX_120.html?cgid=lipstick","nyxcosmetics.com",0,"Makeup API dataset (2017–2018)"],["lipstick","NYX Professional Makeup","Extra Creamy Round Lipstick","matte",0.95,null,"USD","https://www.nyxcosmetics.com/extra-creamy-round-lipstick/NYX_006.html?cgid=lipstick","nyxcosmetics.com",0,"Makeup API dataset (2017–2018)"],["lipstick","NYX Professional Makeup","Matte Lipstick","matte",0.95,6.0,"USD","https://www.nyxcosmetics.com/matte-lipstick/NYX_005.html?cgid=lipstick","nyxcosmetics.com",0,"Makeup API dataset (2017–2018)"],["lipstick","NYX Professional Makeup","Pro Lip Cream Palette","matte",0.95,12.0,"USD","https://www.nyxcosmetics.com/pro-lip-cream-palette/NYX_321.html?cgid=lipstick","nyxcosmetics.com",0,"Makeup API dataset (2017–2018)"],["lipstick","NYX Professional Makeup","Full Throttle Lipstick","matte",0.95,7.0,"USD","https://www.nyxcosmetics.com/full-throttle-lipstick/NYX_312.html?cgid=lipstick","nyxcosmetics.com",0,"Makeup API dataset (2017–2018)"],["lipstick","NYX Professional Makeup","Plush Gel Lipstick","satin",0.85,7.0,"USD","https://www.nyxcosmetics.com/plush-gel-lipstick/NYX_334.html?cgid=lipstick","nyxcosmetics.com",0,"Makeup API dataset (2017–2018)"],["lipstick","NYX Professional Makeup","Velvet Matte Lipstick","matte",0.95,7.0,"USD","https://www.nyxcosmetics.com/velvet-matte-lipstick/NYX_348.html?cgid=lipstick","nyxcosmetics.com",0,"Makeup API dataset (2017–2018)"],["lipstick","NYX Professional Makeup","Turnt Up! Lipstick","satin",0.85,6.5,"USD","https://www.nyxcosmetics.com/turnt-up-lipstick/NYX_395.html?cgid=lipstick","nyxcosmetics.com",0,"Makeup API dataset (2017–2018)"],["lipstick","NYX Professional Makeup","Pin-Up Pout Lipstick","satin",0.85,8.0,"USD","https://www.nyxcosmetics.com/pin-up-pout-lipstick/NYX_399.html?cgid=lipstick","nyxcosmetics.com",0,"Makeup API dataset (2017–2018)"],["lipstick","NYX Professional Makeup","Super Cliquey Matte Lipstick","matte",0.95,9.0,"USD","https://www.nyxcosmetics.com/super-cliquey-matte-lipstick/NYX_451.html?cgid=lipstick","nyxcosmetics.com",0,"Makeup API dataset (2017–2018)"],["lipstick","NYX Professional Makeup","Powder Puff Lippie Powder Lip Cream","matte",0.95,8.5,"USD","https://www.nyxcosmetics.com/powder-puff-lippie-powder-lip-cream/NYX_586.html?cgid=lipstick","nyxcosmetics.com",0,"Makeup API dataset (2017–2018)"],["lipstick","NYX Professional Makeup","Liquid Suede Metallic Matte","matte",0.95,7.5,"USD","https://www.nyxcosmetics.com/liquid-suede-metallic-matte/NYX_441.html?cgid=lipstick","nyxcosmetics.com",0,"Makeup API dataset (2017–2018)"],["lipstick","NYX Professional Makeup","Liquid Suede Cream Lipstick","matte",0.95,7.0,"USD","https://www.nyxcosmetics.com/liquid-suede-cream-lipstick/NYX_201.html?cgid=lipstick","nyxcosmetics.com",0,"Makeup API dataset (2017–2018)"],["lipstick","NYX Professional Makeup","Lip Lingerie","matte",0.95,7.0,"USD","https://www.nyxcosmetics.com/lip-lingerie/NYX_315.html?cgid=lipstick","nyxcosmetics.com",0,"Makeup API dataset (2017–2018)"],["lipstick","NYX Professional Makeup","Soft Matte Lip Cream","matte",0.95,6.5,"USD","https://www.nyxcosmetics.com/soft-matte-lip-cream/NYX_007.html?cgid=lipstick","nyxcosmetics.com",0,"Makeup API dataset (2017–2018)"],["lipstick","Fenty Beauty","MATTEMOISELLE - Plush Matte Lipstick","matte",0.95,18.0,"USD","https://www.fentybeauty.com/mattemoiselle/plush-matte-lipstick/FB40005.html?dwvar_FB40005_color=FB4014","fentybeauty.com",0,"Makeup API dataset (2017–2018)"],["lipstick","Dior","DIORIFIC MATTE FLUID - Christmas Look 2017 Limited Edition","matte",0.95,27.5,"GBP","https://www.dior.com/beauty/en_gb/fragrance-beauty/makeup/look-exclusives/precious-rocks-collection/pr-preciousrockslook-y0278001_f027800005-lip-cheek-velvet-colour.html","dior.com",0,"Makeup API dataset (2017–2018)"],["lipstick","Dior","DIORIFIC KHÔL","matte",0.95,29.5,"GBP","https://www.dior.com/beauty/en_gb/fragrance-beauty/makeup/look-exclusives/precious-rocks-collection/pr-preciousrockslook-y0027647_f002764341-powder-lipstick-ultra-pigmented-long-wear-intensity.html","dior.com",0,"Makeup API dataset (2017–2018)"],["lipstick","Dior","Diorific","satin",0.85,29.5,"GBP","https://www.dior.com/beauty/en_gb/fragrance-beauty/makeup/lips/lipsticks/pr-lipsticks-y0027600_f002760005-haute-couture-long-wearing-lipstick.html","dior.com",0,"Makeup API dataset (2017–2018)"],["lipstick","Dior","Dior Addict Lipstick - Limited Edition","satin",0.85,27.5,"GBP","https://www.dior.com/beauty/en_gb/fragrance-beauty/makeup/lips/lipsticks/pr-lipsticks-y0028752_f002875465-hydra-gel-core-mirror-shine.html","dior.com",0,"Makeup API dataset (2017–2018)"],["lipstick","Dior","Dior Addict Lipstick","satin",0.85,27.5,"GBP","https://www.dior.com/beauty/en_gb/fragrance-beauty/makeup/lips/lipsticks/pr-lipsticks-y0028757_f002875435-hydra-gel-core-mirror-shine.html","dior.com",0,"Makeup API dataset (2017–2018)"],["lipstick","Dior","DIOR ADDICT LACQUER STICK","gloss",0.55,27.5,"GBP","https://www.dior.com/beauty/en_gb/fragrance-beauty/makeup/lips/lipsticks/pr-lipsticks-y0028808_f002880344-liquified-shine-saturated-lip-colour-weightless-wear.html","dior.com",0,"Makeup API dataset (2017–2018)"],["lipstick","Dior","ROUGE DIOR COLLECTION COUTURE - Christmas Look 2017 Limited Edition","matte",0.95,29.5,"GBP","https://www.dior.com/beauty/en_gb/fragrance-beauty/makeup/look-exclusives/precious-rocks-collection/pr-preciousrockslook-y0027859_f002785999-jewel-lipstick-couture-colour-comfort-wear.html","dior.com",0,"Makeup API dataset (2017–2018)"],["lipstick","Dior","ROUGE DIOR - Fall 2017 Limited Edition","satin",0.85,27.5,"GBP","https://www.dior.com/beauty/en_gb/fragrance-beauty/makeup/look-exclusives/metallics-collection/pr-metallicslook-y0027837_f002784426-couture-colour-lipstick-comfort-wear.html","dior.com",0,"Makeup API dataset (2017–2018)"],["lipstick","Dior","Rouge Dior","matte",0.95,27.5,"GBP","https://www.dior.com/beauty/en_gb/fragrance-beauty/makeup/lips/lipsticks/pr-lipsticks-y0027830_f002783028-couture-colour-from-satin-to-matte-comfort-wear.html","dior.com",0,"Makeup API dataset (2017–2018)"],["lipstick","Dior","Rouge Dior Double Rouge","matte",0.95,27.5,"GBP","https://www.dior.com/beauty/en_gb/fragrance-beauty/makeup/lips/lipsticks/pr-lipsticks-y0027279_f002727288-matte-metal-colour-couture-contour-lipstick.html","dior.com",0,"Makeup API dataset (2017–2018)"],["lipstick","Dior","Rouge Dior Liquid","matte",0.95,26.5,"GBP","https://www.dior.com/beauty/en_gb/fragrance-beauty/makeup/lips/lipsticks/pr-lipsticks-y0027269_f002726162-liquid-lip-stain.-intense-couture-colour.-extreme-long-wear.-3-effects-matte-metal-satin.html","dior.com",0,"Makeup API dataset (2017–2018)"],["lipstick","IMAN Cosmetics","Luxury Moisturizing Lipstick IMAN Nude","matte",0.95,null,"USD","http://imancosmetics.com/shop/products/lips/lipstick/iman-nude","imancosmetics.com",0,"Makeup API dataset (2017–2018)"],["lipstick","Benefit Cosmetics","hydra-smooth lip color","satin",0.85,23.0,"USD","https://www.benefitcosmetics.com/ca/en-gb/product/hydra-smooth-lip-color","benefitcosmetics.com",0,"Makeup API dataset (2017–2018)"],["lipstick","Smashbox","BE LEGENDARY LONG-WEAR LIP LACQUER","gloss",0.55,24.0,"USD","http://www.smashbox.com/product/6126/31301/Lips-Cheek/Lipstick-Liner/BE-LEGENDARY-LONG-WEAR-LIP-LACQUER","smashbox.com",0,"Makeup API dataset (2017–2018)"],["liner","Smashbox","Always Sharp Lip Liner","matte",0.9,21.0,"USD","http://www.smashbox.com/product/6126/31303/Lips-Cheek/Lipstick-Liner/Always-Sharp-Lip-Liner","smashbox.com",0,"Makeup API dataset (2017–2018)"],["lipstick","Smashbox","BE LEGENDARY LIPSTICK × FOSTER SISTERS","satin",0.85,21.0,"USD","http://www.smashbox.com/product/6126/44787/Lips-Cheek/Lipstick-Liner/BE-LEGENDARY-LIPSTICK-FOSTER-SISTERS","smashbox.com",0,"Makeup API dataset (2017–2018)"],["lipstick","Smashbox","Be Legendary Lipstick","satin",0.85,21.0,"USD","http://www.smashbox.com/product/6126/39351/Lips-Cheek/Lipstick-Liner/Be-Legendary-Lipstick/NEW-SHADES","smashbox.com",0,"Makeup API dataset (2017–2018)"],["lipstick","Smashbox","ALWAYS ON LIQUID LIPSTICK","matte",0.95,24.0,"USD","http://www.smashbox.com/product/6126/42295/Lips-Cheek/Lipstick-Liner/ALWAYS-ON-LIQUID-LIPSTICK/New","smashbox.com",0,"Makeup API dataset (2017–2018)"],["lipstick","COVERGIRL","CoverGirl Outlast Longwear Lipstick","satin",0.85,10.99,"USD","https://www.covergirl.com","covergirl.com",0,"Makeup API dataset (2017–2018)"],["lipstick","butter LONDON","butter LONDON Moisture Matte Lipstick","matte",0.95,28.96,"USD","https://www.butterlondon.com","butterlondon.com",0,"Makeup API dataset (2017–2018)"],["lipstick","L'Oréal Paris","L'Oreal Paris Colour Riche Le Matte & La Lacque Lip Colour","gloss",0.55,11.49,"USD","https://www.lorealparisusa.com","lorealparisusa.com",0,"Makeup API dataset (2017–2018)"],["lipstick","COVERGIRL","CoverGirl Colorlicious Lipstick","satin",0.85,10.49,"USD","https://www.covergirl.com","covergirl.com",0,"Makeup API dataset (2017–2018)"],["lipstick","COVERGIRL","CoverGirl Outlast Lipcolor","satin",0.85,12.99,"USD","https://www.covergirl.com","covergirl.com",0,"Makeup API dataset (2017–2018)"],["lipstick","Mineral Fusion","Mineral Fusion Sheer Moisture Lip Tint","sheer",0.5,12.0,"USD","https://www.mineralfusion.com","mineralfusion.com",0,"Makeup API dataset (2017–2018)"],["lipstick","Maybelline","Maybelline Color Sensational Vivid Matte Liquid Lip Colour","matte",0.95,12.99,"USD","https://www.maybelline.com","maybelline.com",0,"Makeup API dataset (2017–2018)"],["lipstick","Revlon","Revlon Ultra HD Lip Lacquer","gloss",0.55,10.99,"USD","https://www.revlon.com","revlon.com",0,"Makeup API dataset (2017–2018)"],["liner","NYX Professional Makeup","NYX Jumbo Lip Pencil","matte",0.9,5.99,"USD","https://www.nyxcosmetics.com","nyxcosmetics.com",0,"Makeup API dataset (2017–2018)"],["lipstick","CARGO","Cargo Cosmetics ColorStick","matte",0.95,32.0,"USD","https://www.cargocosmetics.com","cargocosmetics.com",0,"Makeup API dataset (2017–2018)"],["lipstick","Revlon","Revlon ColorBurst Lacquer Balm","gloss",0.55,11.49,"USD","https://www.revlon.com","revlon.com",0,"Makeup API dataset (2017–2018)"],["lipstick","CARGO","Cargo Cosmetics Essential Lip Color","gloss",0.55,24.0,"USD","https://www.cargocosmetics.com","cargocosmetics.com",0,"Makeup API dataset (2017–2018)"],["lipstick","L'Oréal Paris","L'Oreal Paris Colour Riche Collection Exclusive Pure Reds","matte",0.95,10.99,"USD","https://www.lorealparisusa.com","lorealparisusa.com",0,"Makeup API dataset (2017–2018)"],["lipstick","NYX Professional Makeup","NYX Extra Creamy Round Lipstick","satin",0.85,6.99,"USD","https://www.nyxcosmetics.com","nyxcosmetics.com",0,"Makeup API dataset (2017–2018)"],["lipstick","Maybelline","Maybelline Color Sensational Rebel Bloom Lipcolour","satin",0.85,9.99,"USD","https://www.maybelline.com","maybelline.com",0,"Makeup API dataset (2017–2018)"],["lipstick","Maybelline","Maybelline Lip Studio Color Blur","matte",0.95,11.99,"USD","https://www.maybelline.com","maybelline.com",0,"Makeup API dataset (2017–2018)"],["lipstick","L'Oréal Paris","L'Oreal Color Riche Extraordinaire Lip Color","gloss",0.55,13.96,"USD","https://www.lorealparisusa.com","lorealparisusa.com",0,"Makeup API dataset (2017–2018)"],["lipstick","Almay","Almay Smart Shade Butter Kiss Lipstick","satin",0.85,8.99,"USD","https://www.almay.com","almay.com",0,"Makeup API dataset (2017–2018)"],["lipstick","wet n wild","Wet n Wild Silk Finish Lipstick","satin",0.85,1.99,"USD","https://www.wetnwildbeauty.com","wetnwildbeauty.com",0,"Makeup API dataset (2017–2018)"],["lipstick","L'Oréal Paris","L'Oreal Paris Colour Riche Crystal Shine","gloss",0.55,10.99,"USD","https://www.lorealparisusa.com","lorealparisusa.com",0,"Makeup API dataset (2017–2018)"],["lipstick","Revlon","Revlon Ultra HD Matte Lipcolor","matte",0.95,10.99,"USD","https://www.revlon.com","revlon.com",0,"Makeup API dataset (2017–2018)"],["lipstick","L'Oréal Paris","L'Oreal Infallible Lipstick","satin",0.85,13.99,"USD","https://www.lorealparisusa.com","lorealparisusa.com",0,"Makeup API dataset (2017–2018)"],["lipstick","Revlon","Revlon ColorStay Ultimate Suede Lipstick","matte",0.95,14.49,"USD","https://www.revlon.com","revlon.com",0,"Makeup API dataset (2017–2018)"],["lipstick","Revlon","Revlon Ultra HD Lipstick","satin",0.85,10.99,"USD","https://www.revlon.com","revlon.com",0,"Makeup API dataset (2017–2018)"],["lipstick","L'Oréal Paris","L'Oreal Paris Colour Riche Collection Exclusive Lip Colour","satin",0.85,10.99,"USD","https://www.lorealparisusa.com","lorealparisusa.com",0,"Makeup API dataset (2017–2018)"],["lipstick","Maybelline","Maybelline Color Sensational The Buffs Lipcolour","satin",0.85,9.99,"USD","https://www.maybelline.com","maybelline.com",0,"Makeup API dataset (2017–2018)"],["lipstick","Maybelline","Maybelline Color Sensational Vivids Lipcolour","satin",0.85,9.99,"USD","https://www.maybelline.com","maybelline.com",0,"Makeup API dataset (2017–2018)"],["lipstick","Pacifica","Pacifica Devocean Natural Lipstick Deeply Devoted Creamy Color","satin",0.85,21.0,"USD","https://www.pacificabeauty.com","pacificabeauty.com",0,"Makeup API dataset (2017–2018)"],["lipstick","Burt's Bees","Burt's Bees Lipstick","satin",0.85,9.99,"USD","https://www.burtsbees.com","burtsbees.com",0,"Makeup API dataset (2017–2018)"],["lipstick","Maybelline","Maybelline Color Sensational Creamy Mattes Lipcolour","matte",0.95,9.99,"USD","https://www.maybelline.com","maybelline.com",0,"Makeup API dataset (2017–2018)"],["lipstick","L'Oréal Paris","L'Oreal Paris Colour Riche Lipstick","satin",0.85,10.99,"USD","https://www.lorealparisusa.com","lorealparisusa.com",0,"Makeup API dataset (2017–2018)"],["lipstick","Revlon","Revlon Matte Lipstick","matte",0.95,11.79,"USD","https://www.revlon.com","revlon.com",0,"Makeup API dataset (2017–2018)"],["lipstick","Revlon","Revlon ColorStay Ultimate Liquid Lipstick","matte",0.95,14.49,"USD","https://www.revlon.com","revlon.com",0,"Makeup API dataset (2017–2018)"],["lipstick","Maybelline","Maybelline Color Sensational Lipcolour","satin",0.85,9.99,"USD","https://www.maybelline.com","maybelline.com",0,"Makeup API dataset (2017–2018)"],["lipstick","NYX Professional Makeup","NYX Soft Matte Lip Cream","gloss",0.55,8.99,"USD","https://www.nyxcosmetics.com","nyxcosmetics.com",0,"Makeup API dataset (2017–2018)"],["lipstick","Burt's Bees","Burt's Bees Lip Crayon","matte",0.95,9.99,"USD","https://www.burtsbees.com","burtsbees.com",0,"Makeup API dataset (2017–2018)"],["lipstick","e.l.f. Cosmetics","e.l.f. Studio Matte Lip Color","matte",0.95,4.99,"USD","https://www.elfcosmetics.com","elfcosmetics.com",0,"Makeup API dataset (2017–2018)"],["lipstick","Revlon","Revlon Super Lustrous Lipstick","satin",0.85,11.49,"USD","https://www.revlon.com","revlon.com",0,"Makeup API dataset (2017–2018)"],["lipstick","Milani","Milani Color Statement Moisture Matte Lipstick","matte",0.95,6.99,"USD","https://www.milanicosmetics.com","milanicosmetics.com",0,"Makeup API dataset (2017–2018)"],["lipstick","Milani","Milani Color Statement Lipstick","matte",0.95,6.99,"USD","https://www.milanicosmetics.com","milanicosmetics.com",0,"Makeup API dataset (2017–2018)"],["lipstick","Revlon","Revlon ColorBurst Matte Balm","sheer",0.5,11.49,"USD","https://www.revlon.com","revlon.com",0,"Makeup API dataset (2017–2018)"],["lipstick","e.l.f. Cosmetics","e.l.f. Studio Moisturizing Lipstick","gloss",0.55,4.99,"USD","https://www.elfcosmetics.com","elfcosmetics.com",0,"Makeup API dataset (2017–2018)"],["liner","Maybelline","Maybelline Color Sensational Lipliner","matte",0.9,8.29,"USD","https://www.maybelline.com","maybelline.com",0,"Makeup API dataset (2017–2018)"],["lipstick","Maybelline","Superstay Matte Ink","matte",0.95,null,null,"https://www.maybelline.com","maybelline.com",0,"Makeup API dataset (2017–2018)"],["liner","NYX Professional Makeup","#LOTD Lip Of The Day Liquid Lip Liner","matte",0.9,7.0,"USD","https://www.nyxcosmetics.com/lotd-lip-of-the-day-liquid-lip-liner/NYX_350.html?cgid=lip-liner","nyxcosmetics.com",0,"Makeup API dataset (2017–2018)"],["liner","NYX Professional Makeup","Slide On Lip Pencil","matte",0.9,8.0,"USD","https://www.nyxcosmetics.com/slide-on-lip-pencil/NYX_234.html?cgid=lip-liner","nyxcosmetics.com",0,"Makeup API dataset (2017–2018)"],["liner","NYX Professional Makeup","Retractable Lip Liner","matte",0.9,5.0,"USD","https://www.nyxcosmetics.com/retractable-lip-liner/NYX_051.html?cgid=lip-liner","nyxcosmetics.com",0,"Makeup API dataset (2017–2018)"],["liner","NYX Professional Makeup","Suede Matte Lip Liner","matte",0.9,4.0,"USD","https://www.nyxcosmetics.com/suede-matte-lip-liner/NYX_355.html?cgid=lip-liner","nyxcosmetics.com",0,"Makeup API dataset (2017–2018)"],["liner","NYX Professional Makeup","Slim Lip Pencil","matte",0.9,4.0,"USD","https://www.nyxcosmetics.com/slim-lip-pencil/NYX_052.html?cgid=lip-liner","nyxcosmetics.com",0,"Makeup API dataset (2017–2018)"],["liner","NYX Professional Makeup","Jumbo Lip Pencil","matte",0.9,4.5,"USD","https://www.nyxcosmetics.com/jumbo-lip-pencil/NYX_003.html?cgid=lip-liner","nyxcosmetics.com",0,"Makeup API dataset (2017–2018)"],["gloss","NYX Professional Makeup","Lip Lustre Glossy Lip Tint","gloss",0.3,7.0,"USD","https://www.nyxcosmetics.com/lip-lustre-glossy-lip-tint/NYX_362.html?cgid=lipgloss","nyxcosmetics.com",0,"Makeup API dataset (2017–2018)"],["gloss","NYX Professional Makeup","Cosmic Metals Lip Cream","gloss",0.3,7.5,"USD","https://www.nyxcosmetics.com/cosmic-metals-lip-cream/NYX_343.html?cgid=lipgloss","nyxcosmetics.com",0,"Makeup API dataset (2017–2018)"],["lipstick","YSL Beauty","Rouge Volupté Shine","gloss",0.55,null,null,"https://www.yslbeautyus.com","yslbeautyus.com",0,"Ovilia lipstick dataset"],["lipstick","YSL Beauty","Rouge Pur Couture","satin",0.85,null,null,"https://www.yslbeautyus.com","yslbeautyus.com",0,"Ovilia lipstick dataset"],["lipstick","YSL Beauty","Rouge Volupté","satin",0.85,null,null,"https://www.yslbeautyus.com","yslbeautyus.com",0,"Ovilia lipstick dataset"],["lipstick","YSL Beauty","Vernis à Lèvres","gloss",0.55,null,null,"https://www.yslbeautyus.com","yslbeautyus.com",0,"Ovilia lipstick dataset"],["gloss","YSL Beauty","Volupté Tint-in-Oil","gloss",0.3,null,null,"https://www.yslbeautyus.com","yslbeautyus.com",0,"Ovilia lipstick dataset"],["lipstick","YSL Beauty","Baby Doll Kiss & Blush","matte",0.95,null,null,"https://www.yslbeautyus.com","yslbeautyus.com",0,"Ovilia lipstick dataset"],["gloss","YSL Beauty","Gloss Volupté","gloss",0.3,null,null,"https://www.yslbeautyus.com","yslbeautyus.com",0,"Ovilia lipstick dataset"],["lipstick","Chanel","Rouge Coco Shine","gloss",0.55,null,null,"https://www.chanel.com","chanel.com",0,"Ovilia lipstick dataset"],["lipstick","Chanel","Rouge Allure","satin",0.85,null,null,"https://www.chanel.com","chanel.com",0,"Ovilia lipstick dataset"],["lipstick","Chanel","Rouge Allure Velvet","matte",0.95,null,null,"https://www.chanel.com","chanel.com",0,"Ovilia lipstick dataset"],["lipstick","Dior","Dior Addict Lacquer Stick","gloss",0.55,null,null,"https://www.dior.com","dior.com",0,"Ovilia lipstick dataset"],["lipstick","Dior","Dior Addict Lip Tattoo","sheer",0.5,null,null,"https://www.dior.com","dior.com",0,"Ovilia lipstick dataset"],["lipstick","Dior","Rouge Dior","satin",0.85,null,null,"https://www.dior.com","dior.com",0,"Ovilia lipstick dataset"],["lipstick","Maybelline","Color Sensational Creamy Matte","matte",0.95,null,null,"https://www.maybelline.com","maybelline.com",0,"Ovilia lipstick dataset"],["lipstick","Givenchy","Le Rouge","satin",0.85,null,null,"https://www.givenchybeauty.com","givenchybeauty.com",0,"Ovilia lipstick dataset"],["lipstick","Givenchy","Rouge Interdit","sheer",0.5,null,null,"https://www.givenchybeauty.com","givenchybeauty.com",0,"Ovilia lipstick dataset"]],"shades":[[0,"Comes Naturally","A8706A","rosy nude"],[0,"Moody Nude","9A6457","nude"],[0,"Cappuccino","8A5A46","medium brown"],[0,"Cinnamon","8C4532","warm brown"],[0,"Chill Brown","7A4A3C","brown"],[0,"Sultry","5E2A2C","deep wine-brown"],[0,"Cocoa","4A2A22","deep brown"],[1,"Talented","B98A78","true neutral beige"],[1,"Creative","C98A75","muted peach"],[1,"Lively","C0606E","rose pink"],[1,"Humble","A86872","rose mauve"],[1,"Worthy","9E6A6E","muted mauve"],[1,"Fun","977076","neutral mauve"],[1,"Wise","9B6450","warm brown nude"],[2,"Devoted","B3192B","true red"],[1,"Bold","8C2F45","deep berry rose"],[1,"Gifted","6B3A4A","deep dusty plum"],[1,"Strong","5A3328","rich chocolate brown"],[3,"Chill","F4ECEA","clear"],[4,"XOXO","E8A0AE","sheer pink"],[5,"Oat","DDAA98","milky peachy pink"],[5,"Coconut","D9A2A6","milky rosy pink"],[5,"Sesame","C99A9E","milky mauve"],[5,"Cashew","A8706A","milky rosy brown"],[5,"Almond","8A5A48","milky chocolate"],[6,"Wild","C2385E","sheer-ish raspberry"],[7,"Dip","C28E7E","bikini nude"],[7,"Malibu","E58FA6","surfy pink"],[7,"Cola","7A3E32","sheer rich brown"],[8,"Slushy","B52638","sheer cherry red"],[9,"Jaws","A3121F","hot blood red"],[10,"BFF Pencil 2","AB7164",""],[10,"Toy Pencil","DFAC9B",""],[10,"Ellarie Pencil","542328",""],[10,"I Heart This Pencil","B0516F",""],[10,"Brink Pencil","B5716A",""],[10,"Bull Chic Pencil","242225",""],[10,"Leather Pencil","5C3357",""],[10,"Dukes Pencil","653E44",""],[10,"Bichette Pencil","93283C",""],[10,"Poison Pencil","702E2D",""],[10,"Love Bug Pencil","8C4A47",""],[10,"LBB Pencil","762F50",""],[10,"Pitch Pencil","714B41",""],[10,"Mamacita Pencil","361927",""],[10,"Toolips Pencil","4D2D28",""],[10,"Dopey Pencil","6D414B",""],[10,"Wild Nothing Pencil","914B4C",""],[10,"Bossy Pencil","AF4051",""],[10,"Frenchie Pencil","C23D3C",""],[10,"Clique Pencil","A33C37",""],[10,"Chi Chi Pencil","DA6952",""],[10,"Trixie Pencil","CE435D",""],[10,"Heart On Pencil","BF2C7E",""],[10,"Contempo Pencil","965564",""],[10,"Are N Be Pencil","743A6A",""],[10,"Brills Pencil","C095BC",""],[10,"BFF Pencil 3","5F2820",""],[10,"Bumble Pencil","8E474D",""],[10,"Lumiere Pencil","865B69",""],[10,"Curvii Pencil","975348",""],[10,"Oh Snap Pencil","8F5954",""],[10,"Beeper Pencil","966A60",""],[10,"951 Pencil","A36B5E",""],[10,"BFF Pencil","B28378",""],[11,"Candyfloss","7C3F35",""],[11,"Lolly","452222",""],[11,"Ice Cube","904550",""],[11,"On a Stick","A12A33",""],[11,"Drip","8E4140",""],[11,"Brain Freeze","BB656B",""],[11,"Bee's Knees","B72227",""],[12,"Kapish","975450",""],[12,"Taurus","763A31",""],[12,"Lumiere","A05F6A",""],[12,"Poppin'","AB223E",""],[12,"Trust Me","CB2931",""],[12,"Chi Chi","DC4A3C",""],[12,"Bossy","C5282D",""],[12,"Grunge","864740",""],[12,"LBB","623343",""],[12,"Poison","621F20",""],[12,"Mirror, Mirror","AB3E61",""],[12,"Frenchie","D12C35",""],[12,"Leather","5C4761",""],[12,"Pitch","442A26",""],[12,"Persuasion","AA4E79",""],[12,"Cookie","AF7564",""],[12,"Tootsi","8F6557",""],[12,"I Heart this Lippie","C5314F",""],[12,"Heart on","B82485",""],[12,"Contempo","C08586",""],[12,"Lullaby","EA5151",""],[12,"Topanga","B75E59",""],[12,"Sauce","B86A82",""],[12,"Bichette","852528",""],[12,"Parker","B67367",""],[12,"Party Foul","762554",""],[12,"Bound","CF8D98",""],[12,"Faded","BC6E6B",""],[12,"Oh Snap","C08892",""],[12,"Daydream","C17773",""],[12,"Ellarie","5D2318",""],[12,"Candy Paint","A3595E",""],[12,"Ink Blot","C07D6B",""],[12,"Little Tings","D68B99",""],[12,"After Shock","BA7378",""],[12,"Goal Digger","B97271",""],[12,"Fly-Fi","9A2B24",""],[12,"Sike","E28474",""],[12,"Cami","AA6968",""],[12,"Brink","C68176",""],[12,"Aquarius","9E574D",""],[12,"Who Run this","94372D",""],[12,"Love Life","BF3A30",""],[12,"Goldie","723739",""],[12,"Ziggie","793C36",""],[13,"Like","E5C2CF",""],[13,"Crush","CB6382",""],[13,"Jam","974A72",""],[13,"Leo","A46C58",""],[13,"Zip","DE6262",""],[14,"Pink & Plenty","EE8FA8",""],[14,"Normous Nude","B37366",""],[14,"Portly Peach","E76F5F",""],[14,"Jumbo Jem","E28F96",""],[14,"Powerhouse Punch","CB1B56",""],[14,"Goliath Grape","973566",""],[14,"Va Va Va Violet","A54A6D",""],[14,"Super Scarlet","BF133F",""],[15,"Lipblush","7E4542",""],[15,"Neutrally","9B4F46",""],[15,"Honeystick","98483A",""],[15,"Bamboo","934252",""],[15,"Cocoa Rose","7F343B",""],[15,"Baby Buff","B7706B",""],[15,"Crushed Berry","A9405C",""],[15,"Soft Rose","C76378",""],[15,"Velvet Rose","831441",""],[15,"Cocoa Peach","CA5245",""],[15,"Tawny Tulip","7B0705",""],[15,"Sky Violet","B05087",""],[15,"Plummy","562A41",""],[15,"Chocolate Chip","490C05",""],[15,"Bon Bon","733A40",""],[15,"Chili","5D0810",""],[16,"Intense Hibiscus","E76393",""],[16,"Intense Punch","C12B73",""],[16,"Intense Jam","B51869",""],[16,"Intense Cosmo","941E58",""],[16,"Intense Cranberry","99122B",""],[16,"Intense Passion","CA1238",""],[16,"Intense Blush","AD5E51",""],[16,"Intense Cayenne","BB4F40",""],[16,"Intense Sassafras","B36D5C",""],[16,"Intense Cafe","924737",""],[16,"Intense Licorice","4F1115",""],[16,"Intense Cola","4F1919",""],[17,"Pink Honey","D15969",""],[17,"Black Honey","4E1D16",""],[18,"Delovely","BB7267",""],[18,"Adore U","D87A73",""],[18,"Pink-a-boo","E56D75",""],[18,"Pink Beach","CE6B67",""],[18,"Berry Blush","D06A7A",""],[18,"Baby Baby","DD777F",""],[18,"Raspberry Rush","BA4A60",""],[18,"Pink Goddess","C0415A",""],[18,"Waterviolet","CA7783",""],[18,"Apple Brandy","B62841",""],[18,"Fresh Watermelon","CB224E",""],[18,"Cranberry Cream","B80036",""],[18,"Ambrosia","EE4F49",""],[19,"Peach Pop","AA443B",""],[19,"Extreme Pink","B1455A",""],[19,"Go Fig","913B35",""],[19,"Nude Beach","D17C76",""],[19,"Nearly Violet","DC7A75",""],[19,"Honey Blush","E17770",""],[19,"Very Currant","E87785",""],[19,"Toasted Rose","D96A6D",""],[19,"Rose Spectrum","B3505D",""],[19,"Sassy Spice","C02C29",""],[19,"Cider Berry","853439",""],[19,"Pure Posh","CD5247",""],[19,"Rosette","A9434B",""],[19,"After Party","CC5268",""],[19,"Red-y To Wear","AF2033",""],[20,"Roundest Raspberry","792D39",""],[20,"Curviest Caramel","A95C61",""],[20,"Chunkiest Chili","AB383F",""],[20,"Mightiest Maraschino","B5003D",""],[20,"Heftiest Hibiscus","BD3637",""],[20,"Plushest Punch","A51743",""],[20,"Roomiest Rose","831344",""],[20,"Broadest Berry","76303E",""],[20,"Grandest Grape","771835",""],[21,"Matte Beauty","CD5A64",""],[21,"Matte Plum","AD276A",""],[21,"Matte Crimson","CC0631",""],[22,"Will You?","F85856",""],[22,"I Do!","BF4559",""],[22,"Silvery Moon","D97A96",""],[22,"Honeymoon","C96E5A",""],[22,"Violet Berry","BA4A58",""],[22,"Watermelon","CC486A",""],[22,"Ginger Flower","C9253E",""],[22,"Runway Coral","E64E51",""],[22,"Twilight Nude","AF5965",""],[22,"Creamy Nude","AF675D",""],[22,"Baby Kiss","A75155",""],[22,"Berry Freeze","AD3836",""],[22,"Rose Shimmer","A8005B",""],[22,"Beauty","B35060",""],[22,"All Heart","A44242",""],[22,"Red Red Red","B32127",""],[22,"Golden Brandy","BE453E",""],[22,"Pink Spice","A75258",""],[22,"Black Violet","6C2A2D",""],[22,"Blushing Nude","A95554",""],[22,"Sugared Maple","A95C5B",""],[22,"Merlot","8F212E",""],[22,"Bamboo Pink","A96361",""],[22,"Heather Moon","874F58",""],[22,"Dubonnet","A52B25",""],[22,"Pink Chocolate","A7413D",""],[23,"Petal Pop","E86BA5",""],[23,"Boom Pop","841544",""],[23,"Cake Pop","DA7D7E",""],[23,"Flame Pop","C8093A",""],[23,"Ripe Pop","EF3232",""],[23,"Sweetheart Pop","9E1B56",""],[23,"Candied Apple Pop","790126",""],[23,"Black Licorice Pop","5E072F",""],[24,"Budding Blossom","FF8FB2",""],[24,"Coming Up Rosy","E35773",""],[24,"Poppin' Poppy","F26A6F",""],[24,"Flowering Freesia","783E5B",""],[25,"Love Pop","AD384A",""],[25,"Palm Beach Pop","EA2C51",""],[25,"Cola Pop","7B3636",""],[25,"Melon Pop","F45A3B",""],[25,"Beige Pop","CC756C",""],[25,"Capri Pop","E51E4F",""],[25,"Fab Pop","FB8187",""],[25,"Bare Pop","C86464",""],[25,"Cherry Pop","CD1859",""],[25,"Poppy Pop","F83A3C",""],[25,"Santorini Pop","AE266B",""],[26,"A Different Grape","8C3050",""],[26,"Sugared Grapefruit","E26872",""],[26,"Think Bronze","B96565",""],[26,"Guava Stain","B76E74",""],[26,"Sweet Honey","DC555E",""],[26,"Plum Brandy","9F3245",""],[26,"Surprise","8F4A4E",""],[26,"Shy","A44155",""],[26,"Angel Red","9C0B2D",""],[26,"Raspberry Glace","AB455E",""],[26,"Ripe Raisin","CC364C",""],[26,"Spiced Apple","A3555D",""],[26,"Tenderheart","984A37",""],[26,"Glazed Berry","DD587C",""],[26,"Bronze Leaf","AD665D",""],[27,"Nude Pop","D88282",""],[27,"Lava Pop","D7142E",""],[27,"Sugar Pop","CC6674",""],[27,"Cocoa Pop","A65957",""],[27,"Sweetie Pop","FF1E5A",""],[27,"Peace Pop","6A1144",""],[27,"Wink Pop","EC878D",""],[27,"Go-Go Pop","EF005F",""],[27,"Love Pop","924257",""],[27,"Happy Pop","FF3D3C",""],[28,"Bubblegum Pop","F276A2",""],[28,"Sugar Plum Pop","C05C67",""],[28,"Sprinkle Pop","CC376A",""],[28,"Fireball Pop","C12838",""],[28,"Melon Drop Pop","F45C5F",""],[28,"Licorice Pop","731E3B",""],[29,"Super Strawberry","B1515D",""],[29,"Heaping Hazelnut","B76F69",""],[29,"Graped-Up","954B57",""],[29,"Whole Lotta Honey","AF6262",""],[29,"Fuller Fig","9B4344",""],[29,"Richer Raisin","853F36",""],[29,"Two Ton Tomato","CE1F1D",""],[29,"Mega Melon","C45A5B",""],[29,"Oversized Orange","F66366",""],[29,"Chunky Cherry","C04156",""],[29,"Pudgy Peony","B11F60",""],[29,"Woppin' Watermelon","E17587",""],[29,"Bountiful Blush","984D50",""],[29,"Curvy Candy","E76477",""],[29,"Mighty Mimosa","E3727C",""],[29,"Voluptuous Violet","8F3851",""],[29,"Plumped Up Pink","F7659E",""],[29,"Supreme Sorbet","F09495",""],[29,"Jumbo Jasmine","A7354B",""],[30,"Bold Pop","4A1323",""],[30,"Ruby Pop","A8100B",""],[30,"Rose Pop","961741",""],[30,"Pow Pop","7F2D55",""],[30,"Graffiti Pop","CC0D49",""],[30,"Clove Pop","592A26",""],[30,"Peppermint Pop","A80028",""],[30,"Cute Pop","A54B60",""],[30,"Shock Pop","AF1A58",""],[30,"Coral Pop","D3313F",""],[30,"Mod Pop","DE387D",""],[30,"Icon Pop","900925",""],[30,"Peony Pop","DC7587",""],[30,"Blushing Pop","9F5859",""],[30,"Avant Garde Pop","301018",""],[30,"Beach Pop","8E4546",""],[31,"Nude Pop","D3796E",""],[31,"Fab Pop","F37E91",""],[31,"Beige Pop","E08E7F",""],[31,"Melon Pop","F47B74",""],[31,"Bare Pop","B75C54",""],[31,"Sweet Pop","EB6B8A",""],[31,"Wow Pop","EF5498",""],[31,"Grape Pop","974B6A",""],[31,"Poppy Pop","EB4944",""],[31,"Plum Pop","B45865",""],[31,"Punch Pop","CB254C",""],[31,"Cherry Pop","B90E26",""],[31,"Love Pop","8D3949",""],[31,"Passion Pop","750D15",""],[31,"Berry Pop","641126",""],[31,"Cola Pop","5A1E1B",""],[32,"Blossom Pop","BB5974",""],[32,"Dune Pop","9F6469",""],[32,"Fuchsia Pop","C91C67",""],[32,"Fiesta Pop","A82F5B",""],[32,"Crimson Pop","C02840",""],[32,"Bright Pop","C6243C",""],[32,"Brown Sugar Pop","83403C",""],[32,"Fun Pop","713547",""],[33,"Fearless","8C6989",""],[33,"Passionate","773950",""],[33,"Extraordinary","963673",""],[33,"Brave","543A61",""],[33,"Brilliant","9A5953",""],[33,"Confident","C87F76",""],[34,"Flushed","FA7B84",""],[34,"Primrose","F86F9D",""],[34,"First Base","EA7F9B",""],[34,"French Kiss","F94E9A",""],[34,"XOXO","F45863",""],[34,"Enchanted","FE8483",""],[35,"Maraschino","D43748",""],[35,"Candy Apple","E62E50",""],[35,"Russian Roulette","F2626C",""],[35,"Seduction","FE5A50",""],[35,"Leading Lady","D33556",""],[35,"Knock Out","C4605E",""],[36,"Fairest","EBA38B",""],[36,"Peaches","FAA893",""],[36,"Disrobed","ED9B8F",""],[36,"Sable","C16E5E",""],[36,"Exposed","DE9079",""],[36,"Honey","EAA88E",""],[37,"Rose","F695BE",""],[37,"Orange Blossom","FE9846",""],[37,"Citron","FDBD3F",""],[37,"Key Lime","78D877",""],[37,"Pistachio","53CEBC",""],[37,"Blue Velvet","14A8E6",""],[37,"Earl Grey","76A9D8",""],[37,"Lavender","A89DD9",""],[37,"Violet","B778D1",""],[37,"Chambord","181818",""],[38,"Metallic Gold","835546",""],[38,"Glossy Deep Berry","7D2C35",""],[38,"Metallic Bronze","604238",""],[39,"Power","895762",""],[39,"Wrath","714119",""],[39,"Mischievous","D0AD53",""],[39,"Trickery","494623",""],[39,"Risque","118A77",""],[39,"Scandalous","11AFAE",""],[39,"Envy","0035B8",""],[39,"Sinful","073895",""],[39,"Immortal","6934B8",""],[39,"Betrayal","390C67",""],[39,"Cold Hearted","515151",""],[40,"Bewitching","863C4D",""],[40,"Temptress","49142E",""],[40,"She Devil","451D35",""],[40,"Aphrodisiac","4F212B",""],[40,"Covet","771C21",""],[40,"Enamored","412227",""],[41,"Metallic Violet Black","382B35",""],[41,"Matte Nude","A56856",""],[41,"Glossy Plum","552D2D",""],[42,"Glossy Nude","964C41",""],[42,"Matte Navy","303356",""],[42,"Metallic Brown","543435",""],[43,"Glossy Black","1E1E1E",""],[43,"Matte Red","891B28",""],[43,"Matte Mauve","954743",""],[44,"Glossy Pale Pink","A1483A",""],[44,"Matte Rose","B5595C",""],[44,"Glossy Peach","C1573F",""],[45,"Metallic Copper","902E2B",""],[45,"Glossy Wine","57273F",""],[45,"Matte Warm Brown","512D2D",""],[46,"Summer Fruits","FD9A95",""],[46,"Seashell","FD9B92",""],[46,"Pink Bikini","FD869A",""],[46,"Hot Nights","FF4F83",""],[46,"Snowcone","FE7295",""],[46,"Staycation","F84656",""],[46,"Beach BBQ","F84563",""],[46,"Fruit Punch","F04B69",""],[46,"Sweet Shock","EA3B96",""],[46,"Daydreaming","B66F99",""],[46,"Midnight Swim","C36A8A",""],[46,"Thunderstorm","8E215A",""],[46,"Moonlit Night","66071D",""],[46,"Block Party","531522",""],[46,"Ripe Berry","A13F3C",""],[46,"Root Beer Float","CE6B65",""],[46,"Afternoon Heat","B90508",""],[46,"Lifeguard","AE2304",""],[46,"Fire Brick","D30A1A",""],[46,"Firecracker","EF2438",""],[46,"Heat Wave","F32637",""],[46,"Scorching Sun","F72E12",""],[46,"Neon Lights","FC4130",""],[46,"Bonfire","FF421C",""],[46,"Shooting Star","FF9065",""],[46,"Easy Livin","FE8C72",""],[46,"West Coast","FF9387",""],[46,"Sandy Kiss","FF9D84",""],[46,"Snack Shack","C5735D",""],[46,"Sandcastle","FEA07C",""],[46,"Smormellow","FDB494",""],[46,"Boardwalk","F59E83",""],[46,"Tan Lines","C37E61",""],[46,"Vacation Spot","895B41",""],[47,"Milan","CD787B",""],[47,"Athena","F3CFCF",""],[47,"Baby Pink","F2D0E0",""],[47,"Sash","F7D0C9",""],[47,"Harmonica","FBCDD0",""],[47,"Marrakesh Pink","FFC5B9",""],[47,"Strawberry Milk","F7C9CB",""],[47,"Jupiter","F9C3C1",""],[47,"Gala","F9CABA",""],[47,"Narcissus","FFBFCD",""],[47,"Lip Du Jour","F5C3C6",""],[47,"Paris","FF7C86",""],[47,"Sky Pink","FEBDC1",""],[47,"Rose Bud","FD9CA7",""],[47,"Flower","FD93A9",""],[47,"Vitamin","F9AC9C",""],[47,"Indian Pink","FC978D",""],[47,"Chic","FAA19D",""],[47,"Stella","FDA09B",""],[47,"Margarita","FD9491",""],[47,"Paparazzi","F1757F",""],[47,"Pink Lyric","FF5E8F",""],[47,"Hot Pink","FF4986",""],[47,"Christie","F7BAC1",""],[47,"Rose Bouquet","FD829E",""],[47,"Gem","D3748C",""],[47,"Watermelon","FDA290",""],[47,"Blush","E37880",""],[47,"Fig","E36974",""],[47,"Tea Rose","E07C7C",""],[47,"Louisiana","FF607C",""],[47,"Spell Bound","FB5468",""],[47,"Gardenia","FB7D92",""],[47,"Haute Couture","EA6C82",""],[47,"Shiva","F26198",""],[47,"Eucalyptus","F66493",""],[47,"Chloe","F8639D",""],[47,"Fusion","ED6FAE",""],[47,"Peach","DA7C7C",""],[47,"Minimalism","CA787A",""],[47,"Heather","F09292",""],[47,"Doll","DC6271",""],[47,"Thalia","C78376",""],[47,"Perfect","C88471",""],[47,"B52","D2736F",""],[47,"Lala","BF6E7F",""],[47,"Power","C3A4B6",""],[47,"Castle","E2AED4",""],[47,"Pandora","CE86B6",""],[47,"Violet Ray","C14E6D",""],[47,"Medusa","AD4B72",""],[47,"Bruised","4D182A",""],[47,"Hestia","891A0F",""],[47,"Hero","9D181D",""],[47,"Black Cherry","7B1427",""],[47,"Hope","DF726F",""],[47,"Topaz","EC8681",""],[47,"Hebe","F25C67",""],[47,"Snow White","BF1F11",""],[47,"Electra","D40F18",""],[47,"Chaos","D50326",""],[47,"Chic Red","E70F50",""],[47,"Fire","F1232D",""],[47,"Eros","EF1C07",""],[47,"Rose","FE7C84",""],[47,"NYX","FFA181",""],[47,"Haute Melon","FF5B38",""],[47,"Femme","FD5A49",""],[47,"Peach Bellini","FC927C",""],[47,"Orange Soda","FEAE89",""],[47,"Pure Nude","E89D7E",""],[47,"Pumpkin Pie","D49377",""],[47,"Iris","F9C2AE",""],[47,"Frosted Flakes","F0D9BA",""],[47,"Echo","DEA588",""],[47,"Circe","E2A589",""],[47,"Honey","E0A789",""],[47,"Galaxy","D2B4AA",""],[47,"Rea","D39E7F",""],[47,"Summer Love","FDC0AD",""],[47,"Darling","F69D99",""],[47,"Frappucino","D3856F",""],[47,"Heredes","CE7A62",""],[47,"Mars","CE886F",""],[47,"Cocoa","CB7C6B",""],[48,"Hippie Chic","FFAAA1",""],[48,"Pale Pink","FFB1B1",""],[48,"Audrey","FF96A6",""],[48,"Summer Breeze","FF93B9",""],[48,"Girl Crush","FF73A3",""],[48,"Shocking Pink","FF7CC4",""],[48,"Sweet Pink","FE73AE",""],[48,"Zen Orchid","B97BBE",""],[48,"Up The Bass","7E5F71",""],[48,"Dark Era","7D2D30",""],[48,"Aria","882A5E",""],[48,"Siren","802A35",""],[48,"Goal Digger","573438",""],[48,"Honeymoon","B67B6D",""],[48,"Tea Rose","F48898",""],[48,"Natural","ED8D99",""],[48,"Whipped Caviar","F497A2",""],[48,"Euro Trash","FDA099",""],[48,"Sierra","FB6E64",""],[48,"Strawberry Daiquiri","FF8883",""],[48,"Crazed","94382D",""],[48,"Angel","FF7D93",""],[48,"Merlot","E75268",""],[48,"Alabama","DC453A",""],[48,"Eden","F43847",""],[48,"Bloody Mary","FD4068",""],[48,"Perfect Red","E92A2F",""],[48,"Pure Red","FF3F4C",""],[48,"Street Cred","F78493",""],[48,"Crave","FF5864",""],[48,"Indie Flick","FF584C",""],[48,"Nude","FEB19F",""],[48,"Spirit","FFB0A6",""],[48,"Temptress","FFAAA3",""],[48,"Couture","FFB0AC",""],[48,"Forbidden","FDB79E",""],[48,"Daydream","FFA899",""],[48,"Shy","FBBC9D",""],[48,"Bare With Me","EEA690",""],[48,"Minx","AA8771",""],[48,"Butter","DCAF98",""],[48,"Sable","E7B092",""],[48,"Maison","B27A61",""],[49,"The Nudes","B76C4C",""],[49,"The Pinks","CD5C56",""],[49,"The Reds","C21A17",""],[49,"The Plums","99242C",""],[50,"Lethal Kiss","F84B8B",""],[50,"Trickster","BA5591",""],[50,"Locked","9D2D43",""],[50,"Loaded","753529",""],[50,"Night Crawler","6D2F46",""],[50,"Con Artist","87372E",""],[50,"Up The Bass","C1120D",""],[50,"Sandman","9B3C2A",""],[50,"Firestorm","DE3228",""],[50,"Jolt","EC5039",""],[50,"Sidekick","E89782",""],[50,"Kiss The Dust","BB745E",""],[51,"Nude Beach","D39483",""],[51,"Dime Piece","E5898A",""],[51,"Air Blossom","FF739D",""],[51,"Azalea","FB4C9B",""],[51,"Fizzy Berries","DE4A84",""],[51,"Karma Kiss","E62D57",""],[51,"Sharp Femme","D52A3D",""],[51,"Sacred Mix","B1223E",""],[51,"Pastel Dust","FE987F",""],[51,"Foxy Love","FF6541",""],[51,"Coral Mist","FE6D5C",""],[51,"Breakup","A9655C",""],[52,"Effervescent","EC737C",""],[52,"Miami Nights","FD227E",""],[52,"Unicorn Fur","DB5DA6",""],[52,"Disorderly","66459C",""],[52,"Violet Voltage","894193",""],[52,"Midnight Muse","272B58",""],[52,"Volcano","8F323D",""],[52,"Blood Love","C42627",""],[52,"Beach Casual","C69078",""],[52,"Soft Femme","B06C6D",""],[52,"Charmed","AB5C58",""],[52,"Duchess","9C656A",""],[53,"French Kiss","FEA3A0",""],[53,"Pink Lady","FF9B8F",""],[53,"Beam","FE958F",""],[53,"Rags To Riches","FF5555",""],[53,"Tiara","FE9288",""],[53,"Sweet 16","FF888C",""],[53,"Privileged","FE6695",""],[53,"Flutter Kisses","DB8880",""],[53,"Playdate","CA94C5",""],[53,"Twisted","A75BA5",""],[53,"Wine & Dine","980A30",""],[53,"Feline","85242B",""],[53,"Dahlia","3E1213",""],[53,"Burlesque","9F0B0B",""],[53,"Hollywood","CC0607",""],[53,"Rock Star","EE2E2B",""],[53,"Free Spirit","FE623A",""],[53,"Tan-Gerine","FFAC8E",""],[53,"Mirage","FFBB9E",""],[53,"Flawless","F1B18E",""],[53,"Stone","ECAC91",""],[53,"Dirty Talk","8A4830",""],[54,"Darling","D8687E",""],[54,"Opinionated","DF5866",""],[54,"Dance Party","F25491",""],[54,"Bombshell","D21A50",""],[54,"Boundless","C56A65",""],[54,"Almost Famous","A6595F",""],[54,"Cocktail Hour","A02961",""],[54,"Fiery","F14231",""],[54,"Lucy","A30305",""],[54,"Red Haute","930801",""],[54,"Revolution","6F2323",""],[54,"Rebel Soul","763637",""],[54,"Smoke Me","9F8995",""],[54,"Wisteria","984CA6",""],[54,"Violet Femme","7A3169",""],[54,"Flashy","743049",""],[54,"True Vixen","4A2F34",""],[54,"Wild Spirit","42306E",""],[54,"Silk","CC846C",""],[54,"Sophisticated","C0745D",""],[54,"Corset","BC7969",""],[54,"Individualistic","9C5949",""],[54,"Savage","6F3027",""],[54,"Resistance","8D4749",""],[55,"On The DL","DB7D64",""],[55,"Oh So Pretty","EB6669",""],[55,"Obvs","9F3E52",""],[55,"Conform","7E4F47",""],[55,"Serpent","BF2259",""],[55,"Chain Reaction","BF207A",""],[55,"Snarky","D53C3E",""],[55,"In The Red","BF012D",""],[55,"Risktaker","A21A2E",""],[55,"Ruthless","651F77",""],[55,"Empowered","934A43",""],[55,"Dangerous","742332",""],[56,"Cool Intentions","864B45",""],[56,"Puppy Love","D9484D",""],[56,"Group Love","98020D",""],[56,"Squad Goals","A65156",""],[56,"Teenage Dream","BD2266",""],[56,"Pop Quiz","682826",""],[56,"Moody","874755",""],[56,"Best Buds","C06465",""],[57,"Exposed","BC7D5A",""],[57,"Mauve Mist","9A4F3C",""],[57,"Bella","9C3E3C",""],[57,"New Era","82412B",""],[57,"Neat Nude","563428",""],[57,"Buzzkill","A91851",""],[57,"Acme","9E1F26",""],[57,"Modern Maven","7A253A",""],[57,"Pure Society","761538",""],[57,"Biker Babe","752329",""],[57,"Ego","472071",""],[57,"Go Rogue","2F3239",""],[58,"Tea & Cookies","DF666F",""],[58,"Life's A Beach","FE5862",""],[58,"Pink Lust","FC3183",""],[58,"Kitten Heels","CD060B",""],[58,"Cherry Skies","962A27",""],[58,"Foiled Again","FD7136",""],[58,"Orange County","FC5221",""],[58,"Little Denim Dress","01A3E3",""],[58,"Jet Set","2F2A88",""],[58,"Foul Mouth","3A1C66",""],[58,"Respect The Pink","DE65B2",""],[58,"Sway","BE61B1",""],[58,"Run The World","A03FA0",""],[58,"Amethyst","6D2686",""],[58,"Subversive Socialite","5A2253",""],[58,"Oh, Put It On","3B1153",""],[58,"Vintage","7B2D3B",""],[58,"Club Hopper","722F26",""],[58,"Sandstorm","AA614E",""],[58,"Soft-Spoken","AE5350",""],[58,"Brooklyn Thorn","815049",""],[58,"Downtown Beauty","7E5036",""],[58,"Stone Fox","585455",""],[58,"Alien","2A2829",""],[59,"Cheekies","F8AB8F",""],[59,"Silk Indulgent","E59886",""],[59,"Baby Doll","C48B7A",""],[59,"Lace Detail","C38878",""],[59,"Push-Up","B77E6B",""],[59,"Bedtime Flirt","AF7260",""],[59,"Embellishment","AF7079",""],[59,"Cashmere Silk","BF7D6F",""],[59,"Bustier","A9796F",""],[59,"French Maid","A76169",""],[59,"Confident","704D47",""],[59,"Exotic","903E33",""],[59,"Cabaret Show","A25A4E",""],[59,"Seduction","C46954",""],[59,"Ruffle Trim","C07764",""],[59,"Dusk To Dawn","E29871",""],[59,"Satin Ribbon","C59581",""],[59,"Corset","C0947B",""],[59,"Delicate Lust","966F60",""],[59,"Honeymoon","96705D",""],[59,"Teddy","8F624D",""],[59,"After Hours","8B5845",""],[59,"Beauty Mark","855A4A",""],[59,"Scandalous","715E50",""],[60,"London","D18B72",""],[60,"Sydney","F6A0BD",""],[60,"Tokyo","FB9BA6",""],[60,"Istanbul","ED9194",""],[60,"Milan","F17086",""],[60,"Manila","F34745",""],[60,"Antwerp","FB5062",""],[60,"Ibiza","F54F5B",""],[60,"Prague","C43F6C",""],[60,"Sao Paulo","D6475B",""],[60,"Paris","E83169",""],[60,"Addis Ababa","E93275",""],[60,"Seoul","9F3B77",""],[60,"Moscow","123368",""],[60,"Havana","622F8C",""],[60,"Vancouver","78293C",""],[60,"Transylvania","621132",""],[60,"Copenhagen","7B0F33",""],[60,"Budapest","953C42",""],[60,"Madrid","7C2325",""],[60,"Monte Carlo","9C0A2F",""],[60,"Amsterdam","E12836",""],[60,"Morocco","FE3A20",""],[60,"San Juan","FF5A3C",""],[60,"Buenos Aires","FC9B88",""],[60,"Cairo","F7B690",""],[60,"Athens","F6A385",""],[60,"Zurich","F0847A",""],[60,"Stockholm","E78779",""],[60,"Abu Dhabi","D58D75",""],[60,"Cannes","D36B5E",""],[60,"Rome","92433C",""],[60,"Dubai","7B4129",""],[60,"Berlin","7F3C22",""],[61,"Ma'Damn - Royal Red","B6232B",""],[61,"Candy Venom - Electric Pink","DC386C",""],[61,"Up 2 No Good - Nude Peach","E08F71",""],[61,"Freckle Fiesta - Spiced Terracotta","C95E3C",""],[61,"PMS - Moody Brown","6D271A",""],[61,"Ya Dig?! - Periwinkle Blue","6785B8",""],[61,"One of the Boyz - Wild Lilac","9B7DC1",""],[61,"Griselda - Bold Burgundy","631B26",""],[61,"Spanked - Dusty Rose","A7453C",""],[61,"Saw-C - Exotic Tangerine","FC8327",""],[61,"S1ngle - Blushing Nude","D37655",""],[61,"Shawty - Warm Chestnut","894134",""],[61,"Midnight Wasabi - Wicked Green","437954",""],[61,"Clapback - True Navy","072345",""],[62,"005 Charm","AA6565",""],[62,"006 Glory","910924",""],[63,"341 Pure Topaz","E17D79",""],[63,"671 Vibrant Tourmaline","C95B86",""],[63,"741 Deep Ruby","864640",""],[63,"751 Intense Garnet","CD2E3A",""],[63,"991 Bold Amethyst","604751",""],[64,"005 Glory","B55758",""],[64,"008 Mitzah","C56C72",""],[64,"009 Award","E1857A",""],[64,"013 Ange Bleu","D00040",""],[64,"014 Dolce Vita","E30F25",""],[64,"015 Broadway","A27977",""],[64,"021 Icône","CE3C2F",""],[64,"023 Diorella","D55B74",""],[64,"024 Liz","CE6063",""],[64,"025 Diorissimo","E87379",""],[65,"423 Minimal","DC8E74",""],[65,"853 Hype","E2122D",""],[65,"875 Beverly Pink","DC2144",""],[65,"955 Excessive","410000",""],[65,"465 Cruise","EF768F",""],[66,"885 Artsy","E32A67",""],[66,"951 Too Much","C0011F",""],[66,"967 Gotha","7A2335",""],[66,"974 Rebellious","CB0428",""],[66,"138 Purity","F49E90",""],[66,"260 Bright","D48A86",""],[66,"266 Delight","F28F9B",""],[66,"334 Happy","EF7775",""],[66,"343 Spring Ball","DB7F72",""],[66,"441 Frimousse","F07C6E",""],[66,"451 Tribale","EF7771",""],[66,"532 So Electric","EB553E",""],[66,"535 Tailleur Bar","C1807A",""],[66,"536 Lucky","DD2B47",""],[66,"553 Smile","E98693",""],[66,"554 It Pink","E8485D",""],[66,"561 Wonderful","F18592",""],[66,"578 Diorkiss","DC485F",""],[66,"579 Must-Have","DF525F",""],[66,"612 City Lights","8F534E",""],[66,"623 Not Shy","9F4F4D",""],[66,"639 Riviera","EA4A44",""],[66,"655 Mutine","E64B55",""],[66,"680 After Party","BC425F",""],[66,"685 Oversize","E9437C",""],[66,"686 Fantasy","E15F86",""],[66,"722 True","AA5D57",""],[66,"745 New Look","D30C19",""],[66,"750 Rock'n Roll","D50F38",""],[66,"871 Power","E83144",""],[66,"881 Fashion Night","961D4B",""],[66,"976 Be Dior","C01552",""],[66,"983 Insoumise","AC2B56",""],[66,"987 Black Tie","3E0013",""],[66,"435 Dreamy","F295A2",""],[67,"344 Rolling","F19183",""],[67,"420 Underground","A15C61",""],[67,"457 Palm Beach","EB636B",""],[67,"487 Bubble","EB5C97",""],[67,"550 Tease","E47082",""],[67,"554 West Coast","EA5344",""],[67,"570 LA Pink","9E3F48",""],[67,"577 Lazy","C86378",""],[67,"620 Poisonous","8C3D3C",""],[67,"674 K-Kiss","D5305F",""],[67,"684 Diabolo","E60760",""],[67,"740 Club","902215",""],[67,"744 Party Red","E51E1A",""],[67,"757 American Girl","C20516",""],[67,"857 Hollywood Red","A01314",""],[67,"877 Turn Me Dior","C4032B",""],[67,"882 Sassy","BB0E63",""],[67,"904 Black Coffee","391E1C",""],[67,"924 Sauvage","602127",""],[67,"984 Dark Flower","751E41",""],[68,"999 Matte","BA1B2B",""],[69,"426 Sensual Matte","D58F7F",""],[69,"481 Hypnotic Matte","B76566",""],[69,"861 Sophisticated Matte","B52237",""],[69,"999 Metallic","A82628",""],[70,"028 Actrice","E83F4A",""],[70,"047 Miss","E40068",""],[70,"060 Première","D36179",""],[70,"080 Red Smile","D91920",""],[70,"219 Rose Montaigne","D07866",""],[70,"277 Osée","DB7096",""],[70,"365 New World","E06E6D",""],[70,"414 Saint Germain","CA6863",""],[70,"434 Promenade","AD5E56",""],[70,"458 Paris","C15961",""],[70,"520 Feel Good","E4003E",""],[70,"602 Visionary Matte","2E4763",""],[70,"634 Strong Matte","EB5959",""],[70,"642 Ready","EA5156",""],[70,"643 Stand Out","E84618",""],[70,"644 Sydney","B73E42",""],[70,"652 Euphoric Matte","ED6C7E",""],[70,"663 Désir","D0546B",""],[70,"678 Culte","CC4A6B",""],[70,"683 Rendez-Vous","BC5553",""],[70,"743 Rouge Zinnia","A41220",""],[70,"766 Rose Harpers","CF1D58",""],[70,"771 Radiant Matte","E96C81",""],[70,"772 Classic Matte","CB7A84",""],[70,"775 Darling","E1244B",""],[70,"787 Exuberant Matte","E6699D",""],[70,"789 Superstitious Matte","96518F",""],[70,"844 Trafalgar","E0262F",""],[70,"872 Victoire","AD0F1C",""],[70,"897 Mysterious Matte","BC4B76",""],[70,"962 Poison Matte","86556D",""],[70,"964 Ambitious Matte","A05357",""],[70,"999","BE030E",""],[70,"999 Matte","CC424D",""],[70,"343 Panaréa","DB6F6D",""],[71,"288 MISS CRUSH","F09E94",""],[71,"510 JUNGLE BEIGE","B48D86",""],[71,"534 TEMPTING TANGERINE","E97048",""],[71,"582 SPICY SWEET","DD7F9C",""],[71,"992 POISON PURPLE","925970",""],[71,"999 MATTE METAL","BD3C3C",""],[72,"162 MISS SATIN","F08885",""],[72,"221 CHIC MATTE","C27F75",""],[72,"265 FURY MATTE","DA6272",""],[72,"334 VIBRANT METAL","D17B67",""],[72,"375 SPICY METAL","CB657E",""],[72,"427 DELICATE SATIN","C16863",""],[72,"442 IMPETUOUS SATIN","E2544C",""],[72,"515 SCANDALOUS METAL","925738",""],[72,"527 RECKLESS MATTE","AA584E",""],[72,"565 VERSATILE SATIN","CE354A",""],[72,"574 LIVELY MATTE","AB5E6A",""],[72,"614 JUNGLE MATTE","AF695C",""],[72,"625 MYSTERIOUS MATTE","914047",""],[72,"658 EXTREME MATTE","E43F1E",""],[72,"751 ROCK'N'METAL","CC4735",""],[72,"788 FRENETIC SATIN","D32759",""],[72,"797 SAVAGE MATTE","A50C46",""],[72,"862 HECTIC MATTE","6F0F2B",""],[72,"895 FAB SATIN","652832",""],[72,"901 OXBLOOD MATTE","3B2427",""],[72,"908 BLACK MATTE","292324",""],[72,"979 POISON METAL","791D26",""],[72,"999 MATTE","C51215",""],[73,"NEW IMAN Nude","D27D56",""],[73,"NEW Baby Doll","C26256",""],[73,"NEW Hipster","B5432A",""],[73,"NEW Diva","A43A44",""],[73,"NEW Drama Queen","632528",""],[73,"NEW Rebel","602714",""],[73,"Sheer Gold","C47636",""],[73,"Citron","A17E49",""],[73,"Hot","FF4814",""],[73,"Kinky Pink","F4436D",""],[73,"Paprika","B15336",""],[73,"Iman Red","D71D32",""],[73,"Flirtatious","AF0061",""],[73,"Scandalous","A32136",""],[73,"Sheer Ice Tea","874E41",""],[73,"Opal","6A494C",""],[73,"Taboo","73308B",""],[73,"Jaguar","734942",""],[73,"Wild Thing","651738",""],[73,"Black Brandy","52182C",""],[74,"juicy details","D14146",""],[74,"air kiss","F3576C",""],[74,"nice 'n teasy","963A38",""],[74,"frisky business","712F29",""],[74,"lip service","D64D3E",""],[74,"tutti-cutie","FF5864",""],[74,"talk flirty","8A3850",""],[74,"fling thing","7D2034",""],[74,"dare me","B80229",""],[74,"wing woman","AD3B33",""],[75,"CORAL","DA5F5F",""],[75,"CURRANT","A43E5B",""],[75,"BORDEAUX","771C47",""],[76,"NUDE FAIR","E49380",""],[76,"NUDE LIGHT","B47352",""],[76,"NUDE MEDIUM","A05745",""],[76,"NUDE DARK","663F38",""],[76,"SIENNA","AD5240",""],[76,"ROSEBUD","D3716E",""],[76,"PEONY","DE7E8D",""],[76,"FRENCHIE","EE8AA1",""],[76,"MELON","F48376",""],[76,"RUBY","D71938",""],[76,"CRIMSON","A31530",""],[76,"FIGGY","952A3E",""],[76,"VIOLET","92195D",""],[76,"SHOCKING PINK","E53368",""],[76,"FUCHSIA","D21380",""],[77,"MANDARIN (ERIN)","ED262F",""],[77,"HONEY (SARA)","C16055",""],[78,"DO NO WRONG","904F50",""],[78,"SHAVASANA","835947",""],[78,"MANDARIN","C03C3B",""],[78,"CHESTNUT","642B24",""],[78,"NYLON NUDE","D99684",""],[78,"FAIR PLAY","BF999F",""],[78,"OBVI","D48D93",""],[78,"MAGENTA","B65689",""],[78,"PUNCH DRUNK","BB2F67",""],[78,"PARIS PINK","E5859A",""],[78,"MULBERRY","8B404C",""],[78,"SHOCK ME PINK","E75999",""],[78,"PLUM SCENE","53041C",""],[78,"ELECTRIC PINK","DD4169",""],[78,"HONEY","995C50",""],[78,"LATTE","C08A79",""],[78,"PINK PETAL","FA6085",""],[78,"VIVID VIOLET","701E4C",""],[78,"FUCHSIA FLASH","BB3675",""],[78,"GRENADINE","82183B",""],[78,"POSY PINK","E4838E",""],[78,"HIDE OUT","D3818F",""],[78,"GETS IT","C37588",""],[78,"PUBLICIST","C81C71",""],[78,"MAUVE","CB7988",""],[78,"ROOKIE","DC7A81",""],[78,"HIRE ME","C57483",""],[78,"JUST HIT PLAY","C9636D",""],[78,"STANDING O","B95952",""],[78,"NUDE BEACH","DA8177",""],[78,"FULL FRONTAL","CF8171",""],[78,"INSIDE ACCESS","D69082",""],[78,"BACK TALK","D9786D",""],[78,"TICKET ME","C6745D",""],[78,"CALL BACK","D06C58",""],[78,"NERVE","A26251",""],[78,"PRESS TOUR","8D5247",""],[78,"DONE DEAL","BD7863",""],[78,"NUDE MOOD","A76458",""],[78,"TAROT CARD","8A4F52",""],[78,"PHANTOM","A5786D",""],[78,"WORK IT","A56858",""],[78,"SAFE WORD","8B4A45",""],[78,"MONOGAMOUS","B26F69",""],[78,"CHAI","AA5E41",""],[78,"DIRTY","7D3B34",""],[78,"EASY","A95647",""],[78,"CLIFFHANGER","73312C",""],[78,"FAMOUS","B26054",""],[78,"BOOKED","793C41",""],[78,"LATER","BB5A54",""],[78,"OFF SCRIPT","913C33",""],[78,"FIRST TIME","8A3C3F",""],[78,"ON SET","8D564B",""],[78,"JUICE IT","AF4C42",""],[78,"WRAP PARTY","9F4430",""],[78,"PRIMROSE","BD6165",""],[78,"STYLIST","833640",""],[78,"COGNAC","985349",""],[78,"UNZIPPED","8F122C",""],[78,"SCREEN QUEEN","871544",""],[78,"AUDITION","A15E5F",""],[78,"FEMME FATALE","703850",""],[78,"HIGH","8D4241",""],[78,"MADE IT","711115",""],[78,"BAD MOOD","8D3D45",""],[78,"STACKED","5E0A17",""],[78,"MY DIGITS","8C3B47",""],[78,"WARRIOR POSE","4C2C28",""],[78,"TOP SHELF","7D2D2F",""],[78,"TALK TO ME","EE3882",""],[78,"HIGH STAKES","733C36",""],[78,"TOTES","C14961",""],[78,"HATER","633012",""],[78,"FIREBALL","EE3538",""],[78,"RIGHT ON RED","761E1E",""],[78,"POWER ON","DD3C46",""],[78,"JAM SESH","6F1B29",""],[78,"PINCH ME","BA433F",""],[78,"BLACK CHERRY","690927",""],[78,"BING","A31228",""],[78,"DEAL BREAKER","6A0D37",""],[78,"COFFEE RUN","713236",""],[78,"HOT SEAT","C1234C",""],[78,"Infrared","71081E",""],[78,"STRAIGHT UP","6C351C",""],[78,"JAM ON IT","780C40",""],[78,"SPECTACLE","D34031",""],[78,"VIOLET RIOT","662B65",""],[78,"CASITA","CF4E39",""],[78,"PLUM ROLE","310020",""],[78,"ON THE BEACH","BC3A36",""],[78,"TEMPT ME","D23A32",""],[78,"HATES PILATES","472319",""],[78,"GET FIRED","DF2127",""],[78,"PUNKED","453A3C",""],[78,"HEADLINER","DF3743",""],[78,"9 TO 5","B5214A",""],[78,"INVITE ONLY","981925",""],[78,"INSPIRATION","AC1D4B",""],[78,"ACTION","A16695",""],[78,"FAN MAIL","C86BA9",""],[78,"TABLOID","9A4A96",""],[78,"VALLEY","F16583",""],[78,"CAN'T TYPE","ED7FA1",""],[78,"POUT","FEB6CE",""],[78,"PRETTY SOCIAL","F0AEC1",""],[78,"BOMBASTIC","EF5190",""],[78,"PANORAMA PINK","BC4D5E",""],[78,"RED RAGE","C72036",""],[78,"L.A. SUNSET","C42738",""],[78,"FIG","78243E",""],[78,"MANIAC","540734",""],[78,"Legendary","8E0E26",""],[78,"WITCHY","4C1920",""],[78,"VINYL","401E3E",""],[78,"SKINNY JEANS","103254",""],[78,"DEEP","20233B",""],[78,"BANKROLLED","151516",""],[78,"GRUNGE","5D4E51",""],[79,"Dream Huge","AF5561",""],[79,"Stepping Out","9E5C4C",""],[79,"In Demand","B76F60",""],[79,"Babe Alert","AD5851",""],[79,"Out Loud","A04322",""],[79,"Driver's Seat","9C4035",""],[79,"Baja Bound","C84B47",""],[79,"Bawse","A82024",""],[79,"Thrill Seeker","E74425",""],[79,"Bang-Bang","CC2127",""],[79,"Blast Off","CB2648",""],[79,"Shockaholic","BD2467",""],[79,"Some Nerve","A856A2",""],[79,"Let's Dance","923459",""],[79,"Big Spender","933C44",""],[79,"Disorderly","7F1917",""],[79,"Girl Gang","6E1243",""],[79,"Miss Conduct","640719",""],[79,"True Grit","53250D",""],[79,"Chill Zone","635961",""],[80,"Plum Fury","51122B",""],[80,"Red Siren","A1211C",""],[80,"Phantom Pink","C5777E",""],[81,"Loved Up - sassy berry-red cream","CF2D4F",""],[81,"Old Blighty - brilliant brick red cream","B53034",""],[81,"Ruby Murray - delicious deep berry cream","AE2343",""],[82,"Game, Set & Matte","FC6E7F",""],[82,"Lacque-y Charm","C14E5C",""],[82,"Lacque-y You","B0233E",""],[82,"Lacquerized","B41428",""],[82,"Mad for Matte","C81E2F",""],[82,"Matte for Me","FC5B9D",""],[82,"Matte-r of Fact","D03370",""],[82,"She's So Matte","C15555",""],[83,"Verve Violet","ECA4BE",""],[83,"Sultry Sienna","BF837C",""],[84,"Plum Berry","864058",""],[84,"Nude","996066",""],[84,"Wine to Five","9C5961",""],[84,"Wild Berry","8B3158",""],[84,"Cinnamon Stick","744144",""],[84,"Brazen Raisin","783E49",""],[85,"Smolder - Cherry Red","981E29",""],[85,"Glisten - Caramel Shimmer","B1585C",""],[85,"Flicker - Berry","892E33",""],[85,"Blush - Earthy Purple","793041",""],[85,"Adorn - Rich Plum","54281F",""],[86,"Nude Thrill","AC7773",""],[86,"Nude Flush","BD7A80",""],[86,"Pink Charge","D65F84",""],[86,"Electric Pink","D73D8C",""],[86,"Fuchsia Ecstasy","B12156",""],[86,"Orange Shot","BC2830",""],[86,"Rebel Red","B7233B",""],[86,"Berry Boost","8C1F48",""],[86,"Vivid Violet","542A71",""],[86,"Possessed Plum","300B28",""],[87,"HD Carenelian","A41C42",""],[87,"HD Fire Opal","D8242F",""],[87,"HD Garnet","CC3B75",""],[87,"HD Petalite","F18085",""],[87,"HD Pink Diamond","C8A0BC",""],[87,"HD Pink Ruby","D9198B",""],[87,"HD Pink Sapphire","F07B98",""],[87,"HD Rose Quartz","B55D6D",""],[87,"HD Smoky Quartz","894643",""],[87,"HD Smoky Topaz","CE8886",""],[87,"HD Strawberry Topaz","E02246",""],[87,"HD Sunstone","EF5E5F",""],[87,"HD Tourmaline","EB4296",""],[88,"Chaos (JLP724) Strawberry Pink (Cream)","C1486C",""],[88,"Fuschia","C27273",""],[88,"Hera (JLP722) Iridescent Soft Fuchsia (Pearl)","C9528C",""],[88,"Honey Nectar (JLP720) Soft Brown","BB5F60",""],[88,"Hot Red (JLP704) Bright Blue-Red (Cream)","AA202E",""],[88,"Iced Coffee (JLP711) Deep Beige (Cream)","975D4F",""],[88,"Pecan","A1605E",""],[89,"Key West","F8C9BF",""],[89,"Maui","EF8087",""],[89,"Santorini","FBBBD3",""],[89,"St. Tropez","FEC7CC",""],[90,"Coy","BF7061",""],[90,"Demure","E58674",""],[90,"Enticing","8E4852",""],[90,"Provocative","A30017",""],[91,"Sedona (Bright Coral)","DB3B3D",""],[91,"Santa Fe (Deep Apricot)","E1A2A3",""],[91,"Punta Cana (Bright Fuscia)","DF5A99",""],[91,"Paris (Deep Red)","BC2A2D",""],[91,"Palm Beach (Pink Coral)","DA506A",""],[91,"Napa (Rich Berry)","A32950",""],[91,"Las Vegas (Pale Beige)","E7A680",""],[91,"Kyoto (Baby Pink)","E379A1",""],[91,"Dubai (Burnt Nude)","CB705D",""],[91,"Bordeaux (Deep Wine)","6F1E2C",""],[91,"Bombay (Shimmery Rose)","E07875",""],[91,"Bermuda (Nude Pink)","EBACA3",""],[92,"Blake's Red","AB0C19",""],[92,"Eva's Red","8E1305",""],[92,"Freida's Red","C5004B",""],[92,"Julianne's Red","D82A37",""],[92,"Liya's Red","C90E32",""],[92,"Zoe's Red","782B2F",""],[93,"Baby Pink","DAA8C5",""],[93,"Castle","AB6BA0",""],[93,"Chaos","970015",""],[93,"Chic (LSS563A) Blue-Toned Bubblegum Pink (Pearl)","FF898F",""],[93,"Chloe (LSS521) Iridescent Fuchsia (Pearl)","CF337A",""],[93,"Femme (LSS643) Bright Pink-Red (Cream)","FA394C",""],[93,"Fig (LSS640) Dark Neutral Pink (Cream)","E46A79",""],[93,"Fire (LSS599) Fire-Engine Blue-Toned Red (Cream)","DC002C",""],[93,"Flower (LSS619) Blue-Toned Medium Pink (Pearl)","E96384",""],[93,"Gala","F08C8C",""],[93,"Haute Melon","FD6C65",""],[93,"Indian Pink (LSS550) Peachy Pink with Gold Shimmer (Pearl)","DE6463",""],[93,"Margarita (LSS597) Shimmery Coral (Pearl)","F96173",""],[93,"Narcissus","FC86AF",""],[93,"Nyx (LSS507) Tangerine (Pearl)","FE7C61",""],[93,"Orange Soda (LSS588) Light Salmon Pink (Cream)","E69F73",""],[93,"Peach Bellini (LSS593A) Glittery Coral (Pearl)","F76E64",""],[93,"Power (LSS629) Blue-Toned Mauve (Cream)","CD859D",""],[93,"Pure Nude (LSS518A) Neutral Baby Pink (Cream)","E6A28E",""],[93,"Stella (LSS564A) Bright Yellow-Toned Pink (Cream)","F58E7C",""],[93,"Summer Love (LSS617) Beige with Soft Pink Undertones (Cream)","DDA1A1",""],[93,"Violet Ray (LSS561) Violet (Cream)","7A3760",""],[93,"Vitamin (LSS626) Shimmering Peach (Pearl)","FA8F85",""],[94,"Barely Bloomed","DB967F",""],[94,"Blushing Bud","D37D79",""],[94,"Coral Burst","F05B4A",""],[94,"Lilac Flush","CD86B0",""],[94,"Petal Pink","FF8F9D",""],[94,"Rose Rush","BD2629",""],[95,"Berry Misbehaved","EF6E87",""],[95,"Cherry Cherry Bang Bang","CF444B",""],[95,"Fast & Fuchsia","FF94A7",""],[95,"I Like to Mauve It","E18CB0",""],[95,"I'm Blushing!","F393B0",""],[95,"My-My Magenta","C06E8A",""],[95,"Partner in Crimson","B42F3F",""],[95,"Pink Insanity","FF99DC",""],[95,"Plum, Please","955C69",""],[96,"Rose Melody (101)","D15D62",""],[97,"Berry - light","C66294",""],[97,"Pink - light","F3748F",""],[97,"Nude - light","EB796F",""],[97,"Red - light","F51F41",""],[97,"Berry - light / medium","D46179",""],[97,"Pink - light / medium","F05283",""],[97,"Nude - light / medium","AF675E",""],[97,"Red - light / medium","CB1E4B",""],[97,"Berry - medium","9A3056",""],[97,"Pink - medium","DC4787",""],[97,"Nude - medium","763C36",""],[97,"Red - medium","9E1B3B",""],[98,"Dark Pink Frost","AD6678",""],[98,"Fuchsia with Blue Pearl","BF1790",""],[98,"Pink Ice","E96187",""],[99,"Praline # 340","DA5468",""],[100,"Addiction","B03062",""],[100,"Seduction","D46C6A",""],[100,"Passion","9E0C30",""],[101,"Cherry Noir 217","692628",""],[101,"Continual Crimson 213","AA2B37",""],[101,"Everlasting Caramel 201","D9695A",""],[101,"Flamboyant Flamingo 113","DC6D81",""],[101,"Heaven to Henna 205","B75B4E",""],[101,"Infallible Red","E01D25",""],[101,"Lilac Infinite 105","B25875",""],[101,"Neverending Nutmeg 119","C5725F",""],[101,"Passionate Petal 111","DC6375",""],[101,"Perpetual Apricot 207","D33C2E",""],[101,"Raisin Revival 215","5A243B",""],[101,"Timeless Rose 115","E89DA2",""],[101,"Toujours Teaberry 109","C24651",""],[101,"Violet Parfait 107","A13954",""],[102,"Boho Chic","7B050A",""],[102,"Ready 2 Wear","B30232",""],[102,"Stylist","D04E83",""],[102,"Backstage","801B3C",""],[102,"Supermodel","9E5E76",""],[102,"Runway","A36F68",""],[102,"Iconic","B25A5D",""],[102,"Fashionista","B64847",""],[102,"Couture","C21643",""],[102,"Silhouette","C77A9B",""],[102,"Preview","CC7183",""],[102,"Socialite","CE7E82",""],[102,"Womenswear","D47E93",""],[102,"Muse","DA469A",""],[102,"Finale","DF274F",""],[102,"Private Viewing","EABBAA",""],[102,"Flashing Lights","ED8984",""],[102,"Cruise Collection","F26F67",""],[102,"High Heels","F382A4",""],[103,"HD Camilla","B47B6D",""],[103,"HD Dahlia","A7363E",""],[103,"HD Geranium","EE5C5F",""],[103,"HD Gladiolus","DA1F3E",""],[103,"HD Hibiscus","F1766C",""],[103,"HD Hydrangea","E14C70",""],[103,"HD Iris","95164A",""],[103,"HD Magnolia","DF888D",""],[103,"HD Marigold","ED4838",""],[103,"HD Peony","F07EA4",""],[103,"HD Petunia","CB1861",""],[103,"HD Poinsettia","CF254C",""],[103,"HD Poppy","D8222D",""],[103,"HD Primrose","A95661",""],[103,"HD Rose","D97484",""],[103,"HD Snapdragon","9C4B3F",""],[103,"HD Sweet Pea","EF74A5",""],[103,"HD Tulip","F07273",""],[104,"Doutzen's Nude","DEA1A6",""],[104,"Eva's Nude","B16B61",""],[104,"Freida's Nude","83605E",""],[104,"JLo's Nude","BD7069",""],[104,"Julianne's Nude","BA6C6C",""],[104,"Liya's Nude","994835",""],[105,"Bare All","E3A28C",""],[105,"Blushing Beige","EB907D",""],[105,"Nude Lust","DD8A78",""],[105,"Maple Kiss","A95D50",""],[105,"Truffle Tease","E2937F",""],[105,"Stormy Sahara","D47661",""],[105,"Untainted Spice","8A3938",""],[105,"Expresso Exposed","590004",""],[106,"Vivid Rose (825)","F9005B",""],[106,"Fuchsia Flash (865)","FF2E8C",""],[106,"Shocking Coral (870)","FF4A62",""],[106,"Electric Orange (880)","FF3B00",""],[106,"Pink Pop (880)","FF6AB6",""],[106,"On Fire Red (895)","BA0000",""],[107,"XOX","EB7583",""],[108,"Blush Basin","A86160",""],[108,"Brimming Berry","831F41",""],[108,"Fuchsia Flood","AE4B74",""],[108,"Iced Iris","CD6A86",""],[108,"Juniper Water","7A2946",""],[108,"Lilly Lake","853D53",""],[108,"Magenta Rush","8B214F",""],[108,"Nile Nude","B66F61",""],[108,"Ruby Ripple","811A35",""],[108,"Russet River","662A2C",""],[108,"Scarlet Soaked","892026",""],[108,"Suede Splash","B06A60",""],[108,"Sunset Cruise","AE4349",""],[108,"Tulip Tide","B26487",""],[109,"Craving Coral","FF1303",""],[109,"Daringly Nude","E87E74",""],[109,"Faint For Fuchsia","FF2F99",""],[109,"Lust for Blush","DB5C83",""],[109,"Mesmerizing Magenta","EC0064",""],[109,"Ravishing Rose (Bright Rose Pink)","F5367D",""],[109,"Touch of Spice","B63849",""],[110,"Blushing Berry","A33750",""],[110,"British Red","FF244B",""],[110,"Cinnamon Toast","B5353A",""],[110,"Fairest Nude","B3857D",""],[110,"Mica","C37685",""],[110,"Nature's Blush","A44D54",""],[110,"Plum Explosion","761214",""],[110,"Ruby Flame","C52531",""],[111,"Really Red","C21919",""],[111,"Nude Attitude","F6B197",""],[112,"Brilliant Bordeaux","8E0F34",""],[112,"Premier Plum","A14667",""],[112,"#1 Nude","BD736B",""],[112,"Iconic Iris","C1738F",""],[112,"Top Tomato","C20D20",""],[112,"Stellar Sunrise","DA2D26",""],[112,"Premium Pink","EF4D75",""],[113,"Are you Red-dy","E70C2F",""],[113,"Born With It","DF8A82",""],[113,"Coral Crush","F15B50",""],[113,"Crazy for Coffee","8F332C",""],[113,"Warm Me Up","CA6E6B",""],[114,"Abu Dhabi","9D6D61",""],[114,"Addis Ababa","E44B82",""],[114,"Budapest","933A40",""],[114,"Buenos Aires","F19988",""],[114,"Cairo","DA956F",""],[114,"Cannes","924A41",""],[114,"Copenhagen","5F192B",""],[114,"Havana","612E8D",""],[114,"Ibiza","C9404D",""],[114,"Instabul","CD888C",""],[114,"London","AE6F66",""],[114,"Morocco","F32E17",""],[114,"Moscow","103167",""],[114,"Paris","E62F67",""],[114,"Prague","9A2B46",""],[114,"San Juan","FC5236",""],[114,"Seoul","9F3A76",""],[114,"Sydney","F6A9BE",""],[114,"Transylvania","481E32",""],[114,"Vancouver","79283B",""],[114,"Zurich","B75E4E",""],[115,"Carolina Coast","FF88B1",""],[115,"Napa Vineyard","B7021E",""],[115,"Niagara Overlook","F9636D",""],[115,"Redwood Forest","8C212B",""],[116,"Wine","923144",""],[116,"Tea Rose","D1949C",""],[116,"Rich Red","C63232",""],[116,"Natural","E6A2A3",""],[116,"Dash of Pink","D4233F",""],[116,"Cranberry","9B3F4A",""],[116,"Berry Sorbet","AA2A63",""],[117,"Cherry Blossom","DA3A44",""],[117,"Demure","EF8579",""],[117,"Siren","FF5B24",""],[117,"Black Cherry","4F2114",""],[117,"Berry Haute","946893",""],[117,"Mauvy Night","B14862",""],[117,"Wine With Everything Cream","B3202F",""],[117,"Fuchsia Fusion","B62252",""],[117,"Sandalwood Beige","BE4D2A",""],[117,"Rose Velvet","C4615E",""],[117,"Certainly Red","C50032",""],[117,"Plumalicious","CA4B63",""],[117,"Porcelain Pink","CD808F",""],[117,"Primrose","DA89A0",""],[117,"Pink In The Afternoon","EB8B86",""],[117,"Love That Red","ED062F",""],[117,"Fire & Ice","EE001C",""],[117,"Coralberry","F26D6D",""],[117,"Champagne on Ice","F3A98C",""],[117,"Kiss Me Coral","FF4E3A",""],[117,"Smoky Rose","A96354",""],[117,"Abstract Orange","E2321E",""],[117,"Luminous Pink","F7B8B8",""],[118,"Matte Beauty","824A4D",""],[118,"Matte Blissful","D590A8",""],[118,"Matte Confident","A42036",""],[118,"Matte Darling","A14D57",""],[118,"Matte Diva","E172AC",""],[118,"Matte Fearless","301623",""],[118,"Matte Flirty","501E31",""],[118,"Matte Glam","7C4182",""],[118,"Matte Iconic","870D0D",""],[118,"Matte Innocence","E1B5A4",""],[118,"Matte Kiss","981E26",""],[118,"Matte Love","421E26",""],[118,"Matte Lux","DF4921",""],[118,"Matte Naked","AE5E57",""],[119,"Bronze Beauty (Shimmer)","9A3306",""],[119,"Cabaret Blend","5E172D",""],[119,"Catwalk Pink","F296CF",""],[119,"Coral Addict","F3574B",""],[119,"Bahama Beige","A87363",""],[119,"Best Red (Matte)","B6091D",""],[119,"Black Cherry (Cream)","6E4148",""],[119,"Blushing Beauty","9E283E",""],[119,"Brandy Berry","301623",""],[119,"Double Espresso","5C3D31",""],[119,"Dulce Caramelo (Pearl)","AC5446",""],[119,"Empress","C92F0B",""],[119,"Fruit Punch (Cream)","D96081",""],[119,"Naturally Chic (Cream)","DA7A6C",""],[119,"Nude Creme (Cream)","B6605F",""],[119,"Orange-Gina (Pearl)","D55B3C",""],[119,"Pink Frost (Metallic)","EB9DAD",""],[119,"Plumrose (Cream)","963546",""],[119,"Power Pink","E01783",""],[119,"Pretty Natural","D78396",""],[119,"Rebel Rouge","A71800",""],[119,"Red Label (Cream)","AB0B11",""],[119,"Rose Femme","9D6670",""],[119,"Rose Hip (Cream)","FE3D93",""],[119,"Ruby Valentine (Vinyl)","A5051D",""],[119,"Sangria (Matte)","8B2058",""],[119,"Sweet Nectar (Cream)","F77234",""],[119,"Teddy Bare (Cream)","B26457",""],[119,"Tuscan Toast","56181B",""],[119,"Uptown Mauve (Cream)","A2356C",""],[119,"Velvet Merlot","5A0011",""],[119,"Violet Volt","7C109A",""],[120,"Elusive","E66675",""],[120,"Shewy","F2579B",""],[120,"Standout","99302A",""],[120,"Striking","E53134",""],[120,"Sultry","A93041",""],[120,"Unapologet","FF4E62",""],[121,"Cheeky","C26659",""],[121,"Pink Minx","F57574",""],[121,"Ravishing Rose","C55456",""],[121,"Red Carpet","D40D14",""],[121,"Wine Tour","7D2D3A",""],[121,"Party in the Buff","FCAE98",""],[122,"Nude","A15638",""],[122,"Plum","7B4344",""],[122,"Raisin","854337",""],[122,"Toast","B3705A",""],[123,"Merah Passion","9C2B39",""],[123,"Rose Nude","B45E7C",""],[123,"Plum Elegan","803E75",""],[124,"Sunlit","E1B44E",""],[124,"Gem","D28F69",""],[124,"Hex","AC5F28",""],[124,"Heatwave","8F1C11",""],[124,"Taboo","5D2E94",""],[124,"Kinetic","7388AD",""],[124,"Enchanted","6B8F78",""],[124,"Python","B19E5D",""],[124,"Cherished","C38181",""],[125,"Timid","F5AFB1",""],[125,"Rosey Sunset","EC687D",""],[125,"Sweet Pink","E9688F",""],[125,"Disco Rage","E05B90",""],[125,"Fluorescent","E06291",""],[125,"Cheeky","BF727A",""],[125,"Bedrose","BF807B",""],[125,"Alluring","B67772",""],[125,"High Standards","BD6D70",""],[125,"Knock Em Red","C74454",""],[125,"Red Tape","C24155",""],[125,"Brick House","8B4543",""],[125,"Dark Soul","714947",""],[125,"Pink Canteloupe","F6B1A2",""],[125,"Crushed","E1787F",""],[125,"Summer Tease","E06263",""],[125,"Revolution","1F725E",""],[125,"Live In Pastel","B0A2D5",""],[125,"Brazen","954C91",""],[125,"Revamp","6E446C",""],[125,"Nebula","674651",""],[125,"Staged","E9A59C",""],[125,"Nude Suede Shoes","BA857D",""],[125,"Sugar Glass","B48979",""],[125,"Beyond Nude","AD796C",""],[125,"Need Me","AB7D70",""],[125,"Intimidate","A37568",""],[125,"Urban Café","745038",""],[126,"Pinky Beige","E17F7C",""],[126,"Soft Pink","D86B7E",""],[126,"Peony","E67D84",""],[126,"Pretty In Pink","D45F65",""],[126,"Nectar","C4686B",""],[126,"Nude Pink","BE595F",""],[126,"Jewel","AC4A4B",""],[126,"Hot Pink","C1386C",""],[126,"Plum","77182E",""],[126,"Dark Red","7E101D",""],[126,"Sienna","964436",""],[126,"Red","A81F27",""],[126,"Ruby","D11E21",""],[126,"Vanilla Sky","A96D51",""],[126,"Natural","A16644",""],[126,"Nude","A36348",""],[126,"Sand Beige","90583D",""],[126,"Cocoa","713E2B",""],[127,"Tea & Cookies","C66B70",""],[127,"Cannes","A54F52",""],[127,"Whipped Cavier","A15056",""],[127,"Life's A Beach","F3665C",""],[127,"Sao Paulo","BD5065",""],[127,"Milan","C2586E",""],[127,"Pink Lust","DA4076",""],[127,"Aria","8F2762",""],[127,"Prune","761D39",""],[127,"Cherry Skies","8D1E2F",""],[127,"Copenhagen","6D132C",""],[127,"Alabama","842D24",""],[127,"Kitten Heels","AB1F12",""],[127,"Orange County","EE5F37",""],[127,"Foiled Again","FF6C4A",""],[127,"Little Denim Dress","0098CD",""],[127,"Jet Set","00347F",""],[127,"Foul Mouth","3A4758",""],[127,"Respect The Pink","D36997",""],[127,"Sway","8B5AB5",""],[127,"Run The World","8E2D8C",""],[127,"Amethyst","553394",""],[127,"Subversive Socialite","6B1B4E",""],[127,"Oh, Put It On","392A4B",""],[127,"Stockholm","B5654A",""],[127,"London","BC7B53",""],[127,"Sandstorm","A56B57",""],[127,"Soft-Spoken","A05D4D",""],[127,"Los Angeles","895150",""],[127,"Vintage","822D32",""],[127,"Downtown Beauty","6D4A2E",""],[127,"Maison","6E3C33",""],[127,"Club Hopper","5A342B",""],[127,"Brooklyn Thorn","62473C",""],[127,"Stone Fox","3C3C3C",""],[127,"Alien","2E2E2E",""],[128,"Flower","E89FB0",""],[128,"Dolly Pink","D26987",""],[128,"Rose","D87079",""],[128,"Hot Pink","F04B76",""],[128,"Citrine","CB5E5B",""],[128,"Sand Pink","D87683",""],[128,"Pinky","CF476B",""],[128,"Edge Pink","CA315D",""],[128,"Fuchsia","C03E6A",""],[128,"Bloom","A9305B",""],[128,"Purple Rain","9F366E",""],[128,"Pale Pink","CC7C7D",""],[128,"Mauve","8E4745",""],[128,"Ever","A3432D",""],[128,"Plum","8F1C29",""],[128,"Deep Purple","790C2B",""],[128,"Prune","792139",""],[128,"Currant","781833",""],[128,"Mahogany","873B3B",""],[128,"Never","77393A",""],[128,"Y2K","40281E",""],[128,"Deep Red","922F10",""],[128,"Cabaret","932027",""],[128,"Auburn","8B262A",""],[128,"Burgundy","902630",""],[128,"Plush Red","C13C4D",""],[128,"Hot Red","D11C23",""],[128,"Pumpkin","C9532F",""],[128,"Orange","D6551E",""],[128,"Tangerine","DC744D",""],[128,"Beige","BC6F55",""],[128,"Nude Pink","D07876",""],[128,"Peekaboo Neutral","C47266",""],[128,"Natural","C57B5E",""],[128,"Soft Brown","C17456",""],[128,"Coffee","96463F",""],[128,"Nude Beige","99624E",""],[128,"Nude Truffle","8C5340",""],[128,"Nutmeg","874934",""],[128,"Brown Cafe","745237",""],[128,"Brown","7F4925",""],[128,"Toast","85532E",""],[128,"Cappuccino","67452C",""],[128,"Cocoa","7B412B",""],[128,"Chestnut","5E3F23",""],[128,"Hot Cocoa","663320",""],[128,"Espresso","553327",""],[128,"Dark Brown","523C25",""],[128,"Black Brown","331C16",""],[128,"Black Berry","1C110D",""],[129,"Iris","F6B4C2",""],[129,"Pink Nude","F3B8A8",""],[129,"Irish Coffee","FFAB87",""],[129,"Pink Brown","FFA68B",""],[129,"Honey Nectar","E47F85",""],[129,"Chaos","F75C7E",""],[129,"Pecan","CD737C",""],[129,"Hera","EF5E97",""],[129,"Burgundy","8E1B38",""],[129,"Maroon","91232C",""],[129,"Deep Red","AA1532",""],[129,"Plush Red","D41C36",""],[129,"Hot Red","C02922",""],[129,"Iced Coffee","D28A72",""],[129,"Rose Brown","E9B5A7",""],[130,"Rustic Mirage","C2696F",""],[130,"Antique Romance","D1506E",""],[130,"Liquid Plum","A04858",""],[130,"Euphoric","F45D92",""],[130,"Retro Socialite","E62E86",""],[130,"Love Letter","FF383B",""],[130,"Mystic Gypsy","FE293D",""],[130,"Lovetopia","F5273E",""],[130,"Ruby Couture","D9544B",""],[130,"Juicy Peach","FF643D",""],[130,"Violet Glass","9F43B2",""],[130,"Dark Magic","593C7C",""],[131,"Fuchsia Fusion","F4267B",""],[131,"Crystalized Metal","CC7C7F",""],[131,"Solar Energy","FD633D",""],[131,"Out Of This World","03A373",""],[131,"Extraterrestrial","747354",""],[131,"Electromagnetic","029BA1",""],[131,"Comets Tail","0090C7",""],[131,"Dark Nebula","166DA3",""],[131,"Asteroid Aura","B145AA",""],[131,"Ultraviolet","894DA5",""],[131,"Celestial Star","3750A4",""],[131,"Speed Of Light","F08C72",""],[131,"Metropolitan Night","D29F82",""],[131,"Celestial","D69A76",""],[131,"Retro Harmony","C99379",""],[131,"Galactic Love","9D5D44",""],[131,"Elite","824F4B",""],[131,"Galactic","747378",""],[132,"No. 49","D62352",""],[132,"No. 14","DC4B41",""],[132,"No. 05","B22146",""],[132,"No. 08","A25356",""],[132,"No. 12","DF3443",""],[132,"No. 15","E06C68",""],[132,"No. 19","842C71",""],[132,"No. 43","D13C4F",""],[132,"No. 04","B71D32",""],[132,"No. 06","DE2361",""],[132,"No. 09","B05856",""],[132,"No. 13","E06F70",""],[132,"No. 16","CD4143",""],[132,"No. 41","EC6A70",""],[132,"No. 45","C60F2F",""],[132,"No. 47","BB6868",""],[132,"No. 50","E0186B",""],[132,"No. 52","D45E85",""],[132,"No. 44","C16E6F",""],[132,"No. 46","D1121B",""],[132,"No. 48","8E243E",""],[132,"No. 51","EE7486",""],[133,"No. 19","B13C79",""],[133,"No. 13","BB1813",""],[133,"No. 52","EA4E59",""],[133,"No. 01","B8122B",""],[133,"No. 17","F75E70",""],[133,"No. 07","CB2276",""],[133,"No. 09","C27482",""],[133,"No. 11","C06B72",""],[133,"No. 16","BB444A",""],[133,"No. 22","E86E9F",""],[133,"No. 23","DE6F5C",""],[133,"No. 26","CC6D84",""],[133,"No. 36","ED695D",""],[133,"No. 49","DC4D8D",""],[133,"No. 51","FA6C55",""],[133,"No. 56","D9100E",""],[133,"No. 59","B96463",""],[133,"No. 207","CA4061",""],[133,"No. 208","D60846",""],[133,"No. 27","D24379",""],[133,"No. 50","DC2923",""],[133,"No. 57","C7153D",""],[133,"No. 58","B25D84",""],[133,"No. 201","B01020",""],[133,"No. 202","9E2C2C",""],[133,"No. 203","940220",""],[133,"No. 205","550001",""],[133,"No. 72","9A1B2F",""],[133,"No. 73","CF0410",""],[133,"No. 74","E0291B",""],[133,"No. 211","E4004F",""],[133,"No. 212","A53B4F",""],[133,"No. 213","E94138",""],[133,"No. 215","E34E90",""],[133,"No. 216","DE455A",""],[133,"No. 217","DE455A",""],[134,"No. 11","D51768",""],[134,"No. 3","F18885",""],[134,"No. 8","E52322",""],[134,"No. 4","DA0140",""],[134,"No. 1","C05B60",""],[134,"No. 2","E87593",""],[134,"No. 5","630F28",""],[134,"No. 6","CC0824",""],[134,"No. 7","ED6D68",""],[134,"No. 9","E73458",""],[134,"No. 10","A00F30",""],[134,"No. 12","B81D3D",""],[135,"No. 12","D0011E",""],[135,"No. 46","9F182C",""],[135,"No. 50","C64E5B",""],[135,"No. 08","C41304",""],[135,"No. 07","CC2010",""],[135,"No. 09","D4020E",""],[135,"No. 11","D0010B",""],[135,"No. 13","CC030E",""],[135,"No. 15","D41B40",""],[135,"No. 42","DF294E",""],[135,"No. 43","E23E44",""],[135,"No. 47","BC3250",""],[135,"No. 48","C13E30",""],[135,"No. 49","BB325C",""],[135,"No. 51","951E53",""],[135,"No. 200","DC9F8F",""],[136,"No. 05","FF54A3",""],[136,"No. 04","FF725D",""],[136,"No. 06","C072B5",""],[136,"No. 07","FFD0DD",""],[136,"No. 08","FF7B1E",""],[137,"No. 05","E21949",""],[137,"No. 01","DD2269",""],[137,"No. 02","E05572",""],[137,"No. 03","D16479",""],[137,"No. 04","DF4A43",""],[137,"No. 07","DC6B5D",""],[137,"No. 08","DE6A78",""],[137,"No. 09","BF7083",""],[137,"No. 12","AD625E",""],[138,"No. 49","D03370",""],[138,"No. 207","D11746",""],[138,"No. 03","D34E59",""],[138,"No. 15","AB3B48",""],[138,"No. 30","DD6053",""],[138,"No. 203","FE645A",""],[138,"No. 204","FE5B56",""],[138,"No. 206","B80722",""],[139,"No. 69","F17365",""],[139,"No. 46","E87268",""],[139,"No. 122","EA4D4A",""],[139,"No. 97","D53D49",""],[139,"No. 44","FD4334",""],[139,"No. 507","E94648",""],[139,"No. 114","FF3220",""],[139,"No. 91","C12A33",""],[139,"No. 84","CE1220",""],[139,"No. 57","EB6F79",""],[139,"No. 116","EC5193",""],[139,"No. 54","D1918D",""],[139,"No. 79","E86A75",""],[139,"No. 497","ED5A5E",""],[139,"No. 132","E93A5B",""],[139,"No. 87","F8657F",""],[139,"No. 55","F14C77",""],[139,"No. 118","EB2755",""],[139,"No. 62","E12948",""],[139,"No. 134","E7394A",""],[139,"No. 98","CC4D68",""],[139,"No. 60","BB395F",""],[139,"No. 61","C54463",""],[140,"No. 90","FC6E48",""],[140,"No. 96","FA421C",""],[140,"No. 182","E02E20",""],[140,"No. 152","E82F2C",""],[140,"No. 172","E40021",""],[140,"No. 135","99413D",""],[140,"No. 99","8A010D",""],[140,"No. 176","A80D1F",""],[140,"No. 169","8E2622",""],[140,"No. 91","E45661",""],[140,"No. 179","ED6160",""],[140,"No. 94","FC3E6E",""],[140,"No. 138","D93E5E",""],[140,"No. 136","EF4246",""],[140,"No. 178","BF5363",""],[140,"No. 158","B24957",""],[140,"No. 93","CD0043",""],[140,"No. 165","C82C40",""],[140,"No. 184","C80F2E",""],[140,"No. 102","B20032",""],[141,"No. 65","E17062",""],[141,"No. 64","E84632",""],[141,"No. 57","BE2B24",""],[141,"No. 66","E1112A",""],[141,"No. 51","9E333D",""],[141,"No. 56","B23030",""],[141,"No. 38","892833",""],[141,"No. 58","822E2E",""],[141,"No. 63","802932",""],[141,"No. 61","EC7879",""],[141,"No. 42","FE697F",""],[141,"No. 43","FA5059",""],[141,"No. 46","C92D38",""],[141,"No. 37","C43759",""],[141,"No. 44","F06FA5",""],[141,"No. 50","9F2F56",""],[142,"No. 457","EB636B",""],[142,"No. 487","EB5C97",""],[142,"No. 550","E47082",""],[142,"No. 554","EA5344",""],[142,"No. 564","E94858",""],[142,"No. 577","C86378",""],[142,"No. 637","E74218",""],[142,"No. 644","EA5331",""],[142,"No. 684","E60860",""],[142,"No. 740","902216",""],[142,"No. 744","E51E1B",""],[142,"No. 794","95358C",""],[142,"No. 857","A01314",""],[142,"No. 867","901A32",""],[142,"No. 877","C4032B",""],[142,"No. 882","BB0E63",""],[142,"No. 904","391E1D",""],[142,"No. 924","602227",""],[143,"No. 351","D8707D",""],[143,"No. 421","AD5F56",""],[143,"No. 451","E55461",""],[143,"No. 491","A76165",""],[143,"No. 761","E13D5D",""],[143,"No. 771","974249",""],[143,"No. 881","EC6292",""],[144,"No. 028","E83F4A",""],[144,"No. 426","D58F7F",""],[144,"No. 481","B76566",""],[144,"No. 047","E40068",""],[144,"No. 781","833B43",""],[144,"No. 060","D36179",""],[144,"No. 080","D91820",""],[144,"No. 861","B52237",""],[144,"No. 996","BD7376",""],[144,"No. 999","A82628",""],[144,"No. 277","DB7096",""],[144,"No. 343","EF7C6B",""],[144,"No. 351","E46177",""],[144,"No. 459","D1546E",""],[144,"No. 520","E4003E",""],[144,"No. 553","DA4F4E",""],[144,"No. 567","EA5069",""],[144,"No. 576","F08182",""],[144,"No. 602","2E4763",""],[144,"No. 642","EA5155",""],[144,"No. 643","E84617",""],[144,"No. 652","ED6C7F",""],[144,"No. 663","D0546B",""],[144,"No. 665","BD5154",""],[144,"No. 678","CC4A6B",""],[144,"No. 746","DC002C",""],[144,"No. 756","E52F31",""],[144,"No. 766","CF1D59",""],[144,"No. 771","E96C81",""],[144,"No. 772","CB7A84",""],[144,"No. 775","E1244B",""],[144,"No. 787","E6699D",""],[144,"No. 789","96518F",""],[144,"No. 844","E0262E",""],[144,"No. 856","B62631",""],[144,"No. 888","EB5958",""],[144,"No. 962","86556D",""],[145,"No. MAT5","99163A",""],[145,"No. R45M","A22040",""],[145,"No. R41M","C31431",""],[145,"No. MAT1","EC5C80",""],[145,"No. MAT3","EC594F",""],[146,"No. N103","DF695F",""],[146,"No. N105","A82A40",""],[146,"No. N202","F43556",""],[146,"No. N204","BE2446",""],[146,"No. N205","E70060",""],[146,"No. N304","F82131",""],[146,"No. N306","E50036",""],[146,"No. N303","FA054B",""],[146,"No. N302","FB2C60",""],[146,"No. 305","FA013D",""],[146,"No. 201","FA6173",""],[146,"No. 209","F60071",""],[146,"No. 210","FF4D89",""],[146,"No. 315","AC003A",""],[146,"No. 317","E03B35",""],[146,"No. 307","93142F",""],[146,"No. 301","DF3751",""],[146,"No. 214","BB3C5A",""],[146,"No. 323","C53057",""],[146,"No. 326","932844",""],[146,"No. 327","9B325A",""],[146,"No. 324","EE4650",""],[146,"No. 325","E11020",""],[146,"No. 215","844452",""],[146,"No. 329","731919",""],[146,"No. 330","64263F",""],[146,"No. 331","58151E",""],[147,"No. 11","BA353C",""],[147,"No. 7","8B2844",""],[147,"No. 8","B12252",""],[147,"No. 9","DD485B",""],[147,"No. 10","B53D52",""],[147,"No. 12","B9282D",""],[147,"No. 13","CA292E",""],[147,"No. 14","CB2D21",""],[147,"No. 15","D43A29",""],[147,"No. 16","DF4541",""],[147,"No. 18","D35C5E",""],[147,"No. 22","EC2663",""],[147,"No. 23","C62E54",""],[147,"No. 24","AA2260",""],[147,"No. 17","DD5852",""],[147,"No. 19","E36476",""],[147,"No. 20","EC6284",""],[147,"No. 21","EA586F",""]]};
-  var SHADES = { liner: [], lipstick: [], gloss: [] }, BYID = {};
-  function slugify(t) { return t.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''); }
-  function shortBrand(b) { return b.replace(/ (Professional Makeup|Cosmetics|Beauty|Paris)$/, ''); }
-  LIB.shades.forEach(function (r) {
-    var p = LIB.products[r[0]];
-    var x = { layer: p[0], brand: p[1], short: shortBrand(p[1]), product: p[2], finish: p[3], cov: p[4], price: p[5], currency: p[6], url: p[7], domain: p[8], shopify: !!p[9], source: p[10],
-      name: r[1], hex: '#' + r[2], desc: r[3] || '', variant: null };
-    x.id = slugify(x.brand + ' ' + x.product + ' ' + x.name).slice(0, 80);
-    if (BYID[x.layer + ':' + x.id]) return;
-    BYID[x.layer + ':' + x.id] = x; SHADES[x.layer].push(x);
-  });
-  var LAYERS = ['liner', 'lipstick', 'gloss'];
-  function get(l, id) { return BYID[l + ':' + id]; }
+  var reduce = false, finePointer = false;
+  try { reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) {}
+  try { finePointer = window.matchMedia('(hover: hover) and (pointer: fine)').matches; } catch (e) {}
 
-  // ---------- color math ----------
-  var LIN = new Float32Array(256);
-  for (var q = 0; q < 256; q++) { var c0 = q / 255; LIN[q] = c0 <= 0.04045 ? c0 / 12.92 : Math.pow((c0 + 0.055) / 1.055, 2.4); }
-  function f(t) { return t > 0.008856 ? Math.cbrt(t) : 7.787 * t + 16 / 116; }
-  function linToLab(R, G, B) {
-    var x = (R * 0.4124 + G * 0.3576 + B * 0.1805) / 0.95047, y = R * 0.2126 + G * 0.7152 + B * 0.0722, z = (R * 0.0193 + G * 0.1192 + B * 0.9505) / 1.08883;
-    var fx = f(x), fy = f(y), fz = f(z);
-    return [116 * fy - 16, 500 * (fx - fy), 200 * (fy - fz)];
-  }
-  var HEXLAB = {};
-  function hexLabRaw(hex) { return HEXLAB[hex] || (HEXLAB[hex] = linToLab(LIN[parseInt(hex.substr(1, 2), 16)], LIN[parseInt(hex.substr(3, 2), 16)], LIN[parseInt(hex.substr(5, 2), 16)])); }
-  function hue(lab) { return Math.atan2(lab[2], lab[1]) * 180 / Math.PI; } // signed: berry and plum go slightly negative
-  function chroma(lab) { return Math.sqrt(lab[1] * lab[1] + lab[2] * lab[2]); }
-  // CIEDE2000: how different two colors look to a person (more accurate than straight-line distance, especially for reds and pinks)
-  function dE00(l1, l2) {
-    var L1 = l1[0], a1 = l1[1], b1 = l1[2], L2 = l2[0], a2 = l2[1], b2 = l2[2], P7 = Math.pow(25, 7);
-    var Cb = (Math.hypot(a1, b1) + Math.hypot(a2, b2)) / 2, Cb7 = Math.pow(Cb, 7), G = 0.5 * (1 - Math.sqrt(Cb7 / (Cb7 + P7)));
-    var a1p = (1 + G) * a1, a2p = (1 + G) * a2, C1p = Math.hypot(a1p, b1), C2p = Math.hypot(a2p, b2);
-    var h1p = Math.atan2(b1, a1p); if (h1p < 0) h1p += 2 * Math.PI;
-    var h2p = Math.atan2(b2, a2p); if (h2p < 0) h2p += 2 * Math.PI;
-    var dLp = L2 - L1, dCp = C2p - C1p, dhp = 0;
-    if (C1p * C2p !== 0) { dhp = h2p - h1p; if (dhp > Math.PI) dhp -= 2 * Math.PI; else if (dhp < -Math.PI) dhp += 2 * Math.PI; }
-    var dHp = 2 * Math.sqrt(C1p * C2p) * Math.sin(dhp / 2);
-    var Lbp = (L1 + L2) / 2, Cbp = (C1p + C2p) / 2, hbp = h1p + h2p;
-    if (C1p * C2p !== 0) { hbp = (h1p + h2p) / 2; if (Math.abs(h1p - h2p) > Math.PI) hbp += (h1p + h2p < 2 * Math.PI) ? Math.PI : -Math.PI; }
-    var T = 1 - 0.17 * Math.cos(hbp - Math.PI / 6) + 0.24 * Math.cos(2 * hbp) + 0.32 * Math.cos(3 * hbp + Math.PI / 30) - 0.20 * Math.cos(4 * hbp - 63 * Math.PI / 180);
-    var dTh = (30 * Math.PI / 180) * Math.exp(-Math.pow((hbp * 180 / Math.PI - 275) / 25, 2));
-    var Cbp7 = Math.pow(Cbp, 7), Rc = 2 * Math.sqrt(Cbp7 / (Cbp7 + P7));
-    var Sl = 1 + 0.015 * Math.pow(Lbp - 50, 2) / Math.sqrt(20 + Math.pow(Lbp - 50, 2)), Sc = 1 + 0.045 * Cbp, Sh = 1 + 0.015 * Cbp * T, Rt = -Math.sin(2 * dTh) * Rc;
-    return Math.sqrt(Math.pow(dLp / Sl, 2) + Math.pow(dCp / Sc, 2) + Math.pow(dHp / Sh, 2) + Rt * (dCp / Sc) * (dHp / Sh));
-  }
+  /* Reduced motion: no autoplaying video; show controls instead. */
 
-  function colorWord(lab) {
-    var h = hue(lab), L = lab[0], C = chroma(lab);
-    if (C < 12) return L > 50 ? 'neutral nude' : 'deep neutral';
-    if (h > 50) return L > 55 ? 'peachy nude' : 'brown';
-    if (h > 35) return L > 58 ? 'nude' : L > 40 ? 'rosy brown' : 'chocolate';
-    if (h > 22) return C > 45 ? (L > 50 ? 'coral' : 'true red') : (L > 55 ? 'rosy nude' : 'brick');
-    if (h > 5) return C > 40 ? (L > 55 ? 'pink' : 'red') : (L > 55 ? 'rose' : 'mauve');
-    return L > 55 ? 'pink' : L > 35 ? 'berry' : 'plum';
-  }
-  function descOf(x) { return x.desc || (x.finish + ' ' + colorWord(hexLabRaw(x.hex))); }
-  // novelty shades (metallics, glitter, blue/green/black) stay in the picker but are never auto-recommended
-  var NOVELTY = /(metal|metallic|glitter|gold|silver|chrome|holo|shimmer|sparkle|frost|foil|galaxy|neon|blue|green|black|white|grey|gray|purple)/i;
-  function wearable(x) { return !NOVELTY.test(x.name + ' ' + x.product) || (x.layer === 'liner' && /brown/i.test(x.name)); }
-  var REC = {};
-  function recPool(l) { return REC[l] || (REC[l] = SHADES[l].filter(wearable)); }
-  function isClear(x) { return x.cov <= 0.06 || hexLabRaw(x.hex)[0] > 88; }
 
-  // ---------- reading skin ----------
-  // ITA (Individual Typology Angle): the standard dermatology measure of how light or deep skin is.
-  function ita(skin) { return Math.atan((skin[0] - 50) / Math.max(1, skin[2])) * 180 / Math.PI; }
-  var BANDS = [
-    { min: 55, name: 'very light', bold: [32, 50] }, { min: 41, name: 'light', bold: [30, 48] },
-    { min: 28, name: 'medium', bold: [27, 45] }, { min: 10, name: 'tan', bold: [23, 41] },
-    { min: -30, name: 'brown', bold: [18, 36] }, { min: -999, name: 'deep', bold: [12, 31] }];
-  function bandOf(skin) { var t = ita(skin); for (var k = 0; k < BANDS.length; k++) if (t > BANDS[k].min) return BANDS[k]; return BANDS[BANDS.length - 1]; }
-  function describe(read) {
-    var sk = read.skin, h = hue(sk), band = bandOf(sk);
-    var tone = h > 57 ? 'warm' : h < 47 ? 'cool' : 'neutral';
-    var lh = hue(read.lip), lc = chroma(read.lip), lL = read.lip[0];
-    var lipWord = (lL > 58 ? 'soft ' : lL < 40 ? 'deep ' : '') + (lc < 14 ? 'neutral' : lh < 22 ? 'rosy berry' : lh < 38 ? 'rosy' : lh < 52 ? 'rosy brown' : 'warm brown');
-    return { depth: band.name, band: band, ita: Math.round(ita(sk)), tone: tone, lipWord: lipWord.trim() };
-  }
-  // Natural lips sit a little darker and pinker than the skin around them, with soft color.
-  // Lipstick usually breaks that: very saturated, lighter than skin, an odd hue, or very shiny.
-  function detectProduct(read) {
-    var lip = read.lip, sk = read.skin, c = chroma(lip), h = hue(lip), why = [];
-    if (c > 36) why.push('very saturated');
-    if (lip[0] > sk[0] + 1) why.push('lighter than your skin');
-    if (h < 2 || h > 62) why.push('a shade lips don’t usually have');
-    if (sk[0] > 50 && sk[0] - lip[0] > 30) why.push('much darker than your skin');
-    return { lipstick: why.length > 0, glossy: (read.shine || 0) > 0.1, why: why };
-  }
-  // When lip color is already on, estimate the natural lip from the skin around it.
-  function predictNatural(sk) {
-    var t = Math.max(0, Math.min(1, (70 - sk[0]) / 40));
-    return [Math.max(12, sk[0] - (4 + 0.12 * sk[0])), sk[1] + 14 - 4 * t, sk[2] - 6 + 2 * t];
-  }
-
-  // ---------- scoring ----------
-  function outside(v, lo, hi) { return v < lo ? lo - v : v > hi ? v - hi : 0; }
-  function rank(list, score, skip) {
-    var pool = list.filter(function (x) { return !skip || skip.indexOf(x.id) < 0; });
-    return pool.map(function (x) { return { x: x, s: score(x, hexLabRaw(x.hex)) }; }).sort(function (a, b) { return a.s - b.s; });
-  }
-  // undertone fit: warm skin suits peach/brown nudes, cool skin suits rose/mauve
-  function tonePenalty(tone, lab) { var h = hue(lab); return tone === 'warm' ? Math.max(0, 25 - h) * 0.4 : tone === 'cool' ? Math.max(0, h - 30) * 0.4 : 0; }
-  function pickLiner(ls, deeperBy) {
-    var L = hexLabRaw(ls.hex), t = [L[0] - deeperBy, L[1] * 0.9, L[2] + 2];
-    return rank(recPool('liner'), function (x, lab) { return dE00(lab, t) + 2.5 * outside(L[0] - lab[0], 5, 20) + 2 * Math.max(0, 14 - lab[0]); })[0].x;
-  }
-  // milky light glosses go chalky on skin deeper than they are
-  function chalky(x, lab, sk) { return x.cov >= 0.3 && lab[0] > sk[0] + 4 ? 25 : 0; }
-
-  function recommend(read, seen) {
-    seen = seen || { lipstick: [] };
-    var info = describe(read), used = seen.lipstick.slice(), out = [];
-    var lip = read.lip, sk = read.skin, sL = sk[0];
-    var tooLight = function (lab) { return lab[0] > sL - 3 ? 40 : 0; }; // a lipstick lighter than your skin reads chalky
-
-    // 1. everyday: your natural lip, a little richer, never lighter than your lips or skin
-    var hiL = Math.min(lip[0], sL - 4), t1 = [lip[0] - 4, lip[1] * 1.1, lip[2]];
-    var lipC = chroma(lip);
-    // everyday stays close to your own lip saturation: no jump to a bright berry or red
-    var nudes = recPool('lipstick').filter(function (x) { var lab = hexLabRaw(x.hex); return chroma(lab) < 34 && hue(lab) >= 12; });
-    var nt = [sL - 14, 17, 16];
-    var score2 = function (x, lab) { return dE00(lab, nt) + 2.5 * outside(lab[0], sL - 26, sL - 7) + tooLight(lab) + tonePenalty(info.tone, lab) * 0.6; };
-    var score1 = function (x, lab) { return dE00(lab, t1) + 2.5 * outside(lab[0], hiL - 12, hiL + 3) + tooLight(lab) + tonePenalty(info.tone, lab) + 0.8 * Math.max(0, chroma(lab) - (lipC + 10)); };
-    // choose everyday + 90s lipsticks together: the pair with the best combined fit, two different shades when possible
-    var e1 = rank(recPool('lipstick'), score1, used).slice(0, 40), e2 = rank(nudes, score2, used).slice(0, 40), bestPair = null;
-    e1.forEach(function (a) { e2.forEach(function (b) { if (a.x.id === b.x.id) return; var t = a.s + b.s; if (!bestPair || t < bestPair.t) bestPair = { a: a.x, b: b.x, t: t }; }); });
-    var same = e1[0].s + e2.filter(function (b) { return b.x.id === e1[0].x.id; }).concat([{ s: 999 }])[0].s;
-    var ls1 = bestPair && bestPair.t < same + 25 ? bestPair.a : e1[0].x, ls2 = bestPair && bestPair.t < same + 25 ? bestPair.b : e1[0].x;
-    used.push(ls1.id); used.push(ls2.id);
-    var ln1 = pickLiner(ls1, 10), L1 = hexLabRaw(ls1.hex);
-    var g1 = rank(recPool('gloss').filter(function (x) { return x.cov <= 0.35; }), function (x, lab) { if (ls1.id === ls2.id && isClear(x)) return 0; // same lipstick as 90s: keep everyday clear and simple
-       return isClear(x) ? 14 : dE00(lab, [L1[0] + 8, L1[1], L1[2]]) + chalky(x, lab, sk); })[0].x;
-    out.push({ key: 'everyday', name: 'everyday', kicker: 'your lips, but better', picks: { liner: ln1.id, lipstick: ls1.id, gloss: g1.id },
-      why: 'Built from your natural lip color.',
-      how: { lipstick: ls1.name + ' is the closest shade to your natural ' + info.lipWord + ' lip color, a touch richer and never lighter than your lips.',
-             liner: ln1.name + ' sits one step deeper than ' + ls1.name + ', so the edge looks defined, not drawn on.',
-             gloss: isClear(g1) ? g1.name + ' is clear, so you get shine without changing the color.' : g1.name + ' is a sheer tint in the same family, for shine without changing the color.' } });
-
-    // 2. 90s brown: a nude that sits deeper than your skin, and a dark brown edge
-    var L2 = hexLabRaw(ls2.hex);
-    var ln2 = rank(recPool('liner'), function (x, lab) { return 2.5 * outside(L2[0] - lab[0], 12, 26) + (hue(lab) < 20 ? 10 : 0) + Math.abs(chroma(lab) - 18) * 0.3 + 2 * Math.max(0, 14 - lab[0]); })[0].x;
-    var g2 = rank(recPool('gloss').filter(function (x) { return x.cov <= 0.4; }), function (x, lab) { return isClear(x) ? 16 : dE00(lab, [sL - 8, 16, 14]) + chalky(x, lab, sk); })[0].x;
-    out.push({ key: '90s', name: '90s brown', kicker: 'the TikTok classic', picks: { liner: ln2.id, lipstick: ls2.id, gloss: g2.id },
-      why: 'Built from your skin depth.',
-      how: { liner: ln2.name + ' is a deep brown, ' + Math.round(L2[0] - hexLabRaw(ln2.hex)[0]) + ' steps darker than the lipstick, for the dark blended 90s edge.',
-             lipstick: ls2.name + ' is a nude picked to sit deeper than ' + info.depth + ' skin (ITA ' + info.ita + '°), so it won’t wash you out.',
-             gloss: isClear(g2) ? g2.name + ' adds clear shine on top.' : g2.name + ' (' + descOf(g2) + ') is sheer, so it adds shine and keeps the brown tone.' } });
-
-    // 3. night out: a bold shade at the right depth for your skin, leaning with your undertone
-    var th = info.tone === 'warm' ? 28 : info.tone === 'cool' ? 6 : 16, bd = info.band.bold;
-    var r3 = rank(recPool('lipstick').filter(function (x) { var lab = hexLabRaw(x.hex); return chroma(lab) >= 20 && hue(lab) < 35; }), function (x, lab) { return 0.5 * Math.abs(hue(lab) - th) + 2 * outside(lab[0], bd[0], bd[1]) + tooLight(lab); }, used);
-    var ls3 = (r3[0] || rank(recPool('lipstick'), function (x, lab) { return -chroma(lab); }, used)[0]).x; used.push(ls3.id);
-    var ln3 = pickLiner(ls3, 9), L3 = hexLabRaw(ls3.hex);
-    var g3 = rank(recPool('gloss'), function (x, lab) { return isClear(x) ? 14 : (x.cov < 0.3 ? 99 : dE00(lab, L3) + chalky(x, lab, sk)); })[0].x;
-    out.push({ key: 'night', name: 'night out', kicker: 'the statement', picks: { liner: ln3.id, lipstick: ls3.id, gloss: g3.id },
-      why: 'Built from your undertone and skin depth.',
-      how: { lipstick: ls3.name + ' (' + descOf(ls3) + ') leans ' + (th >= 25 ? 'warm' : th <= 10 ? 'cool' : 'balanced') + ' for your ' + info.tone + ' undertone, at a depth that pops on ' + info.depth + ' skin.',
-             liner: ln3.name + ' is the liner closest to ' + ls3.name + ', one step deeper, to keep the edge crisp.',
-             gloss: isClear(g3) ? g3.name + ' adds clear shine so the color stays true.' : g3.name + ' is the tinted gloss closest to ' + ls3.name + ', for a wet finish.' } });
-
-    return { info: info, combos: out };
-  }
-  /*ENDREC*/
-
-  // ---------- color math ----------
-  function finv(t) { var t3 = t * t * t; return t3 > 0.008856 ? t3 : (t - 16 / 116) / 7.787; }
-  function gam(v) { v = v <= 0.0031308 ? 12.92 * v : 1.055 * Math.pow(v, 1 / 2.4) - 0.055; return v < 0 ? 0 : v > 1 ? 255 : v * 255; }
-  function labToRgb(L, a, b, out, o) {
-    var fy = (L + 16) / 116, fx = fy + a / 500, fz = fy - b / 200;
-    var x = finv(fx) * 0.95047, y = finv(fy), z = finv(fz) * 1.08883;
-    out[o] = gam(3.2406 * x - 1.5372 * y - 0.4986 * z);
-    out[o + 1] = gam(-0.9689 * x + 1.8758 * y + 0.0415 * z);
-    out[o + 2] = gam(0.0557 * x - 0.2040 * y + 1.0570 * z);
-  }
-  function pxLab(d, o) { return linToLab(LIN[d[o]], LIN[d[o + 1]], LIN[d[o + 2]]); }
-
-  // ---------- face tracking ----------
-  var MP_JS = window.LIPPY_MP_JS || 'https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh@0.4.1633559619/';
-  var LIP_OUT = [61, 146, 91, 181, 84, 17, 314, 405, 321, 375, 291, 409, 270, 269, 267, 0, 37, 39, 40, 185];
-  var LIP_IN = [78, 95, 88, 178, 87, 14, 317, 402, 318, 324, 308, 415, 310, 311, 312, 13, 82, 81, 80, 191];
-  var CHEEKS = [50, 280, 205, 425];
-  var fm = null, fmReady = null, onFace = null;
-  function getFaceMesh() {
-    if (fmReady) return fmReady;
-    fmReady = new Promise(function (res) {
-      if (!window.FaceMesh) { res(null); return; }
-      try {
-        var m = new window.FaceMesh({ locateFile: function (f) { return /\.js$/.test(f) ? MP_JS + f : 'mp/' + f + (/\.wasm$/.test(f) ? '' : '.wasm'); } });
-        m.setOptions({ maxNumFaces: 1, refineLandmarks: false, minDetectionConfidence: 0.5, minTrackingConfidence: 0.5 });
-        m.onResults(function (r) { if (onFace) onFace(r.image, r.multiFaceLandmarks && r.multiFaceLandmarks[0] || null); });
-        var t = setTimeout(function () { res(null); }, 25000);
-        m.initialize().then(function () { clearTimeout(t); fm = m; res(m); }, function () { clearTimeout(t); res(null); });
-      } catch (e) { res(null); }
+  /* Same custom cursor as the homepage. */
+  if (finePointer) {
+    document.documentElement.classList.add('custom-cursor');
+    var cur = document.getElementById('cursor');
+    document.addEventListener('mousemove', function (e) {
+      cur.style.opacity = '1';
+      cur.style.transform = 'translate(' + e.clientX + 'px,' + e.clientY + 'px)';
     });
-    return fmReady;
-  }
-
-  // ---------- canvases ----------
-  var view = document.getElementById('view'), vctx = view.getContext('2d');
-  var frameC = document.createElement('canvas'), fctx = frameC.getContext('2d', { willReadFrequently: true });
-  var maskC = document.createElement('canvas'), mctx = maskC.getContext('2d', { willReadFrequently: true });
-  var bandC = document.createElement('canvas'), bctx = bandC.getContext('2d', { willReadFrequently: true });
-  var holdC = document.createElement('canvas'), hctx = holdC.getContext('2d');
-  var W = 0, H = 0, lastLm = null, lastSrc = null;
-  var hint = document.getElementById('hint');
-  function setHint(t) { hint.textContent = t || ''; hint.hidden = !t; }
-  function size(w, h) {
-    if (w === W && h === H) return;
-    W = w; H = h;
-    [frameC, maskC, bandC].forEach(function (c) { c.width = W; c.height = H; });
-  }
-  function pts(lm, ids, k, cx, cy) { return ids.map(function (i) { var x = lm[i].x * W, y = lm[i].y * H; return [cx + (x - cx) * k, cy + (y - cy) * k]; }); }
-  function path(c, p) { c.beginPath(); p.forEach(function (q, j) { if (j) c.lineTo(q[0], q[1]); else c.moveTo(q[0], q[1]); }); c.closePath(); }
-
-  // lip outline + liner band for this frame
-  function lipMasks(lm) {
-    var cx = 0, cy = 0;
-    LIP_OUT.forEach(function (i) { cx += lm[i].x; cy += lm[i].y; }); cx = cx / LIP_OUT.length * W; cy = cy / LIP_OUT.length * H;
-    var out = pts(lm, LIP_OUT, 0.985, cx, cy), inn = pts(lm, LIP_IN, 1.0, cx, cy);
-    var x0 = W, x1 = 0, y0 = H, y1 = 0;
-    out.forEach(function (p) { if (p[0] < x0) x0 = p[0]; if (p[0] > x1) x1 = p[0]; if (p[1] < y0) y0 = p[1]; if (p[1] > y1) y1 = p[1]; });
-    var pad = 6, bb = { x: Math.max(0, Math.floor(x0 - pad)), y: Math.max(0, Math.floor(y0 - pad)) };
-    bb.w = Math.min(W, Math.ceil(x1 + pad)) - bb.x; bb.h = Math.min(H, Math.ceil(y1 + pad)) - bb.y;
-    if (bb.w < 8 || bb.h < 4) return null;
-    var lipH = y1 - y0, edge = Math.max(0.8, lipH * 0.035);
-    mctx.clearRect(0, 0, W, H);
-    mctx.filter = 'blur(' + edge.toFixed(1) + 'px)';
-    mctx.fillStyle = '#fff'; path(mctx, out); mctx.fill();
-    mctx.globalCompositeOperation = 'destination-out'; path(mctx, inn); mctx.fill();
-    mctx.globalCompositeOperation = 'source-over'; mctx.filter = 'none';
-    bctx.clearRect(0, 0, W, H);
-    bctx.filter = 'blur(' + Math.max(1, lipH * 0.05).toFixed(1) + 'px)';
-    bctx.strokeStyle = '#fff'; bctx.lineWidth = Math.max(2, lipH * 0.16); bctx.lineJoin = 'round';
-    path(bctx, out); bctx.stroke();
-    bctx.filter = 'none';
-    bctx.globalCompositeOperation = 'destination-in'; bctx.drawImage(maskC, 0, 0);
-    bctx.globalCompositeOperation = 'source-over';
-    return bb;
-  }
-
-  // read natural lip + skin color from one frame (used for the 3 combos)
-  var EYES = [[33, 133], [362, 263]];
-  function trimmed(Ls, As, Bs) { // ignore the brightest and darkest 20% (shine and shadow)
-    var idx = Ls.map(function (v, k) { return k; }).sort(function (a, b) { return Ls[a] - Ls[b]; });
-    var keep = idx.slice(Math.floor(idx.length * 0.2), Math.ceil(idx.length * 0.8));
-    return [median(keep.map(function (k) { return Ls[k]; })), median(keep.map(function (k) { return As[k]; })), median(keep.map(function (k) { return Bs[k]; }))];
-  }
-  function readColors(lm, bb) {
-    var fd = fctx.getImageData(0, 0, W, H).data, md = mctx.getImageData(bb.x, bb.y, bb.w, bb.h).data;
-    var lipL = [], lipA = [], lipB = [], hi = 0;
-    for (var y = 0; y < bb.h; y++) for (var x = 0; x < bb.w; x++) {
-      if (md[(y * bb.w + x) * 4 + 3] < 230) continue;
-      var lab = pxLab(fd, ((bb.y + y) * W + bb.x + x) * 4); lipL.push(lab[0]); lipA.push(lab[1]); lipB.push(lab[2]);
-    }
-    if (lipL.length < 30) return null;
-    var mL = median(lipL.slice());
-    for (var i = 0; i < lipL.length; i++) if (lipL[i] > mL + 22) hi++;
-    function patch(px, py, r, out) {
-      for (var yy = Math.round(py) - r; yy <= Math.round(py) + r; yy++) for (var xx = Math.round(px) - r; xx <= Math.round(px) + r; xx++) {
-        if (xx < 0 || yy < 0 || xx >= W || yy >= H) continue;
-        out.push(pxLab(fd, (yy * W + xx) * 4));
-      }
-    }
-    var sk = [], r = Math.max(2, Math.round(bb.w * 0.05));
-    CHEEKS.forEach(function (k) { patch(lm[k].x * W, lm[k].y * H, r, sk); });
-    if (sk.length < 9) return null;
-    var skin = trimmed(sk.map(function (c) { return c[0]; }), sk.map(function (c) { return c[1]; }), sk.map(function (c) { return c[2]; }));
-    // a white reference tells us the light's color and how bright the camera made everything:
-    // the whites of the eyes, plus teeth when you're smiling
-    var wh = [];
-    EYES.forEach(function (e) {
-      var ax = lm[e[0]].x * W, ay = lm[e[0]].y * H, bx = lm[e[1]].x * W, by = lm[e[1]].y * H, ew = Math.hypot(bx - ax, by - ay), re = Math.max(1, Math.round(ew * 0.07));
-      [0.2, 0.8].forEach(function (t) { patch(ax + (bx - ax) * t, ay + (by - ay) * t, re, wh); });
-    });
-    var mouth = mouthPixels(lm);
-    for (var mI = 0; mI < mouth.length; mI++) wh.push(pxLab(fd, mouth[mI] * 4));
-    wh = wh.filter(function (c) { return Math.hypot(c[1], c[2]) < 14; }).sort(function (a, b) { return b[0] - a[0]; });
-    wh = wh.slice(0, Math.floor(wh.length * 0.3));
-    var ref = null;
-    if (wh.length >= 15) {
-      var refL = median(wh.map(function (c) { return c[0]; }));
-      // only trust it if it's clearly brighter than skin; otherwise we probably sampled skin or eyelid
-      if (refL > skin[0] + 6) ref = { L: refL, a: median(wh.map(function (c) { return c[1]; })), b: median(wh.map(function (c) { return c[2]; })) };
-    }
-    return { lip: trimmed(lipL, lipA, lipB), skin: skin, shine: hi / lipL.length, ref: ref };
-  }
-  // pixels inside the mouth opening (teeth when smiling)
-  var mouthC = document.createElement('canvas'), mouthX = mouthC.getContext('2d', { willReadFrequently: true });
-  function mouthPixels(lm) {
-    if (mouthC.width !== W || mouthC.height !== H) { mouthC.width = W; mouthC.height = H; }
-    var p = LIP_IN.map(function (i) { return [lm[i].x * W, lm[i].y * H]; }), x0 = W, x1 = 0, y0 = H, y1 = 0;
-    p.forEach(function (q) { if (q[0] < x0) x0 = q[0]; if (q[0] > x1) x1 = q[0]; if (q[1] < y0) y0 = q[1]; if (q[1] > y1) y1 = q[1]; });
-    x0 = Math.max(0, Math.floor(x0)); y0 = Math.max(0, Math.floor(y0)); var w = Math.min(W, Math.ceil(x1)) - x0, h = Math.min(H, Math.ceil(y1)) - y0;
-    if (w < 4 || h < 3) return [];
-    mouthX.clearRect(x0, y0, w, h); mouthX.fillStyle = '#fff'; path(mouthX, p); mouthX.fill();
-    var d = mouthX.getImageData(x0, y0, w, h).data, out = [];
-    for (var k = 0; k < w * h; k++) if (d[k * 4 + 3] > 200) out.push((y0 + Math.floor(k / w)) * W + x0 + (k % w));
-    return out;
-  }
-  // combine ~24 frames: the median of each value, so one bad frame can't skew the read
-  function combineReads(fr) {
-    function med3(key) { return [0, 1, 2].map(function (k) { return median(fr.map(function (r) { return r[key][k]; })); }); }
-    var refs = fr.filter(function (r) { return r.ref; }), ref = null;
-    if (refs.length >= fr.length / 3) ref = { L: median(refs.map(function (r) { return r.ref.L; })), a: median(refs.map(function (r) { return r.ref.a; })), b: median(refs.map(function (r) { return r.ref.b; })) };
-    return { lip: med3('lip'), skin: med3('skin'), shine: median(fr.map(function (r) { return r.shine; })), ref: ref };
-  }
-  // exposure: rescale lightness as if the white reference were a standard white (Y 0.62, about L 83)
-  function Yof(L) { var t = (L + 16) / 116; return t * t * t; }
-  function Lof(Y) { return Math.max(0, Math.min(100, 116 * Math.cbrt(Math.max(0, Y)) - 16)); }
-  function toTrueL(L) { return st.expo ? Lof(Yof(L) / Yof(st.expo) * 0.62) : L; }
-  function toPhotoL(L) { return st.expo ? Lof(Yof(L) / 0.62 * Yof(st.expo)) : L; }
-
-  // recolor the lips for this frame
-  var LCACHE = {};
-  function shadeLab(hex) { return LCACHE[hex] || (LCACHE[hex] = hexLabRaw(hex)); }
-  function paintLips(bb) {
-    var picks = activePicks(), show = st.show, K = st.intensity / 100;
-    if (!picks || st.before || !(show.liner || show.lipstick || show.gloss || st.natural)) return;
-    var img = fctx.getImageData(bb.x, bb.y, bb.w, bb.h), d = img.data;
-    var md = mctx.getImageData(bb.x, bb.y, bb.w, bb.h).data, bd = bctx.getImageData(bb.x, bb.y, bb.w, bb.h).data;
-    var n = bb.w * bb.h, Ls = new Float32Array(n), As = new Float32Array(n), Bs = new Float32Array(n), hist = new Uint32Array(101), cnt = 0, sum = 0, i, o;
-    for (i = 0; i < n; i++) {
-      if (md[i * 4 + 3] < 3) continue;
-      var lab = pxLab(d, i * 4); Ls[i] = lab[0]; As[i] = lab[1]; Bs[i] = lab[2];
-      if (md[i * 4 + 3] > 200) { hist[Math.max(0, Math.min(100, Math.round(lab[0])))]++; cnt++; sum += lab[0]; }
-    }
-    if (!cnt) return;
-    var meanL = sum / cnt, acc = 0, hiT = 100, hiMax = 100, p82 = cnt * 0.82, p99 = cnt * 0.99;
-    for (i = 0; i <= 100; i++) { acc += hist[i]; if (hiT === 100 && acc >= p82) hiT = i; if (acc >= p99) { hiMax = i; break; } }
-    var span = Math.max(1, hiMax - hiT);
-    var ln = get('liner', picks.liner), lp = get('lipstick', picks.lipstick), gl = get('gloss', picks.gloss);
-    var c0 = st.cast ? st.cast[0] : 0, c1 = st.cast ? st.cast[1] : 0, lit = function (v) { return [toPhotoL(v[0]), v[1] + c0, v[2] + c1]; };
-    var LN = lit(shadeLab(ln.hex)), LP = lit(shadeLab(lp.hex)), GL = lit(shadeLab(gl.hex));
-    var NB = st.natural ? lit(st.natural) : null, flat = NB && st.product && st.product.glossy, mA = st.read ? st.read.lipRawA : 0, mB = st.read ? st.read.lipRawB : 0;
-    for (i = 0; i < n; i++) {
-      var m = md[i * 4 + 3] / 255; if (m < 0.012) continue;
-      var L0 = Ls[i], L = L0, a = As[i], b = Bs[i], w, tl;
-      if (NB) {
-        L = L0 + ((NB[0] + (L0 - meanL) * 0.8) - L0) * m; a += ((NB[1] + (As[i] - mA) * 0.3) - a) * m; b += ((NB[2] + (Bs[i] - mB) * 0.3) - b) * m;
-        if (flat) L -= Math.max(0, L0 - hiT) * 0.6 * m;
-      }
-      if (show.lipstick) { w = lp.cov * m * K; tl = LP[0] + (L0 - meanL); L += (tl - L) * w * 0.65; a += (LP[1] - a) * w; b += (LP[2] - b) * w; }
-      var bw = bd[i * 4 + 3] / 255;
-      if (show.liner && bw > 0.01) { w = bw * 0.62 * K; tl = LN[0] + (L0 - meanL) * 0.8; L += (tl - L) * w * 0.7; a += (LN[1] - a) * w; b += (LN[2] - b) * w; }
-      var hl = Math.max(0, Math.min(1, (L0 - hiT) / span)); hl = hl * hl * (3 - 2 * hl); if (flat) hl *= 0.4;
-      if (show.gloss) { w = gl.cov * m * 0.5 * K; a += (GL[1] - a) * w; b += (GL[2] - b) * w; L += (GL[0] - L) * w * 0.3; L += (100 - L) * hl * 0.45 * m + 1.5 * m * (1 - hl); }
-      else if (show.lipstick) { L -= hl * 5 * m; }
-      labToRgb(L, a, b, d, i * 4);
-    }
-    fctx.putImageData(img, bb.x, bb.y);
-  }
-
-  // the view follows your face: head and shoulders, smoothed so it doesn't jitter
-  var VW = 720, VH = 900, camv = null;
-  function present(lm) {
-    if (view.width !== VW) { view.width = VW; view.height = VH; }
-    var tx = W / 2, ty = H / 2, th = H;
-    if (lm) {
-      var x0 = 1, x1 = 0, y0 = 1, y1 = 0;
-      for (var k = 0; k < lm.length; k += 3) { var q = lm[k]; if (q.x < x0) x0 = q.x; if (q.x > x1) x1 = q.x; if (q.y < y0) y0 = q.y; if (q.y > y1) y1 = q.y; }
-      var fh = (y1 - y0) * H; th = fh * 1.75; tx = (x0 + x1) / 2 * W; ty = (y0 + y1) / 2 * H + fh * 0.12;
-    }
-    var tw = th * VW / VH;
-    if (tw > W) { tw = W; th = tw * VH / VW; }
-    if (th > H) { th = H; tw = th * VW / VH; }
-    if (!camv || st.mode !== 'live') camv = { x: tx, y: ty, h: th };
-    else { camv.x += (tx - camv.x) * 0.25; camv.y += (ty - camv.y) * 0.25; camv.h += (th - camv.h) * 0.25; }
-    var h = Math.min(camv.h, H), w = h * VW / VH; if (w > W) { w = W; h = w * VH / VW; }
-    var sx = Math.max(0, Math.min(W - w, camv.x - w / 2)), sy = Math.max(0, Math.min(H - h, camv.y - h / 2));
-    vctx.fillStyle = '#2A171B'; vctx.fillRect(0, 0, VW, VH);
-    vctx.imageSmoothingQuality = 'high';
-    vctx.drawImage(frameC, sx, sy, w, h, 0, 0, VW, VH);
-  }
-
-  // one frame in: draw it, find lips, read colors once, paint
-  var stable = 0, frames = [];
-  function drawFrame(src, lm) {
-    var w = src.videoWidth || src.width, h = src.videoHeight || src.height;
-    if (!w || !h) return;
-    size(w, h);
-    fctx.drawImage(src, 0, 0, W, H);
-    lastSrc = src; lastLm = lm;
-    if (!lm) { stable = 0; present(null); setHint(st.mode === 'live' ? 'looking for your face…' : 'couldn’t find a face. Try a clearer, front-facing photo.'); return; }
-    var bb = lipMasks(lm);
-    if (!bb) { present(lm); return; }
-    stable++;
-    if (!st.read && (st.mode !== 'live' || stable > 6)) {
-      var rd = readColors(lm, bb);
-      if (rd) { frames.push(rd); if (st.mode !== 'live' || frames.length >= 24) takeRead(combineReads(frames)); }
-    }
-    setHint(st.read ? '' : 'hold still, reading your lips…' + (st.mode === 'live' && frames.length ? ' ' + Math.round(frames.length / 24 * 100) + '%' : ''));
-    paintLips(bb);
-    present(lm);
-  }
-  function takeRead(rd) {
-    // with a trusted white reference: remove the light's tint and the camera's brightness; without one, use the colors as seen
-    var cast = rd.ref ? [Math.max(-8, Math.min(8, rd.ref.a - 1)), Math.max(-8, Math.min(8, rd.ref.b - 6))] : [0, 0];
-    st.cast = cast; st.expo = rd.ref ? rd.ref.L : null;
-    st.read = { lip: [toTrueL(rd.lip[0]), rd.lip[1] - cast[0], rd.lip[2] - cast[1]], skin: [toTrueL(rd.skin[0]), rd.skin[1] - cast[0], rd.skin[2] - cast[1]], shine: rd.shine, lipRawA: rd.lip[1], lipRawB: rd.lip[2], ref: !!rd.ref };
-    st.product = detectProduct(st.read);
-    st.natural = st.product.lipstick ? predictNatural(st.read.skin) : st.product.glossy ? st.read.lip.slice() : null;
-    var eff = st.natural ? { lip: st.natural, skin: st.read.skin } : st.read;
-    var r = recommend(eff, { lipstick: [] });
-    st.info = r.info; st.combos = r.combos; st.active = 0;
-    drawUI();
-  }
-  // redraw after a control changes (needed when frozen or using a photo)
-  function redraw() { if (st.mode !== 'live' || st.held) { if (st.held) drawFrame(holdC, lastLm); else if (lastSrc) drawFrame(lastSrc, lastLm); } }
-
-  // ---------- live loop ----------
-  var stream = null, busy = false, raf = 0, video = document.getElementById('video');
-  function loop() {
-    raf = requestAnimationFrame(loop);
-    if (busy || st.held || !fm || video.readyState < 2) return;
-    busy = true;
-    fm.send({ image: video }).then(function () { busy = false; }, function () { busy = false; });
-  }
-  function startLive() {
-    var note = document.getElementById('camNote');
-    var md = navigator.mediaDevices;
-    if (!md || !md.getUserMedia) { note.hidden = false; note.textContent = 'This browser can’t open the camera here. Upload a photo instead.'; return; }
-    note.hidden = false; note.textContent = 'Opening your camera…';
-    md.getUserMedia({ video: { facingMode: 'user', width: { ideal: 960 }, height: { ideal: 720 } }, audio: false }).then(function (s) {
-      stream = s; video.srcObject = s;
-      var pl = video.play(); if (pl && pl.catch) pl.catch(function () {});
-      note.hidden = true;
-      resetSession('live');
-      showView('tryon');
-      setHint('starting the try-on…');
-      getFaceMesh().then(function (m) {
-        if (!m) { setHint('Face tracking couldn’t load. Check your connection and reload.'); return; }
-        onFace = drawFrame; m.reset(); cancelAnimationFrame(raf); loop();
-      });
-    }).catch(function () {
-      note.hidden = false;
-      note.textContent = 'Camera’s blocked here. In this preview Lippy can’t use your camera; on the Lippy website it can. Upload a photo instead.';
+    document.addEventListener('mouseleave', function () { cur.style.opacity = '0'; });
+    Array.prototype.forEach.call(document.querySelectorAll('a'), function (a) {
+      a.addEventListener('mouseenter', function () { cur.classList.add('big'); });
+      a.addEventListener('mouseleave', function () { cur.classList.remove('big'); });
     });
   }
-  function stopLive() { cancelAnimationFrame(raf); if (stream) { stream.getTracks().forEach(function (t) { t.stop(); }); stream = null; } }
-  function usePhoto(file) {
-    stopLive();
-    var img = new Image();
-    img.onload = function () {
-      var sc = Math.min(1, 1100 / Math.max(img.naturalWidth, img.naturalHeight));
-      holdC.width = Math.round(img.naturalWidth * sc); holdC.height = Math.round(img.naturalHeight * sc);
-      hctx.drawImage(img, 0, 0, holdC.width, holdC.height);
-      resetSession('photo');
-      showView('tryon');
-      setHint('finding your lips…');
-      getFaceMesh().then(function (m) {
-        if (!m) { setHint('Face tracking couldn’t load. Check your connection and reload.'); return; }
-        onFace = function (src, lm) { drawFrame(holdC, lm); };
-        m.reset(); m.send({ image: holdC });
-      });
-    };
-    img.src = URL.createObjectURL(file);
-  }
-  function resetSession(mode) {
-    st.mode = mode; st.read = null; st.combos = []; st.active = 0; st.held = mode === 'photo'; st.before = false; stable = 0; frames = []; lastLm = null; camv = null; st.cast = null; st.expo = null;
-    st.show = { liner: true, lipstick: true, gloss: true };
-    view.classList.toggle('mirror', mode === 'live');
-    document.getElementById('liveTag').hidden = mode !== 'live';
-    document.getElementById('hold').hidden = mode !== 'live';
-    syncButtons(); drawUI();
-  }
-
-
-  // ---------- state + helpers ----------
-  var st = { view: 'start', mode: null, read: null, product: null, natural: null, info: null, combos: [], active: 0, layer: 'lipstick', show: { liner: true, lipstick: true, gloss: true }, intensity: 80, before: false, held: false, opened: {} };
-  function median(arr) { if (!arr.length) return 0; arr.sort(function (a, b) { return a - b; }); return arr[arr.length >> 1]; }
-  function activePicks() { return st.combos[st.active] ? st.combos[st.active].picks : null; }
-  function el(tag, attrs, kids) {
-    var e = document.createElement(tag);
-    for (var k in attrs) { if (k === 'text') e.textContent = attrs[k]; else e.setAttribute(k, attrs[k]); }
-    (kids || []).forEach(function (c) { if (c) e.appendChild(typeof c === 'string' ? document.createTextNode(c) : c); });
-    return e;
-  }
-  var SYM = { USD: '$', GBP: '£', CAD: 'CA$' };
-  function money(v, cur) { return v == null ? '' : (SYM[cur || 'USD'] || '$') + (Math.round(v * 100) / 100).toFixed(v % 1 ? 2 : 0); }
-  function priceOf(x) { return x.price == null ? 'see site' : money(x.price, x.currency); }
-  function sumUSD(list) { var t = 0, ok = true; list.forEach(function (x) { if (x.price == null || (x.currency && x.currency !== 'USD')) ok = false; else t += x.price; }); return ok ? money(t, 'USD') : ''; }
-  function findAt(x) { var q = encodeURIComponent(x.brand + ' ' + x.product + ' ' + x.name); return [['Sephora', 'https://www.sephora.com/search?keyword=' + q], ['Ulta', 'https://www.ulta.com/search?search=' + q]]; }
-  function dot(hex) { var d = el('span', { class: 'd', 'aria-hidden': 'true' }); d.style.background = hex; return d; }
-
-  // ---------- views ----------
-  var STEPS = ['start', 'tryon', 'bag'], STEP_LABEL = { start: 'camera', tryon: 'try on', bag: 'collection' };
-  var SWATCH = ['#C99A84', '#C2385E', '#8C2F45'];
-  function showView(v) {
-    if (v === 'tryon' && !st.mode) v = 'start';
-    st.view = v;
-    STEPS.forEach(function (k) { document.getElementById('v-' + k).hidden = k !== v; });
-    var start = v === 'start';
-    document.getElementById('home').style.visibility = start ? 'hidden' : 'visible';
-    document.getElementById('bagBtn').style.visibility = start ? 'hidden' : 'visible';
-    document.getElementById('steps').hidden = start;
-    document.getElementById('foot').hidden = start;
-    if (v === 'bag') drawBag();
-    drawSteps();
-    window.scrollTo(0, 0);
-  }
-  function drawSteps() {
-    var nav = document.getElementById('steps'); nav.textContent = '';
-    STEPS.forEach(function (k, i) {
-      var b = el('button', { type: 'button', class: 'step' + (i < STEPS.indexOf(st.view) ? ' done' : ''), text: STEP_LABEL[k] });
-      b.style.setProperty('--c', SWATCH[i]);
-      if (k === st.view) b.setAttribute('aria-current', 'step');
-      if (k === 'tryon' && !st.mode) b.disabled = true;
-      b.onclick = function () { if (k === 'start') stopLive(); showView(k); };
-      nav.appendChild(b);
-    });
-  }
-
-  // ---------- try-on controls ----------
-  function drawUI() {
-    var chips = document.getElementById('comboChips'), lab = document.getElementById('combosLabel');
-    chips.textContent = '';
-    lab.textContent = st.combos.length ? 'your 3 combos · ' + st.info.depth + ' skin, ' + st.info.tone + ' undertone' + (st.product && st.product.lipstick ? ' · natural lip estimated (you’re wearing lip color)' : '') : 'reading your lips…';
-    st.combos.forEach(function (c, idx) {
-      var b = el('button', { type: 'button', class: 'cchip', 'aria-pressed': String(idx === st.active) }, [
-        el('span', { class: 'cname', text: c.name }),
-        el('span', { class: 'cdots', 'aria-hidden': 'true' }, LAYERS.map(function (l) { return dot(get(l, c.picks[l]).hex); }))
-      ]);
-      b.onclick = function () { st.active = idx; st.before = false; syncButtons(); drawUI(); redraw(); };
-      chips.appendChild(b);
-    });
-    var c = st.combos[st.active], why = document.getElementById('whyBox'); why.textContent = '';
-    if (c) {
-      why.appendChild(el('p', { class: 'whyh' }, [el('b', { text: c.kicker + '. ' }), c.why + ' Here’s why each piece:']));
-      why.appendChild(el('ul', {}, LAYERS.map(function (l) { return el('li', {}, [el('span', { class: 'k', text: l }), el('span', { text: c.how[l] })]); })));
-      var i2 = st.info;
-      why.appendChild(el('details', { class: 'how' }, [el('summary', { text: 'how we matched you' }),
-        el('p', { class: 'note', text: (st.read && st.read.ref ? 'We corrected for your lighting and camera brightness using the whites of your eyes (and teeth, if you smiled), then read' : 'We read') + ' about a second of video: your skin from both cheeks and your natural lip color from inside your lip line, ignoring shine and shadow. Your skin measured ' + i2.depth + ' (ITA ' + i2.ita + '°) with a ' + i2.tone + ' undertone. Every shade was scored on how close it is to the look’s target color, whether its depth fits your skin, and whether it suits your undertone. Lipsticks lighter than your skin are ruled out, since they read chalky.' })]));
-    }
-    var show = st.show, layersEl = document.getElementById('layers'); layersEl.textContent = '';
-    LAYERS.forEach(function (l) {
-      var x = c ? get(l, c.picks[l]) : null;
-      var b3 = el('button', { type: 'button', class: 'layer', 'aria-pressed': String(!!show[l]) }, [dot(x ? x.hex : '#ddd'), el('span', { class: 'lt' }, [el('b', { text: l }), el('span', { text: show[l] ? 'on' : 'off' })])]);
-      b3.onclick = function () { st.show = Object.assign({}, show); st.show[l] = !show[l]; st.before = false; syncButtons(); drawUI(); redraw(); };
-      layersEl.appendChild(b3);
-    });
-    var tabs = document.getElementById('tabs'); tabs.textContent = '';
-    LAYERS.forEach(function (l) {
-      var b = el('button', { type: 'button', class: 'tab', 'aria-pressed': String(l === st.layer), text: l });
-      b.onclick = function () { st.layer = l; document.getElementById('brandSel').value = ''; drawUI(); };
-      tabs.appendChild(b);
-    });
-    var sws = document.getElementById('swatches'); sws.textContent = '';
-    var bsel = document.getElementById('brandSel'), q = (document.getElementById('shadeSearch').value || '').trim().toLowerCase();
-    var brands = {}; SHADES[st.layer].forEach(function (x) { brands[x.brand] = (brands[x.brand] || 0) + 1; });
-    var keep = bsel.value; bsel.textContent = '';
-    bsel.appendChild(el('option', { value: '', text: 'all brands (' + SHADES[st.layer].length + ')' }));
-    Object.keys(brands).sort(function (a, b) { return a.toLowerCase() < b.toLowerCase() ? -1 : 1; }).forEach(function (b) { bsel.appendChild(el('option', { value: b, text: b + ' (' + brands[b] + ')' })); });
-    bsel.value = brands[keep] ? keep : '';
-    var cur = c ? get(st.layer, c.picks[st.layer]) : null, curLab = cur ? hexLabRaw(cur.hex) : null;
-    var list = SHADES[st.layer].filter(function (x) { return (!bsel.value || x.brand === bsel.value) && (!q || (x.brand + ' ' + x.product + ' ' + x.name).toLowerCase().indexOf(q) >= 0); });
-    if (curLab) list = list.map(function (x) { return { x: x, d: x === cur ? -1 : dE00(hexLabRaw(x.hex), curLab) }; }).sort(function (a, b) { return a.d - b.d; }).map(function (o) { return o.x; });
-    document.getElementById('pickNote').textContent = list.length ? 'showing ' + Math.min(48, list.length) + ' of ' + list.length + (curLab ? ', closest to your current ' + st.layer + ' first' : '') : 'no shades match';
-    list.slice(0, 48).forEach(function (x) {
-      var b = el('button', { type: 'button', class: 'swb', 'aria-pressed': String(!!c && c.picks[st.layer] === x.id), 'aria-label': x.brand + ' ' + x.product + ' ' + x.name + ', ' + priceOf(x) }, [dot(x.hex), el('b', { text: x.name }), el('span', { text: x.short })]);
-      b.disabled = !c;
-      b.onclick = function () { if (!c) return; c.picks[st.layer] = x.id; c.edited = true; st.show = Object.assign({}, st.show); st.show[st.layer] = true; st.before = false; syncButtons(); drawUI(); redraw(); };
-      sws.appendChild(b);
-    });
-    var pieces = document.getElementById('pieces'); pieces.textContent = '';
-    if (c) LAYERS.forEach(function (l) {
-      var x = get(l, c.picks[l]);
-      pieces.appendChild(el('div', { class: 'piece' + (show[l] ? '' : ' off') }, [dot(x.hex),
-        el('div', { class: 'pname' }, [el('span', { class: 'k' }, [l, x.shopify ? el('span', { class: 'shopify', text: 'shopify store' }) : null]), el('b', { text: x.name }), el('span', { text: x.brand + ' · ' + x.product })]),
-        el('span', { class: 'price', text: priceOf(x) }),
-        el('a', { class: 'plink', href: x.url, target: '_blank', rel: 'noopener', text: 'view', 'aria-label': 'View ' + x.brand + ' ' + x.name + ' at ' + x.domain })]));
-    });
-    var on = LAYERS.filter(function (l) { return show[l]; }), ab = document.getElementById('addBtn');
-    var cost = c ? sumUSD(on.map(function (l) { return get(l, c.picks[l]); })) : '';
-    var inBag = c && on.length && comboInBag(c, on);
-    ab.disabled = !c || !on.length;
-    ab.textContent = !c ? 'lock it in' : !on.length ? 'turn on a layer to lock it in' : inBag ? 'locked in · see collection' : 'lock in ' + (on.length === 3 ? 'all 3' : on.length === 1 ? 'the ' + on[0] : on.join(' + ')) + (cost ? ' · ' + cost : '');
-  }
-  function syncButtons() {
-    var b = document.getElementById('before'); b.setAttribute('aria-pressed', String(st.before)); b.textContent = st.before ? 'show combo' : 'bare lips';
-    var h = document.getElementById('hold'); h.setAttribute('aria-pressed', String(st.held && st.mode === 'live')); h.textContent = st.held && st.mode === 'live' ? 'go live again' : 'hold still';
-  }
-  document.getElementById('before').onclick = function () { st.before = !st.before; syncButtons(); redraw(); };
-  document.getElementById('hold').onclick = function () {
-    if (st.mode !== 'live') return;
-    if (!st.held) { holdC.width = W; holdC.height = H; hctx.drawImage(lastSrc && lastSrc.videoWidth ? lastSrc : video, 0, 0, W, H); st.held = true; redraw(); }
-    else { st.held = false; }
-    syncButtons();
-  };
-  document.getElementById('intensityRange').oninput = function (e) { st.intensity = +e.target.value; redraw(); };
-  document.getElementById('rereadBtn').onclick = function () {
-    st.read = null; st.combos = []; stable = 0; frames = []; drawUI();
-    if (st.mode === 'photo' && fm) { fm.reset(); fm.send({ image: holdC }); } else if (st.held) redraw();
-  };
-  document.getElementById('addBtn').onclick = function () {
-    var c = st.combos[st.active], on = LAYERS.filter(function (l) { return st.show[l]; });
-    if (!c || !on.length) return;
-    if (comboInBag(c, on)) { stopLive(); showView('bag'); return; }
-    addCombo(c, on);
-    document.getElementById('tryStatus').textContent = 'Locked in. Keep trying, or open your collection to check out.';
-    drawUI();
-  };
-
-  // ---------- collection ----------
-  var memBag = [];
-  function loadBag() { try { var v = JSON.parse(localStorage.getItem('lippy-bag') || 'null'); return Array.isArray(v) ? v : memBag; } catch (e) { return memBag; } }
-  function storeBag(b) { memBag = b; try { localStorage.setItem('lippy-bag', JSON.stringify(b)); } catch (e) {} drawBagCount(); }
-  function comboInBag(c, layers) { var bag = loadBag(); return (layers || LAYERS).every(function (l) { return bag.some(function (x) { return x.layer === l && x.id === c.picks[l]; }); }); }
-  function addCombo(c, layers) {
-    var bag = loadBag(), added = 0;
-    (layers || LAYERS).forEach(function (l) { if (!bag.some(function (x) { return x.layer === l && x.id === c.picks[l]; })) { bag.push({ layer: l, id: c.picks[l], qty: 1 }); added++; } });
-    storeBag(bag); return added;
-  }
-  function drawBagCount() { document.getElementById('bagCount').textContent = loadBag().reduce(function (s2, x) { return s2 + x.qty; }, 0); }
-  function checkoutUrl(domain, items) {
-    // real build: one Shopify cart permalink per store, using variant ids from the catalog
-    if (items.every(function (it) { return it.shade.variant; })) return 'https://' + domain + '/cart/' + items.map(function (it) { return it.shade.variant + ':' + it.qty; }).join(',');
-    return items[0].shade.url;
-  }
-  function drawBag() {
-    var bag = loadBag(), list = document.getElementById('bagList'); list.textContent = '';
-    var groups = {}, order = [], everything = [];
-    bag.forEach(function (x) {
-      var sh = get(x.layer, x.id); if (!sh) return;
-      if (!groups[sh.domain]) { groups[sh.domain] = []; order.push(sh.domain); }
-      groups[sh.domain].push({ shade: sh, layer: x.layer, qty: x.qty });
-    });
-    var openedN = order.filter(function (d) { return st.opened[d]; }).length;
-    document.getElementById('bagProgress').textContent = order.length ? 'checked out at ' + openedN + ' of ' + order.length + (order.length === 1 ? ' shop' : ' shops') : '';
-    if (!order.length) {
-      var go = el('button', { type: 'button', class: 'btn primary', text: 'try something on' });
-      go.onclick = function () { showView(st.mode ? 'tryon' : 'start'); };
-      list.appendChild(el('div', { class: 'empty' }, [el('p', { class: 'lede', text: 'Nothing locked in yet. Lock in a combo, or just the pieces you like, and they land here grouped by brand.' }), go]));
-    }
-    order.forEach(function (dom) {
-      var items = groups[dom], all = [];
-      var rows = items.map(function (it) {
-        all.push(it.shade);
-        var rm = el('button', { type: 'button', class: 'remove', text: 'remove', 'aria-label': 'Remove ' + it.shade.name });
-        rm.onclick = function () { storeBag(loadBag().filter(function (x) { return !(x.layer === it.layer && x.id === it.shade.id); })); drawBag(); };
-        return el('div', { class: 'bitem' }, [dot(it.shade.hex), el('div', { class: 'pname' }, [el('span', { class: 'k', text: it.layer }), el('b', { text: it.shade.name }), el('span', { text: it.shade.product })]), el('span', { class: 'price', text: priceOf(it.shade) }), rm]);
-      });
-      var sub = sumUSD(all); everything = everything.concat(all);
-      var sh0 = items[0].shade, links = el('p', { class: 'findat' }, ['also at '].concat(findAt(sh0).map(function (f, k) { return el('a', { href: f[1], target: '_blank', rel: 'noopener', text: f[0] + (k ? '' : ' / ') }); })));
-      var opened = !!st.opened[dom];
-      var co = el('a', { class: 'btn ' + (opened ? '' : 'primary') + ' wide', href: checkoutUrl(dom, items), target: '_blank', rel: 'noopener', text: (opened ? 'opened · ' : sh0.shopify ? 'check out at ' : 'shop at ') + dom + (sub ? ' · ' + sub : '') });
-      co.addEventListener('click', function () { st.opened[dom] = true; setTimeout(drawBag, 50); });
-      list.appendChild(el('div', { class: 'shop' }, [el('div', { class: 'shoph' }, [el('h3', { text: items[0].shade.brand }), el('span', { class: opened ? 'done' : '', text: opened ? 'opened' : (sh0.shopify ? 'shopify store · ' : 'brand site · ') + items.length + (items.length === 1 ? ' piece' : ' pieces') })])].concat(rows).concat([co, links])));
-    });
-    document.getElementById('bagSum').textContent = sumUSD(everything) || (everything.length ? 'see shops' : '$0');
-  }
-
-  // ---------- nav ----------
-  document.getElementById('bagBtn').onclick = function () { st.held = st.held || false; showView('bag'); };
-  document.getElementById('bagBack').onclick = function () { showView(st.mode ? 'tryon' : 'start'); };
-  document.getElementById('home').onclick = function () { stopLive(); showView('start'); };
-  document.getElementById('liveBtn').onclick = startLive;
-  document.getElementById('brandSel').onchange = function () { drawUI(); };
-  var searchT = null; document.getElementById('shadeSearch').oninput = function () { clearTimeout(searchT); searchT = setTimeout(drawUI, 120); };
-  document.getElementById('upload').onchange = function (e) { var f = e.target.files && e.target.files[0]; if (f) usePhoto(f); e.target.value = ''; };
-
-  drawBagCount(); syncButtons(); drawUI(); showView('start');
 })();
 </script>
 </body>
