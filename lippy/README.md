@@ -2,7 +2,7 @@
 
 Live lip-combo try-on. Open the camera and Lippy picks 3 liner + lipstick + gloss combos for your lips from independent beauty brands. You see them on your face in real time, turn each layer on and off, swap shades, and lock in pieces to check out at each brand's own Shopify store.
 
-Live at `/lippy/` on my site. The whole app is `index.html`; face tracking lives in `mp/`.
+Live at `/lippy/app/` on my site, with a write-up at `/lippy/`. The whole app is `app/index.html`; face tracking lives in `app/mp/`.
 
 ## How it works, start to finish
 
@@ -11,6 +11,14 @@ Live at `/lippy/` on my site. The whole app is `index.html`; face tracking lives
 3. **Pick 3 combos.** Each combo has its own rules. Every shade in the catalog gets a score and the best one wins.
 4. **Paint the lips every frame.** Lipstick, liner and gloss are blended in a color space built to match human vision (CIELAB), so your own lip texture, lines and shadows show through.
 5. **Lock in and check out.** Only the layers you have turned on go into your collection, grouped by brand, with one checkout per Shopify store.
+
+## Keeping color on the lips
+
+Three things keep the lipstick exactly on your lip line:
+
+1. **Refined lip points.** Face Mesh runs with `refineLandmarks` on, which adds a second model that re-fits the lips (and eyes) more precisely than the base mesh.
+2. **Steady, not laggy.** Lip points are smoothed between frames, but the smoothing switches off as soon as your lips move, so color sticks to still lips without trailing behind when you talk.
+3. **Edge snapping.** After the first read, Lippy knows your lip color and skin color. Near the edge of the lips it checks each pixel: if it looks like lip, color goes on; if it looks like skin, color stays off. The core of the lips is always painted.
 
 ## Reading your colors
 
@@ -76,12 +84,77 @@ score = color distance to the target (ΔE2000)
 
 ## Catalog
 
-31 real shades from 4 brands that run on Shopify: Kylie Cosmetics liners, Rare Beauty Kind Words lipsticks, Tower 28 ShineOn Lip Jelly, and Kosas Wet Lip Oil Gloss. Prices are from each brand's site, Oct 29, 2026.
+2,049 shades from 35 brands sold at Sephora and Ulta: 251 liners, 1,646 lipsticks and 152 glosses. Open the shade picker to filter by brand or search by shade or product name. Matches are listed closest-first.
+
+### Where the shades come from
+
+- **Makeup API dataset** (public copies on GitHub). Brand, product, shade name, hex color, price and product link, collected around 2017–2018.
+- **Ovilia/lipstick dataset** (GitHub). Hex colors for lipstick lines from Dior, Chanel, YSL and Givenchy, with series names translated to English.
+- **31 checked 2026 shades** from Kylie Cosmetics, Rare Beauty, Tower 28 and Kosas, with prices taken from each brand's site on Oct 29, 2026.
+- **2026 gloss lines** (`data/gloss_2026.json`). The datasets had almost no gloss, so I added 12 current gloss and lip oil lines: Dior Addict Lip Maximizer, Too Faced Lip Injection, NYX Butter Gloss, Charlotte Tilbury Collagen Lip Bath, Fenty Gloss Bomb, Laneige Lip Glowy Balm, Clarins Lip Comfort Oil, Summer Fridays Lip Butter Balm, Rhode Peptide Lip Tint, Rare Beauty Stay Vulnerable, e.l.f. Glow Reviver and Maybelline Lifter Gloss. Shade names come from brand and retailer pages (Nov 2026). Their colors are estimated from the shade names and descriptions, and the prices are US list prices.
+
+`data/build_library.py` combines these sources. It keeps only brands sold at Sephora or Ulta and drops hex values that aren't plausible lip colors (for example near-white or neon). It guesses finish and coverage from the product name, removes duplicates, and points links to the brand's own site instead of resellers. Prices in currencies other than USD, GBP or CAD are dropped.
+
+### Shopify tagging
+
+A brand is tagged **shopify store** when its official site runs on Shopify. Those pieces say "check out at" the brand's store, and the rest say "shop at" the brand's site. Tagged so far: ColourPop, Kosas, Kylie Cosmetics, Rare Beauty, Rhode, Tower 28. ColourPop was detected from its product images, which are served from Shopify's CDN.
+
+| Brand | Liners | Lipsticks | Glosses | Shopify |
+|---|---|---|---|---|
+| NYX Professional Makeup | 163 | 475 | 40 |  |
+| Dior | 0 | 208 | 19 |  |
+| Clinique | 28 | 181 | 8 |  |
+| Smashbox | 15 | 145 | 0 |  |
+| YSL Beauty | 0 | 95 | 13 |  |
+| Revlon | 0 | 95 | 0 |  |
+| ColourPop | 34 | 52 | 0 | yes |
+| Maybelline | 4 | 59 | 10 |  |
+| Chanel | 0 | 59 | 0 |  |
+| Milani | 0 | 46 | 0 |  |
+| Givenchy | 0 | 45 | 0 |  |
+| L'Oréal Paris | 0 | 44 | 0 |  |
+| Fenty Beauty | 0 | 14 | 8 |  |
+| IMAN Cosmetics | 0 | 20 | 0 |  |
+| e.l.f. Cosmetics | 0 | 13 | 6 |  |
+| Burt's Bees | 0 | 18 | 0 |  |
+| CARGO | 0 | 16 | 0 |  |
+| Rare Beauty | 0 | 11 | 4 | yes |
+| Almay | 0 | 12 | 0 |  |
+| COVERGIRL | 0 | 11 | 0 |  |
+| Benefit Cosmetics | 0 | 10 | 0 |  |
+| Tower 28 | 0 | 0 | 8 | yes |
+| Too Faced | 0 | 0 | 8 |  |
+| Kylie Cosmetics | 7 | 0 | 0 | yes |
+| Kosas | 0 | 0 | 5 | yes |
+| Charlotte Tilbury | 0 | 0 | 5 |  |
+| Laneige | 0 | 0 | 5 |  |
+| Summer Fridays | 0 | 0 | 5 |  |
+| Glossier | 0 | 5 | 0 |  |
+| Mineral Fusion | 0 | 5 | 0 |  |
+| Clarins | 0 | 0 | 4 |  |
+| Rhode | 0 | 0 | 4 | yes |
+| butter LONDON | 0 | 3 | 0 |  |
+| wet n wild | 0 | 3 | 0 |  |
+| Pacifica | 0 | 1 | 0 |  |
+
+## Vanity
+
+Every look you lock in is saved to your vanity with the pieces kept together: a small picture of your lips wearing it (taken at the moment you lock it in), the products on a little shelf, and the price of what you still need.
+
+Open a look to get it:
+
+- each piece has a **buy** link to the brand's page, and an **I have it** toggle that takes it off your list
+- **get the look** groups what's left by store, so you check out once per brand ("check out at" for Shopify stores, "shop at" otherwise), with Sephora and Ulta search links as a backup
+- **try it on again** puts the look back on your face
+
+Below the shelf, a **shopping list for every look** combines all your looks, without duplicates or pieces you already have. Looks are saved in your browser (localStorage), so nothing is sent anywhere.
 
 ## Known limits and next steps
 
-- **Shade colors are estimates** from each brand's own shade description, not measured swatches. Next: pull swatch images and variant IDs from Shopify's Global Catalog and measure each shade's color from the swatch.
-- **Deep-skin range is thin.** The catalog has few deep nudes, so on deep skin everyday and 90s can share a lipstick. Adding more brands fixes this.
+- **Older dataset shades.** Most dataset shades are from 2017–2018, so some may be discontinued, and hex values come from the dataset rather than measured swatches.
+- **Missing brands.** MAC, NARS, Charlotte Tilbury, Huda Beauty, Too Faced, Urban Decay, Tarte, Anastasia, Pat McGrath, Makeup by Mario, Rhode and Summer Fridays aren't in the public data yet.
+- **Shade colors are estimates**, not measured swatches. Next: pull swatch images and variant IDs from Shopify's Global Catalog and measure each shade's color from the swatch.
+- **Deep-skin range is thin.** Few deep nudes in the data, so on deep skin everyday and 90s can share a lipstick. Adding the missing brands would fix this.
 - **Camera exposure.** Phones auto-brighten faces. The white-reference correction helps, but only when it finds clean eye whites or teeth. A smile helps.
 - **Rules are hand-tuned.** Next: thumbs up or down on each combo, then tune the weights from that feedback for each skin band.
 - **Checkout** links go to product pages until variant IDs are in. Then they become Shopify cart permalinks, one per brand.
