@@ -162,3 +162,12 @@ Below the shelf, a **shopping list for every look** combines all your looks, wit
 ## Put it online
 
 The live camera needs https. Any static host works; this folder deploys as-is on Vercel or Netlify. The two data files in `mp/` end in `.wasm` on purpose so every host serves them.
+
+
+## Matching and color accuracy (Nov 2026 update)
+
+- **Liners match the lipstick.** Every combo's liner is picked from the lipstick's own color family (within about 10° of hue), a little deeper and similar in saturation. The 90s brown liner leans brown but stays close to the lipstick's family.
+- **Swapping re-matches the liner.** When you swap the lipstick, the liner is re-picked to go with it. You can turn this off under the shade picker.
+- **Glosses match too.** A tinted gloss has to sit in the lipstick's color family; clear gloss always works.
+- **Checked shades first.** About 80% of shade colors come from a 2017–18 public dataset of web swatches. Those are labeled "approx. color" in the picker, and recommendations favor shades checked on brand and retailer pages in 2026.
+- **Finish-aware rendering.** Mattes and satins cover more of your natural lip, sheers and glossy lipsticks let more show through. Intensity starts at 100%.
