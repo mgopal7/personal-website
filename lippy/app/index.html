@@ -279,16 +279,6 @@ details.shoplist summary::-webkit-details-marker { display: none; }
 details.shoplist summary::after { content: "+"; margin-left: auto; }
 details.shoplist[open] summary::after { content: "\2212"; }
 details.shoplist .shop { margin-top: 12px; }
-.acct { background: var(--paper); border: 1px solid var(--line); border-radius: 18px; padding: 14px 16px; display: flex; flex-direction: column; gap: 10px; }
-.acct:empty { display: none; }
-.acct .row { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
-.acct b { font-size: 15px; }
-.acct form { display: flex; flex-direction: column; gap: 10px; }
-.acct .fld { display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: var(--muted); }
-.acct input { min-height: 44px; border-radius: 12px; border: 1px solid var(--line); background: var(--blush); color: var(--ink); font: 14px var(--type); padding: 0 12px; }
-.acct .err { color: #A3122A; font-size: 12px; min-height: 1em; }
-.linkbtn { all: unset; cursor: pointer; font-size: 13px; color: var(--muted); text-decoration: underline; min-height: 44px; display: inline-flex; align-items: center; }
-.linkbtn:focus-visible { outline: 3px solid var(--wine); outline-offset: 2px; }
 
 /* ---- try-on layout: one column on phones, mirror + options side by side on wide screens ---- */
 .tl, .tr { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
@@ -431,7 +421,6 @@ details.shoplist .shop { margin-top: 12px; }
       <div class="bagh"><h2 class="title" id="vanityTitle">Your looks.</h2><p class="sum" id="bagSum"></p></div>
       <p class="progress" id="bagProgress"></p>
     </div>
-    <div class="acct" id="acct"></div>
     <div id="bagList"></div>
     <button class="btn wide" type="button" id="bagBack">keep trying on</button>
   </section>
@@ -1119,7 +1108,7 @@ details.shoplist .shop { margin-top: 12px; }
       var look = saveLook(c, on);
       setTimeout(function () { snap.hidden = true; snap.className = 'snap'; }, 450);
       st.snapping = false;
-      status.textContent = 'Photo taken. Saved “' + look.name + '” to your vanity.' + (loadAcct() ? '' : ' Create an account in your vanity to keep it under your name.');
+      status.textContent = 'Photo taken. Saved “' + look.name + '” to your vanity.';
       drawUI();
     }
     tick();
@@ -1211,54 +1200,13 @@ details.shoplist .shop { margin-top: 12px; }
     st.show = {}; LAYERS.forEach(function (l) { st.show[l] = !!lk.pieces[l]; if (lk.pieces[l]) c.picks[l] = lk.pieces[l]; });
     c.edited = true; st.before = false; showView('tryon'); syncButtons(); drawUI(); redraw();
   }
-  // ---------- account: a name on your vanity (prototype: kept in this browser) ----------
-  var memAcct = null;
-  function loadAcct() { try { return JSON.parse(localStorage.getItem('lippy-account') || 'null') || memAcct; } catch (e) { return memAcct; } }
-  function storeAcct(a) { memAcct = a; try { if (a) localStorage.setItem('lippy-account', JSON.stringify(a)); else localStorage.removeItem('lippy-account'); } catch (e) {} }
-  function drawAcct() {
-    var box = document.getElementById('acct'), a = loadAcct(); box.textContent = '';
-    if (a) {
-      var out = el('button', { type: 'button', class: 'linkbtn', text: 'sign out' });
-      out.onclick = function () { storeAcct(null); drawBag(); };
-      box.appendChild(el('div', { class: 'row' }, [el('span', {}, [el('b', { text: 'signed in as ' + a.name }), el('span', { class: 'note', text: ' · ' + a.email })]), out]));
-      return;
-    }
-    if (!st.acctOpen) {
-      var open = el('button', { type: 'button', class: 'btn primary small', text: 'create an account' });
-      open.onclick = function () { st.acctOpen = true; drawAcct(); var f = document.getElementById('acName'); if (f) f.focus(); };
-      box.appendChild(el('div', { class: 'row' }, [el('span', {}, [el('b', { text: 'keep your vanity' }), el('span', { class: 'note', text: ' · make an account so your looks are saved under your name' })]), open]));
-      return;
-    }
-    var err = el('p', { class: 'err', id: 'acErr', role: 'alert' });
-    function fld(id, label, type, ac) { return el('label', { class: 'fld', for: id }, [label, el('input', { id: id, type: type, autocomplete: ac, required: 'required' })]); }
-    var form = el('form', { novalidate: 'novalidate' }, [
-      el('b', { text: 'create your account' }),
-      fld('acName', 'name', 'text', 'given-name'), fld('acEmail', 'email', 'email', 'email'), fld('acPass', 'password (6+ characters)', 'password', 'new-password'),
-      err,
-      el('button', { type: 'submit', class: 'btn primary wide', text: 'create account' }),
-      el('p', { class: 'note', text: 'Prototype: your account and looks are saved in this browser for now. Your password isn’t stored.' })
-    ]);
-    form.addEventListener('input', function () { err.textContent = ''; });
-    form.onsubmit = function (e) {
-      e.preventDefault();
-      var name = document.getElementById('acName').value.trim(), email = document.getElementById('acEmail').value.trim(), pass = document.getElementById('acPass').value;
-      if (!name) { err.textContent = 'Enter your name.'; document.getElementById('acName').focus(); return; }
-      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { err.textContent = 'Enter a valid email.'; document.getElementById('acEmail').focus(); return; }
-      if (pass.length < 6) { err.textContent = 'Use at least 6 characters for your password.'; document.getElementById('acPass').focus(); return; }
-      storeAcct({ name: name, email: email, at: Date.now() }); st.acctOpen = false; drawBag();
-    };
-    var cancel = el('button', { type: 'button', class: 'linkbtn', text: 'not now' });
-    cancel.onclick = function () { st.acctOpen = false; drawAcct(); };
-    box.appendChild(form); box.appendChild(cancel);
-  }
   function drawBag() {
-    drawAcct();
     var looks = loadLooks(), owned = loadOwned(), list = document.getElementById('bagList'); list.textContent = '';
     var lk = st.openLook && looks.filter(function (x) { return x.id === st.openLook; })[0];
     document.getElementById('bagBack').hidden = !!lk;
     if (lk) { drawLook(lk, owned, list); return; }
     st.openLook = null;
-    var who = loadAcct(); document.getElementById('vanityTitle').textContent = who ? who.name + '’s looks.' : 'Your looks.';
+    document.getElementById('vanityTitle').textContent = 'Your looks.';
     document.getElementById('bagProgress').textContent = looks.length ? looks.length + (looks.length === 1 ? ' look' : ' looks') + ' on your vanity. Tap one to get it.' : '';
     if (!looks.length) {
       var go = el('button', { type: 'button', class: 'btn primary', text: 'try something on' });
