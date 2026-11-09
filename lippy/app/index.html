@@ -214,6 +214,9 @@ details.fix[open] summary::after { content: "−"; }
 .cchip .cname { font-size: 22px; line-height: 1; }
 .cchip .cdots { display: flex; gap: 4px; }
 .cchip .d { width: 14px; height: 14px; }
+.cchip .cls { font-size: 11px; color: var(--muted); line-height: 1.2; text-align: center; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.layer .lsn { font-size: 11px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+.layer .lt { min-width: 0; }
 .cchip[aria-pressed="true"] { border: 2px solid #C8102E; box-shadow: 0 6px 16px rgba(200, 16, 46, 0.14); }
 .whybox { background: var(--paper); border: 1px solid var(--line); border-radius: 18px; padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; }
 .whybox:empty { display: none; }
@@ -276,6 +279,56 @@ details.shoplist summary::-webkit-details-marker { display: none; }
 details.shoplist summary::after { content: "+"; margin-left: auto; }
 details.shoplist[open] summary::after { content: "\2212"; }
 details.shoplist .shop { margin-top: 12px; }
+.acct { background: var(--paper); border: 1px solid var(--line); border-radius: 18px; padding: 14px 16px; display: flex; flex-direction: column; gap: 10px; }
+.acct:empty { display: none; }
+.acct .row { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.acct b { font-size: 15px; }
+.acct form { display: flex; flex-direction: column; gap: 10px; }
+.acct .fld { display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: var(--muted); }
+.acct input { min-height: 44px; border-radius: 12px; border: 1px solid var(--line); background: var(--blush); color: var(--ink); font: 14px var(--type); padding: 0 12px; }
+.acct .err { color: #A3122A; font-size: 12px; min-height: 1em; }
+.linkbtn { all: unset; cursor: pointer; font-size: 13px; color: var(--muted); text-decoration: underline; min-height: 44px; display: inline-flex; align-items: center; }
+.linkbtn:focus-visible { outline: 3px solid var(--wine); outline-offset: 2px; }
+
+/* ---- try-on layout: one column on phones, mirror + options side by side on wide screens ---- */
+.tl, .tr { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+.tune { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 10px; align-items: center; }
+.overline[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: var(--blush); }
+.snapnote { text-align: center; margin-top: -8px; }
+.nowon { position: absolute; left: 12px; right: 12px; bottom: 12px; margin: 0; padding: 6px 12px; border-radius: 999px; background: rgba(255,255,255,0.92); font-size: 12px; text-align: center; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; pointer-events: none; }
+.hint:not([hidden]) ~ .nowon { display: none; }
+.snap { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: rgba(42, 23, 27, 0.25); pointer-events: none; }
+.snap span { font-family: 'Kaushan Script', 'Brush Script MT', cursive; font-size: 120px; line-height: 1; color: #fff; text-shadow: 0 4px 24px rgba(0,0,0,0.35); }
+.snap.flash { background: #fff; animation: flash .45s ease-out forwards; }
+@keyframes flash { from { opacity: 1; } to { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .snap.flash { animation: none; opacity: 0; } }
+@media (max-width: 899px) {
+  .tl, .tr { display: contents; }
+  #v-tryon > .tl > .stage, #v-tryon .stage { order: 1; }
+  #v-tryon .stagebar { order: 2; }
+  #v-tryon .tr > :nth-child(1) { order: 3; }
+  #whyBox { order: 4; }
+  #v-tryon .tr > :nth-child(3) { order: 5; }
+  #v-tryon .editor { order: 6; }
+  #v-tryon .tune { order: 7; }
+  #pieces { order: 8; }
+  #tryStatus { order: 9; }
+  #addBtn { order: 10; }
+  .snapnote { order: 11; }
+  #rereadBtn { order: 12; }
+}
+@media (min-width: 900px) {
+  .app.wide { max-width: 1120px; }
+  #v-tryon:not([hidden]) { display: grid; grid-template-columns: minmax(340px, 440px) minmax(0, 1fr); gap: 32px; align-items: start; }
+  #v-tryon .tl { position: sticky; top: 16px; }
+  #v-tryon .tl .stage canvas { max-height: calc(100vh - 400px); width: auto; max-width: 100%; margin: 0 auto; }
+  #v-tryon .swatches { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+}
+/* start screen: centered */
+#v-start .hero { align-items: center; text-align: center; }
+#v-start .word { justify-content: center; }
+#v-start .hero .stack { transform-origin: center; margin: 0 auto; }
+#v-start .startbtns { width: 100%; }
 </style>
 <style>html,body{margin:0}img{max-width:100%}:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}</style>
 </head>
@@ -322,43 +375,53 @@ details.shoplist .shop { margin-top: 12px; }
 
   <!-- TRY ON -->
   <section id="v-tryon" hidden>
-    <div class="stage" id="stage">
-      <canvas id="view" width="720" height="900" aria-label="You, with the lip combo applied"></canvas>
-      <p class="live" id="liveTag" hidden><span aria-hidden="true"></span>live</p>
-      <p class="hint" id="hint" hidden></p>
-    </div>
-    <div class="stagebar">
-      <button class="btn small" type="button" id="before" aria-pressed="false">bare lips</button>
-      <button class="btn small" type="button" id="hold" aria-pressed="false">hold still</button>
-    </div>
-
-    <div style="display:flex;flex-direction:column;gap:8px">
-      <p class="label" id="combosLabel">reading your lips…</p>
-      <div class="combochips" id="comboChips" role="group" aria-label="Your 3 combos"></div>
-    </div>
-    <div class="whybox" id="whyBox"></div>
-
-    <div style="display:flex;flex-direction:column;gap:8px">
-      <p class="label">mix and match: tap a layer to add or remove it</p>
-      <div class="layers" id="layers" role="group" aria-label="Layers on your lips"></div>
-    </div>
-    <div class="editor">
-      <p class="label">swap a shade · <span id="libCount">all shades</span></p>
-      <div class="tabs" id="tabs"></div>
-      <div class="pickbar">
-        <label class="vh" for="brandSel">Brand</label>
-        <select id="brandSel"></select>
-        <label class="vh" for="shadeSearch">Search shades</label>
-        <input id="shadeSearch" type="search" placeholder="search a shade or product" autocomplete="off">
+    <div class="tl">
+      <div class="stage" id="stage">
+        <canvas id="view" width="720" height="900" aria-label="You, with the lip combo applied"></canvas>
+        <p class="live" id="liveTag" hidden><span aria-hidden="true"></span>live</p>
+        <p class="hint" id="hint" hidden></p>
+        <p class="nowon" id="nowOn" hidden></p>
+        <div class="snap" id="snap" hidden aria-hidden="true"><span id="snapCount"></span></div>
       </div>
-      <p class="note" id="pickNote"></p>
-      <div class="swatches" id="swatches"></div>
+      <div class="stagebar">
+        <button class="btn small" type="button" id="before" aria-pressed="false">bare lips</button>
+        <button class="btn small" type="button" id="hold" aria-pressed="false">hold still</button>
+      </div>
+      <div class="tune">
+        <label class="slider" for="intensityRange">intensity <input type="range" id="intensityRange" min="20" max="100" value="80"></label>
+        <button class="btn small overline" type="button" id="overlineBtn" aria-pressed="false">overline</button>
+      </div>
+      <p class="status" id="tryStatus" role="status"></p>
+      <button class="btn primary wide" type="button" id="addBtn">lock it in</button>
+      <p class="note snapnote">locking in takes a photo of you in the look for your vanity.</p>
+      <button class="btn wide" type="button" id="rereadBtn">re-read my lips</button>
     </div>
-    <label class="slider" for="intensityRange">intensity <input type="range" id="intensityRange" min="20" max="100" value="80"></label>
-    <div class="pieces" id="pieces"></div>
-    <p class="status" id="tryStatus" role="status"></p>
-    <button class="btn primary wide" type="button" id="addBtn">lock it in</button>
-    <button class="btn wide" type="button" id="rereadBtn">re-read my lips</button>
+
+    <div class="tr">
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <p class="label" id="combosLabel">reading your lips…</p>
+        <div class="combochips" id="comboChips" role="group" aria-label="Your 3 combos"></div>
+      </div>
+      <div class="whybox" id="whyBox"></div>
+
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <p class="label">mix and match: tap a layer to add or remove it</p>
+        <div class="layers" id="layers" role="group" aria-label="Layers on your lips"></div>
+      </div>
+      <div class="editor">
+        <p class="label">swap a shade · <span id="libCount">all shades</span></p>
+        <div class="tabs" id="tabs"></div>
+        <div class="pickbar">
+          <label class="vh" for="brandSel">Brand</label>
+          <select id="brandSel"></select>
+          <label class="vh" for="shadeSearch">Search shades</label>
+          <input id="shadeSearch" type="search" placeholder="search a shade or product" autocomplete="off">
+        </div>
+        <p class="note" id="pickNote"></p>
+        <div class="swatches" id="swatches"></div>
+      </div>
+      <div class="pieces" id="pieces"></div>
+    </div>
   </section>
 
   <!-- VANITY -->
@@ -368,6 +431,7 @@ details.shoplist .shop { margin-top: 12px; }
       <div class="bagh"><h2 class="title" id="vanityTitle">Your looks.</h2><p class="sum" id="bagSum"></p></div>
       <p class="progress" id="bagProgress"></p>
     </div>
+    <div class="acct" id="acct"></div>
     <div id="bagList"></div>
     <button class="btn wide" type="button" id="bagBack">keep trying on</button>
   </section>
@@ -604,7 +668,8 @@ details.shoplist .shop { margin-top: 12px; }
     var cx = 0, cy = 0;
     LIP_OUT.forEach(function (i) { cx += lm[i].x; cy += lm[i].y; }); cx = cx / LIP_OUT.length * W; cy = cy / LIP_OUT.length * H;
     var R = st.read, snap = R && R.snapD > 5;
-    var out = pts(lm, LIP_OUT, snap ? 1.045 : 0.985, cx, cy), inn = pts(lm, LIP_IN, 1.0, cx, cy);
+    if (st.overline) snap = false; // overlining paints past the natural edge on purpose
+    var out = pts(lm, LIP_OUT, st.overline ? 1.075 : snap ? 1.045 : 0.985, cx, cy), inn = pts(lm, LIP_IN, 1.0, cx, cy);
     var x0 = W, x1 = 0, y0 = H, y1 = 0;
     out.forEach(function (p) { if (p[0] < x0) x0 = p[0]; if (p[0] > x1) x1 = p[0]; if (p[1] < y0) y0 = p[1]; if (p[1] > y1) y1 = p[1]; });
     var pad = 6, bb = { x: Math.max(0, Math.floor(x0 - pad)), y: Math.max(0, Math.floor(y0 - pad)) };
@@ -619,7 +684,7 @@ details.shoplist .shop { margin-top: 12px; }
     if (snap) snapEdges(lm, bb, cx, cy, edge);
     bctx.clearRect(0, 0, W, H);
     bctx.filter = 'blur(' + Math.max(1, lipH * 0.05).toFixed(1) + 'px)';
-    bctx.strokeStyle = '#fff'; bctx.lineWidth = Math.max(2, lipH * 0.16); bctx.lineJoin = 'round';
+    bctx.strokeStyle = '#fff'; bctx.lineWidth = Math.max(2, lipH * (st.overline ? 0.2 : 0.16)); bctx.lineJoin = 'round';
     path(bctx, out); bctx.stroke();
     bctx.filter = 'none';
     bctx.globalCompositeOperation = 'destination-in'; bctx.drawImage(maskC, 0, 0);
@@ -899,7 +964,7 @@ details.shoplist .shop { margin-top: 12px; }
 
 
   // ---------- state + helpers ----------
-  var st = { view: 'start', mode: null, read: null, product: null, natural: null, info: null, combos: [], active: 0, layer: 'lipstick', show: { liner: true, lipstick: true, gloss: true }, intensity: 80, before: false, held: false, opened: {} };
+  var st = { view: 'start', mode: null, read: null, product: null, natural: null, info: null, combos: [], active: 0, layer: 'lipstick', show: { liner: true, lipstick: true, gloss: true }, intensity: 80, before: false, held: false, opened: {}, overline: false };
   function median(arr) { if (!arr.length) return 0; arr.sort(function (a, b) { return a - b; }); return arr[arr.length >> 1]; }
   function activePicks() { return st.combos[st.active] ? st.combos[st.active].picks : null; }
   function el(tag, attrs, kids) {
@@ -921,6 +986,7 @@ details.shoplist .shop { margin-top: 12px; }
   function showView(v) {
     if (v === 'tryon' && !st.mode) v = 'start';
     st.view = v;
+    document.querySelector('.app').classList.toggle('wide', v === 'tryon');
     STEPS.forEach(function (k) { document.getElementById('v-' + k).hidden = k !== v; });
     var start = v === 'start';
     document.getElementById('home').style.visibility = start ? 'hidden' : 'visible';
@@ -951,7 +1017,8 @@ details.shoplist .shop { margin-top: 12px; }
     st.combos.forEach(function (c, idx) {
       var b = el('button', { type: 'button', class: 'cchip', 'aria-pressed': String(idx === st.active) }, [
         el('span', { class: 'cname', text: c.name }),
-        el('span', { class: 'cdots', 'aria-hidden': 'true' }, LAYERS.map(function (l) { return dot(get(l, c.picks[l]).hex); }))
+        el('span', { class: 'cdots', 'aria-hidden': 'true' }, LAYERS.map(function (l) { return dot(get(l, c.picks[l]).hex); })),
+        el('span', { class: 'cls', text: get('lipstick', c.picks.lipstick).name })
       ]);
       b.onclick = function () { st.active = idx; st.before = false; syncButtons(); drawUI(); redraw(); };
       chips.appendChild(b);
@@ -967,7 +1034,7 @@ details.shoplist .shop { margin-top: 12px; }
     var show = st.show, layersEl = document.getElementById('layers'); layersEl.textContent = '';
     LAYERS.forEach(function (l) {
       var x = c ? get(l, c.picks[l]) : null;
-      var b3 = el('button', { type: 'button', class: 'layer', 'aria-pressed': String(!!show[l]) }, [dot(x ? x.hex : '#ddd'), el('span', { class: 'lt' }, [el('b', { text: l }), el('span', { text: show[l] ? 'on' : 'off' })])]);
+      var b3 = el('button', { type: 'button', class: 'layer', 'aria-pressed': String(!!show[l]) }, [dot(x ? x.hex : '#ddd'), el('span', { class: 'lt' }, [el('b', { text: l + (show[l] ? '' : ' · off') }), el('span', { class: 'lsn', text: x ? x.name : '' })])]);
       b3.onclick = function () { st.show = Object.assign({}, show); st.show[l] = !show[l]; st.before = false; syncButtons(); drawUI(); redraw(); };
       layersEl.appendChild(b3);
     });
@@ -1002,17 +1069,29 @@ details.shoplist .shop { margin-top: 12px; }
         el('span', { class: 'price', text: priceOf(x) }),
         el('a', { class: 'plink', href: x.url, target: '_blank', rel: 'noopener', text: 'view', 'aria-label': 'View ' + x.brand + ' ' + x.name + ' at ' + x.domain })]));
     });
+    var nowOn = document.getElementById('nowOn');
+    if (c && !st.before && LAYERS.some(function (l) { return show[l]; })) {
+      nowOn.textContent = LAYERS.filter(function (l) { return show[l]; }).map(function (l) { return get(l, c.picks[l]).name; }).join(' · ');
+      nowOn.hidden = false;
+    } else nowOn.hidden = true;
     var on = LAYERS.filter(function (l) { return show[l]; }), ab = document.getElementById('addBtn');
     var cost = c ? sumUSD(on.map(function (l) { return get(l, c.picks[l]); })) : '';
     var inBag = c && on.length && lookFor(c, on);
-    ab.disabled = !c || !on.length;
-    ab.textContent = !c ? 'lock it in' : !on.length ? 'turn on a layer to lock it in' : inBag ? 'on your vanity · open it' : 'lock in ' + (on.length === 3 ? 'all 3' : on.length === 1 ? 'the ' + on[0] : on.join(' + ')) + (cost ? ' · ' + cost : '');
+    ab.disabled = !c || !on.length || st.snapping;
+    if (st.snapping) { ab.textContent = 'taking your photo…'; return; }
+    ab.textContent = !c ? 'lock it in' : !on.length ? 'turn on a layer to lock it in' : inBag ? 'on your vanity · open it' : 'lock in ' + (on.length === 3 ? 'all 3' : on.length === 1 ? 'the ' + on[0] : on.join(' + ')) + ' + take a photo' + (cost ? ' · ' + cost : '');
   }
   function syncButtons() {
     var b = document.getElementById('before'); b.setAttribute('aria-pressed', String(st.before)); b.textContent = st.before ? 'show combo' : 'bare lips';
     var h = document.getElementById('hold'); h.setAttribute('aria-pressed', String(st.held && st.mode === 'live')); h.textContent = st.held && st.mode === 'live' ? 'go live again' : 'hold still';
   }
-  document.getElementById('before').onclick = function () { st.before = !st.before; syncButtons(); redraw(); };
+  document.getElementById('before').onclick = function () { st.before = !st.before; syncButtons(); drawUI(); redraw(); };
+  document.getElementById('overlineBtn').onclick = function () {
+    st.overline = !st.overline;
+    this.setAttribute('aria-pressed', String(st.overline));
+    this.textContent = st.overline ? 'overlined' : 'overline';
+    st.before = false; syncButtons(); drawUI(); redraw();
+  };
   document.getElementById('hold').onclick = function () {
     if (st.mode !== 'live') return;
     if (!st.held) { holdC.width = W; holdC.height = H; hctx.drawImage(lastSrc && lastSrc.videoWidth ? lastSrc : video, 0, 0, W, H); st.held = true; redraw(); }
@@ -1029,9 +1108,21 @@ details.shoplist .shop { margin-top: 12px; }
     if (!c || !on.length) return;
     var have = lookFor(c, on);
     if (have) { st.openLook = have.id; stopLive(); showView('bag'); return; }
-    var look = saveLook(c, on);
-    document.getElementById('tryStatus').textContent = 'Saved “' + look.name + '” to your vanity.';
-    drawUI();
+    var snap = document.getElementById('snap'), num = document.getElementById('snapCount'), status = document.getElementById('tryStatus');
+    var reduce = false; try { reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) {}
+    st.snapping = true; drawUI();
+    status.textContent = 'Taking your photo. Hold the pose…';
+    var n = reduce ? 0 : 3;
+    function tick() {
+      if (n > 0) { snap.className = 'snap'; snap.hidden = false; num.textContent = n; n--; setTimeout(tick, 700); return; }
+      num.textContent = ''; snap.className = 'snap flash'; snap.hidden = false;
+      var look = saveLook(c, on);
+      setTimeout(function () { snap.hidden = true; snap.className = 'snap'; }, 450);
+      st.snapping = false;
+      status.textContent = 'Photo taken. Saved “' + look.name + '” to your vanity.' + (loadAcct() ? '' : ' Create an account in your vanity to keep it under your name.');
+      drawUI();
+    }
+    tick();
   };
 
   // ---------- vanity: every look you lock in, kept together ----------
@@ -1120,13 +1211,54 @@ details.shoplist .shop { margin-top: 12px; }
     st.show = {}; LAYERS.forEach(function (l) { st.show[l] = !!lk.pieces[l]; if (lk.pieces[l]) c.picks[l] = lk.pieces[l]; });
     c.edited = true; st.before = false; showView('tryon'); syncButtons(); drawUI(); redraw();
   }
+  // ---------- account: a name on your vanity (prototype: kept in this browser) ----------
+  var memAcct = null;
+  function loadAcct() { try { return JSON.parse(localStorage.getItem('lippy-account') || 'null') || memAcct; } catch (e) { return memAcct; } }
+  function storeAcct(a) { memAcct = a; try { if (a) localStorage.setItem('lippy-account', JSON.stringify(a)); else localStorage.removeItem('lippy-account'); } catch (e) {} }
+  function drawAcct() {
+    var box = document.getElementById('acct'), a = loadAcct(); box.textContent = '';
+    if (a) {
+      var out = el('button', { type: 'button', class: 'linkbtn', text: 'sign out' });
+      out.onclick = function () { storeAcct(null); drawBag(); };
+      box.appendChild(el('div', { class: 'row' }, [el('span', {}, [el('b', { text: 'signed in as ' + a.name }), el('span', { class: 'note', text: ' · ' + a.email })]), out]));
+      return;
+    }
+    if (!st.acctOpen) {
+      var open = el('button', { type: 'button', class: 'btn primary small', text: 'create an account' });
+      open.onclick = function () { st.acctOpen = true; drawAcct(); var f = document.getElementById('acName'); if (f) f.focus(); };
+      box.appendChild(el('div', { class: 'row' }, [el('span', {}, [el('b', { text: 'keep your vanity' }), el('span', { class: 'note', text: ' · make an account so your looks are saved under your name' })]), open]));
+      return;
+    }
+    var err = el('p', { class: 'err', id: 'acErr', role: 'alert' });
+    function fld(id, label, type, ac) { return el('label', { class: 'fld', for: id }, [label, el('input', { id: id, type: type, autocomplete: ac, required: 'required' })]); }
+    var form = el('form', { novalidate: 'novalidate' }, [
+      el('b', { text: 'create your account' }),
+      fld('acName', 'name', 'text', 'given-name'), fld('acEmail', 'email', 'email', 'email'), fld('acPass', 'password (6+ characters)', 'password', 'new-password'),
+      err,
+      el('button', { type: 'submit', class: 'btn primary wide', text: 'create account' }),
+      el('p', { class: 'note', text: 'Prototype: your account and looks are saved in this browser for now. Your password isn’t stored.' })
+    ]);
+    form.addEventListener('input', function () { err.textContent = ''; });
+    form.onsubmit = function (e) {
+      e.preventDefault();
+      var name = document.getElementById('acName').value.trim(), email = document.getElementById('acEmail').value.trim(), pass = document.getElementById('acPass').value;
+      if (!name) { err.textContent = 'Enter your name.'; document.getElementById('acName').focus(); return; }
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { err.textContent = 'Enter a valid email.'; document.getElementById('acEmail').focus(); return; }
+      if (pass.length < 6) { err.textContent = 'Use at least 6 characters for your password.'; document.getElementById('acPass').focus(); return; }
+      storeAcct({ name: name, email: email, at: Date.now() }); st.acctOpen = false; drawBag();
+    };
+    var cancel = el('button', { type: 'button', class: 'linkbtn', text: 'not now' });
+    cancel.onclick = function () { st.acctOpen = false; drawAcct(); };
+    box.appendChild(form); box.appendChild(cancel);
+  }
   function drawBag() {
+    drawAcct();
     var looks = loadLooks(), owned = loadOwned(), list = document.getElementById('bagList'); list.textContent = '';
     var lk = st.openLook && looks.filter(function (x) { return x.id === st.openLook; })[0];
     document.getElementById('bagBack').hidden = !!lk;
     if (lk) { drawLook(lk, owned, list); return; }
     st.openLook = null;
-    document.getElementById('vanityTitle').textContent = 'Your looks.';
+    var who = loadAcct(); document.getElementById('vanityTitle').textContent = who ? who.name + '’s looks.' : 'Your looks.';
     document.getElementById('bagProgress').textContent = looks.length ? looks.length + (looks.length === 1 ? ' look' : ' looks') + ' on your vanity. Tap one to get it.' : '';
     if (!looks.length) {
       var go = el('button', { type: 'button', class: 'btn primary', text: 'try something on' });
